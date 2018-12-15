@@ -13,6 +13,8 @@ import UserManage from './views/userManage' //用户管理
 import MenuManage from './views/menuManage' //菜单管理
 import RoleManage from './views/roleManage' //角色管理
 import PersonalCenter from './views/personalCenter' //个人中心
+import Reconciliation from './views/reconciliation' //对账信息
+import ContractAndInvoice from './views/contractAndInvoice' //合同和发票
 
 let routes = [
     {
@@ -100,16 +102,26 @@ let routes = [
             { path: '/roleManage', component: RoleManage, name: '角色管理' },
         ]
     },
-    // {
-    //     path: '/',
-    //     component: Home,
-    //     name: '',
-    //     iconCls: 'iconfont icon-yonghuguanli',
-    //     leaf: true,//只有一个节点
-    //     children: [
-    //         { path: '/menuManage', component: MenuManage, name: '菜单管理' }
-    //     ]
-    // },
+    {
+        path: '/',
+        component: Home,
+        name: '',
+        iconCls: 'iconfont icon-yonghuguanli',
+        leaf: true,//只有一个节点
+        children: [
+            { path: '/reconciliation', component: Reconciliation, name: '对账信息' }
+        ]
+    },
+    {
+        path: '/',
+        component: Home,
+        name: '',
+        iconCls: 'iconfont icon-yonghuguanli',
+        leaf: true,//只有一个节点
+        children: [
+            { path: '/contractAndInvoice', component: ContractAndInvoice, name: '合同和发票' }
+        ]
+    },
     {
         path: '/',
         component: Home,
