@@ -7,7 +7,7 @@
 					<el-input size="small" clearable v-model="filters.company_name" placeholder="公司名称"></el-input>
 				</el-form-item>
 				<el-form-item>
-					<el-button type="primary" size="small" v-on:click="getGatherList">查询</el-button>
+					<el-button type="primary" size="small" v-on:click="getTableList">查询</el-button>
 				</el-form-item>
 				<el-form-item>
 					<el-button type="primary" size="small" @click="handleAdd">新增</el-button>
@@ -16,57 +16,75 @@
 		</el-col>
 
 		<!--列表-->
-		<el-table :data="list" highlight-current-row v-loading="listLoading" style="width: 100%;">
+		<el-table :data="list" border highlight-current-row v-loading="listLoading" style="width: 100%;">
 			<!-- <el-table-column type="selection" width="55">
 			</el-table-column> -->
 			<el-table-column type="index" width="60">
 			</el-table-column>
-			<el-table-column prop="company_name" label="公司名称" width="200">
+			<el-table-column prop="company_name" label="公司名称" width="220" show-overflow-tooltip>
 			</el-table-column>
-			<el-table-column prop="area" label="销售区域">
+			<el-table-column prop="area" label="销售区域" width="100" show-overflow-tooltip>
 			</el-table-column>
-			<el-table-column prop="pay_time" label="收款时间" width="190">
+			<el-table-column prop="pay_time" label="收款时间" width="190" show-overflow-tooltip>
 			</el-table-column>
-			<el-table-column prop="customer_type" label="客户类型" width="100">
+			<el-table-column prop="customer_type" label="客户类型" width="100" show-overflow-tooltip>
 				<template slot-scope="scope">
 					<span v-if="scope.row.customer_type==0">渠道</span>
 					<span v-if="scope.row.customer_type==1">直客</span>
 				</template>
 			</el-table-column>
-			<el-table-column prop="company_industry" label="公司行业" width="100">
+			<el-table-column prop="audit_status" label="状态" width="100" show-overflow-tooltip>
+				<template slot-scope="scope">
+					<el-button type="info" size="small" plain v-if="scope.row.audit_status==0">未审核</el-button>
+					<el-button type="primary" size="small" plain v-if="scope.row.audit_status==1">审核中</el-button>
+					<el-button type="success" size="small" plain v-if="scope.row.audit_status==2">审核通过</el-button>
+					<el-button type="danger" size="small" plain v-if="scope.row.audit_status==3">审核拒绝</el-button>
+				</template>
 			</el-table-column>
-			<el-table-column prop="robot_number" label="机器人数量" width="100">
+			<el-table-column prop="company_industry" label="公司行业" width="100" show-overflow-tooltip>
 			</el-table-column>
-			<el-table-column prop="customer_clues" label="客户线索来源" width="100">
+			<el-table-column prop="robot_number" label="机器人数量" width="120" show-overflow-tooltip>
+			</el-table-column>
+			<el-table-column prop="customer_clues" label="客户线索来源" width="140" show-overflow-tooltip>
 				<template slot-scope="scope">
 					<span v-if="scope.row.customer_clues==0">SEM</span>
 					<span v-if="scope.row.customer_clues==1">公司</span>
+					<span v-if="scope.row.customer_clues==2">商务本身</span>
 				</template>
 			</el-table-column>
-			<el-table-column prop="business_itself" label="商务本身" width="100">
+			<!-- <el-table-column prop="business_itself" label="商务本身" width="100">
+			</el-table-column> -->
+			<el-table-column prop="number_pay_money" label="号码费" width="100" show-overflow-tooltip>
 			</el-table-column>
-			<el-table-column prop="number_pay_money" label="号码费收款金额" width="100">
+			<el-table-column prop="call_customer_pay_money" label="客户自备线路" width="160" show-overflow-tooltip>
 			</el-table-column>
-			<el-table-column prop="call_customer_pay_money" label="通信费客户自备线路收款金额" width="100">
+			<el-table-column prop="call_card_pay_money" label="通信费卡槽费" width="140" show-overflow-tooltip>
 			</el-table-column>
-			<el-table-column prop="call_card_pay_money" label="通信费卡槽费收款金额" width="100">
+			<el-table-column prop="call_year_pay_money" label="通信费包年正常" width="140" show-overflow-tooltip>
 			</el-table-column>
-			<el-table-column prop="call_year_pay_money" label="通信费包年正常收款金额" width="100">
+			<el-table-column prop="pay_voucher" label="打款凭证" width="200" show-overflow-tooltip>
+				<template slot-scope="scope">
+					<div class="tableImg" v-if="scope.row.pay_voucher">
+						<img v-for="(item,index) in scope.row.pay_voucher" class="smallImg" preview="2" :src="item" :key="index" alt="" style="width: 80px;height: 80px">
+					  <!-- <img class="bigImg" :src="scope.row.url" alt="">   -->
+					</div>
+				</template>
 			</el-table-column>
-			<el-table-column prop="robot_pay_money" label="机器人费收款金额" width="100">
+			<el-table-column prop="robot_pay_money" label="机器人费" width="100" show-overflow-tooltip>
 			</el-table-column>
-			<el-table-column prop="pay_type" label="付款方式" width="100">
+			<el-table-column prop="pay_type" label="付款方式" width="100" show-overflow-tooltip>
 			</el-table-column>
-			<el-table-column prop="refunds" label="是否返款" width="100">
+			<el-table-column prop="refunds" label="是否返款" width="100" show-overflow-tooltip>
 				<template slot-scope="scope">
 					<span v-if="scope.row.refunds==0">未返款</span>
 					<span v-if="scope.row.refunds==1">已返款</span>
 				</template>
 			</el-table-column>
-			<el-table-column prop="pay_voucher" label="打款凭证">
-			</el-table-column>
-			<el-table-column label="操作" fixed="right" width="150">
+			
+			<el-table-column label="操作" fixed="right" width="260">
 				<template slot-scope="scope">
+					<el-button v-if="scope.row.audit_status==0" size="small" @click="auditSubmit(scope.row)">提交审核</el-button>
+					<el-button v-if="scope.row.audit_status==3" size="small" @click="auditSubmit(scope.row)">重新提交</el-button>
 					<el-button size="small" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
 					<el-button type="danger" size="small" @click="handleDel(scope.$index, scope.row)">删除</el-button>
 				</template>
@@ -80,75 +98,90 @@
 		</el-col>
 
 		<!--编辑界面-->
-		<el-dialog title="编辑" v-model="editFormVisible" :close-on-click-modal="false">
-			<el-form :model="editForm" label-width="80px" :rules="editFormRules" ref="editForm">
-				<el-form-item label="公司名称" prop="company_name">
-					<el-input v-model="editForm.company_name" auto-complete="off"></el-input>
-				</el-form-item>
-				<el-form-item label="销售区域" prop="area">
-					<el-input v-model="editForm.area" auto-complete="off"></el-input>
-				</el-form-item>
-				<el-form-item label="收款时间">
-					<el-date-picker v-model="editForm.pay_time" @change="getEditPayTime" value-format="yyyy-MM-dd HH:mm:ss" type="datetime" placeholder="选择收款日期时间">
-					</el-date-picker>
-				</el-form-item>
-				<el-form-item label="客户类型">
-					<el-select v-model="editForm.customer_type" size="small" placeholder="客户类型">
-            <el-option label="直客" value="1"></el-option>
-            <el-option label="渠道" value="0"></el-option>
-          </el-select>
-				</el-form-item>
-				<el-form-item label="公司行业">
-					<el-input v-model="editForm.company_industry" auto-complete="off"></el-input>
-				</el-form-item>
-				<el-form-item label="机器人数量">
-					<el-input v-model="editForm.robot_number" auto-complete="off"></el-input>
-				</el-form-item>
-				<el-form-item label="客户线索来源">
-					<el-select v-model="editForm.customer_clues" size="small" placeholder="客户线索来源">
-            <el-option label="公司" value="1"></el-option>
-            <el-option label="SEM" value="0"></el-option>
-          </el-select>
-				</el-form-item>
-				<el-form-item label="商务本身">
-					<el-input v-model="editForm.business_itself" auto-complete="off"></el-input>
-				</el-form-item>
-				<el-form-item label="号码费收款金额">
-					<el-input v-model="editForm.number_pay_money" auto-complete="off"></el-input>
-				</el-form-item>
-				<!-- <div class="flex">
-					<el-form-item label="开始时间">
-						<el-date-picker v-model="editForm.start_date" @change="getEditPayTime" value-format="yyyy-MM-dd HH:mm:ss" type="datetime" placeholder="选择开始日期时间">
+		<el-dialog title="编辑" width="55%" :visible.sync="editFormVisible" :close-on-click-modal="false">
+			<el-form :model="editForm" label-width="120px" :rules="addFormRules" ref="editForm">
+				<div class="flex">
+					<el-form-item label="公司名称" prop="company_name">
+						<el-input v-model="editForm.company_name" auto-complete="off"></el-input>
+					</el-form-item>
+					<el-form-item label="销售区域" prop="area">
+						<el-input v-model="editForm.area" auto-complete="off"></el-input>
+					</el-form-item>
+				</div>
+				
+				<div class="flex">
+					<el-form-item label="公司行业" prop="company_industry">
+						<el-input v-model="editForm.company_industry" auto-complete="off"></el-input>
+					</el-form-item>
+					<el-form-item label="机器人数量" prop="robot_number">
+						<el-input v-model="editForm.robot_number" auto-complete="off"></el-input>
+					</el-form-item>
+				</div>
+				<div class="flex">
+					<el-form-item label="付款方式" prop="pay_type">
+						<el-input v-model="editForm.pay_type" auto-complete="off"></el-input>
+					</el-form-item>
+					
+					<el-form-item label="号码费" prop="number_pay_money">
+						<el-input v-model="editForm.number_pay_money" auto-complete="off"></el-input>
+					</el-form-item>
+				</div>
+				<div class="flex">
+					<el-form-item label="客户自备线路" prop="call_customer_pay_money">
+						<el-input v-model="editForm.call_customer_pay_money" auto-complete="off"></el-input>
+					</el-form-item>
+					<el-form-item label="通信费卡槽费" prop="call_card_pay_money">
+						<el-input v-model="editForm.call_card_pay_money" auto-complete="off"></el-input>
+					</el-form-item>
+				</div>
+				<div class="flex">
+					<el-form-item label="通信费包年正常" prop="call_year_pay_money">
+						<el-input v-model="editForm.call_year_pay_money" auto-complete="off"></el-input>
+					</el-form-item>
+					<el-form-item label="机器人费" prop="robot_pay_money">
+						<el-input v-model="editForm.robot_pay_money" auto-complete="off"></el-input>
+					</el-form-item>
+				</div>
+				<div class="flex">
+					<el-form-item label="收款时间" prop="pay_time">
+						<el-date-picker v-model="editForm.pay_time" @change="getEditPayTime" value-format="yyyy-MM-dd HH:mm:ss" type="datetime" placeholder="选择收款日期时间">
 						</el-date-picker>
 					</el-form-item>
-					<el-form-item label="关停时间">
-						<el-date-picker v-model="editForm.end_date"  @change="getEditETime" value-format="yyyy-MM-dd HH:mm:ss" type="datetime" placeholder="选择结束日期时间">
-						</el-date-picker>
+					<el-form-item label="客户类型" prop="customer_type">
+						<el-radio-group v-model="editForm.customer_type">
+							<el-radio label="1">直客</el-radio>
+							<el-radio label="0">渠道</el-radio>
+						</el-radio-group>
 					</el-form-item>
-				</div> -->
-				<el-form-item label="通信费客户自备线路收款金额">
-					<el-input v-model="editForm.call_customer_pay_money" auto-complete="off"></el-input>
-				</el-form-item>
-				<el-form-item label="通信费卡槽费收款金额">
-					<el-input v-model="editForm.call_card_pay_money" auto-complete="off"></el-input>
-				</el-form-item>
-				<el-form-item label="通信费包年正常收款金额">
-					<el-input v-model="editForm.call_year_pay_money" auto-complete="off"></el-input>
-				</el-form-item>
-				<el-form-item label="机器人费收款金额">
-					<el-input v-model="editForm.robot_pay_money" auto-complete="off"></el-input>
-				</el-form-item>
-				<el-form-item label="付款方式">
-					<el-input v-model="editForm.pay_type" auto-complete="off"></el-input>
-				</el-form-item>
-				<el-form-item label="是否返款">
-					<el-select v-model="editForm.refunds" size="small" placeholder="是否返款">
-            <el-option label="已返款" value="1"></el-option>
-            <el-option label="未返款" value="0"></el-option>
-          </el-select>
-				</el-form-item>
-				<el-form-item label="打款凭证">
-					<el-input v-model="editForm.pay_voucher" auto-complete="off"></el-input>
+				</div>
+				<div class="flex">
+					<el-form-item label="客户线索来源" prop="customer_clues">
+						<el-radio-group v-model="editForm.customer_clues" size="small">
+							<el-radio label="0">SEM</el-radio>
+							<el-radio label="1">公司</el-radio>
+							<el-radio label="2">商务本身</el-radio>
+						</el-radio-group>
+					</el-form-item>
+					<el-form-item label="是否返款" prop="refunds">
+						<el-radio-group v-model="editForm.refunds" size="small">
+							<el-radio label="1">已返款</el-radio>
+							<el-radio label="0">未返款</el-radio>
+						</el-radio-group>
+					</el-form-item>
+				</div>
+				<el-form-item label="打款凭证" prop="pay_voucher">
+					<!-- <el-input v-model="editForm.pay_voucher" auto-complete="off"></el-input> -->
+					<el-upload ref="editUpload"
+					           :headers="headers"
+					           :action="uploadUrl"
+										 :file-list="editFileList"
+										 list-type="picture-card"
+										 :before-upload="beforeUpload"
+										 :on-success="onEditSuccess"
+										 :on-preview="handlePictureCardPreview"
+										 :on-remove="handleEditRemove">
+						<i class="el-icon-plus"></i>
+					</el-upload>
 				</el-form-item>
 			</el-form>
 			<div slot="footer" class="dialog-footer">
@@ -158,75 +191,90 @@
 		</el-dialog>
 
 		<!--新增界面-->
-		<el-dialog title="新增" v-model="addFormVisible" :close-on-click-modal="false">
-			<el-form :model="addForm" label-width="80px" :rules="addFormRules" ref="addForm">
-				<el-form-item label="公司名称" prop="company_name">
-					<el-input v-model="addForm.company_name" auto-complete="off"></el-input>
-				</el-form-item>
-				<el-form-item label="销售区域" prop="area">
-					<el-input v-model="addForm.area" auto-complete="off"></el-input>
-				</el-form-item>
-				<el-form-item label="收款时间">
-					<el-date-picker v-model="addForm.pay_time" @change="getAddPayTime" value-format="yyyy-MM-dd HH:mm:ss" type="datetime" placeholder="选择收款日期时间">
-					</el-date-picker>
-				</el-form-item>
-				<el-form-item label="客户类型">
-					<el-select v-model="addForm.customer_type" size="small" placeholder="客户类型">
-            <el-option label="直客" value="1"></el-option>
-            <el-option label="渠道" value="0"></el-option>
-          </el-select>
-				</el-form-item>
-				<el-form-item label="公司行业">
-					<el-input v-model="addForm.company_industry" auto-complete="off"></el-input>
-				</el-form-item>
-				<el-form-item label="机器人数量">
-					<el-input v-model="addForm.robot_number" auto-complete="off"></el-input>
-				</el-form-item>
-				<el-form-item label="客户线索来源">
-					<el-select v-model="addForm.customer_clues" size="small" placeholder="客户线索来源">
-            <el-option label="公司" value="1"></el-option>
-            <el-option label="SEM" value="0"></el-option>
-          </el-select>
-				</el-form-item>
-				<el-form-item label="商务本身">
-					<el-input v-model="addForm.business_itself" auto-complete="off"></el-input>
-				</el-form-item>
-				<el-form-item label="号码费收款金额">
-					<el-input v-model="addForm.number_pay_money" auto-complete="off"></el-input>
-				</el-form-item>
-				<!-- <div class="flex">
-					<el-form-item label="开始时间">
-						<el-date-picker v-model="addForm.start_date" @change="getSTime" value-format="yyyy-MM-dd HH:mm:ss" type="datetime" placeholder="选择开始日期时间">
+		<el-dialog title="新增" width="55%" :visible.sync="addFormVisible" :close-on-click-modal="false">
+			<el-form :model="addForm" label-width="120px" :rules="addFormRules" ref="addForm">
+				<div class="flex">
+					<el-form-item label="公司名称" prop="company_name">
+						<el-input v-model="addForm.company_name" auto-complete="off"></el-input>
+					</el-form-item>
+					<el-form-item label="销售区域" prop="area">
+						<el-input v-model="addForm.area" auto-complete="off"></el-input>
+					</el-form-item>
+				</div>
+				
+				<div class="flex">
+					<el-form-item label="公司行业" prop="company_industry">
+						<el-input v-model="addForm.company_industry" auto-complete="off"></el-input>
+					</el-form-item>
+					<el-form-item label="机器人数量" prop="robot_number">
+						<el-input v-model="addForm.robot_number" auto-complete="off"></el-input>
+					</el-form-item>
+				</div>
+				
+				<div class="flex">
+					<el-form-item label="客户自备线路" prop="call_customer_pay_money">
+						<el-input v-model="addForm.call_customer_pay_money" auto-complete="off"></el-input>
+					</el-form-item>
+					<el-form-item label="通信费卡槽费" prop="call_card_pay_money">
+						<el-input v-model="addForm.call_card_pay_money" auto-complete="off"></el-input>
+					</el-form-item>
+				</div>
+				<div class="flex">
+					<el-form-item label="通信费包年正常" prop="call_year_pay_money">
+						<el-input v-model="addForm.call_year_pay_money" auto-complete="off"></el-input>
+					</el-form-item>
+					<el-form-item label="机器人费" prop="robot_pay_money">
+						<el-input v-model="addForm.robot_pay_money" auto-complete="off"></el-input>
+					</el-form-item>
+				</div>
+				<div class="flex">
+					<el-form-item label="付款方式" prop="pay_type">
+						<el-input v-model="addForm.pay_type" auto-complete="off"></el-input>
+					</el-form-item>
+					<el-form-item label="号码费" prop="number_pay_money">
+						<el-input v-model="addForm.number_pay_money" auto-complete="off"></el-input>
+					</el-form-item>
+				</div>
+				<div class="flex">
+					<el-form-item label="收款时间" prop="pay_time">
+						<el-date-picker v-model="addForm.pay_time" @change="getAddPayTime" value-format="yyyy-MM-dd HH:mm:ss" type="datetime" placeholder="选择收款日期时间">
 						</el-date-picker>
 					</el-form-item>
-					<el-form-item label="关停时间">
-						<el-date-picker v-model="addForm.end_date"  @change="getETime" value-format="yyyy-MM-dd HH:mm:ss" type="datetime" placeholder="选择结束日期时间">
-						</el-date-picker>
+					<el-form-item label="客户类型" prop="customer_type">
+						<el-radio-group v-model="addForm.customer_type">
+							<el-radio label="1">直客</el-radio>
+							<el-radio label="0">渠道</el-radio>
+						</el-radio-group>
 					</el-form-item>
-				</div> -->
-				<el-form-item label="通信费客户自备线路收款金额">
-					<el-input v-model="addForm.call_customer_pay_money" auto-complete="off"></el-input>
-				</el-form-item>
-				<el-form-item label="通信费卡槽费收款金额">
-					<el-input v-model="addForm.call_card_pay_money" auto-complete="off"></el-input>
-				</el-form-item>
-				<el-form-item label="通信费包年正常收款金额">
-					<el-input v-model="addForm.call_year_pay_money" auto-complete="off"></el-input>
-				</el-form-item>
-				<el-form-item label="机器人费收款金额">
-					<el-input v-model="addForm.robot_pay_money" auto-complete="off"></el-input>
-				</el-form-item>
-				<el-form-item label="付款方式">
-					<el-input v-model="addForm.pay_type" auto-complete="off"></el-input>
-				</el-form-item>
-				<el-form-item label="是否返款">
-					<el-select v-model="addForm.refunds" size="small" placeholder="是否返款">
-            <el-option label="已返款" value="1"></el-option>
-            <el-option label="未返款" value="0"></el-option>
-          </el-select>
-				</el-form-item>
-				<el-form-item label="打款凭证">
-					<el-input v-model="addForm.pay_voucher" auto-complete="off"></el-input>
+				</div>
+				<div class="flex">
+					<el-form-item label="客户线索来源" prop="customer_clues">
+						<el-radio-group v-model="addForm.customer_clues" size="small">
+							<el-radio label="0">SEM</el-radio>
+							<el-radio label="1">公司</el-radio>
+							<el-radio label="2">商务本身</el-radio>
+						</el-radio-group>
+					</el-form-item>
+					<el-form-item label="是否返款" prop="refunds">
+						<el-radio-group v-model="addForm.refunds" size="small">
+							<el-radio label="1">已返款</el-radio>
+							<el-radio label="0">未返款</el-radio>
+						</el-radio-group>
+					</el-form-item>
+				</div>
+				<el-form-item label="打款凭证" prop="pay_voucher">
+					<!-- <el-input v-model="addForm.pay_voucher" auto-complete="off"></el-input> -->
+					<el-upload ref="addUpload"
+					           :headers="headers"
+					           :action="uploadUrl"
+										 :file-list="fileList"
+										 list-type="picture-card"
+										 :before-upload="beforeUpload"
+										 :on-success="onSuccess"
+										 :on-preview="handlePictureCardPreview"
+										 :on-remove="handleRemove">
+						<i class="el-icon-plus"></i>
+					</el-upload>
 				</el-form-item>
 			</el-form>
 			<div slot="footer" class="dialog-footer">
@@ -234,11 +282,14 @@
 				<el-button type="primary" @click.native="addSubmit" :loading="addLoading">提交</el-button>
 			</div>
 		</el-dialog>
+		<el-dialog :visible.sync="previewDialogVisible">
+			<img width="100%" :src="dialogImageUrl" alt="">
+		</el-dialog>
 	</section>
 </template>
 
 <script>
-	import { getCompanyCollectionByParam, insertCompanyCollection, updateCompanyCollectionById, deleteCompanyCollectionById} from '../../api/api';
+	import { getCompanyCollectionByParam, insertCompanyCollection, updateCompanyCollectionById, deleteCompanyCollectionById, insertProcess} from '../../api/api';
 
 	export default {
 		data() {
@@ -264,15 +315,15 @@
 				editForm: {
 					company_name:'',
 					area:'',
-					pay_time:'',
 					customer_type:'',
 					company_industry:'',
 					robot_number:'',
+					pay_time:'',
 					customer_clues:'',
-					business_itself:'',
+					// business_itself:'',
 					number_pay_money:'',
-					start_date:'',
-					end_date:'',
+					// start_date:'',
+					// end_date:'',
 					call_customer_pay_money:'',
 					call_card_pay_money:'',
 					call_year_pay_money:'',
@@ -280,17 +331,36 @@
 					pay_type:'',
 					refunds:'',
 					pay_voucher:'',
+					del_pic:''
 				},
+				headers:{authorLoginId:JSON.parse(sessionStorage.getItem('user')).login_id},
+				uploadUrl:'api/clouddo-crm/upload/uploadFile',
+				fileList:[],
+				editFileList:[],
+				dialogImageUrl:'',
+				previewDialogVisible:false,
 
 				addFormVisible: false,//新增界面是否显示
 				addLoading: false,
 				addFormRules: {
-					company_name: [
-						{ required: true, message: '请输入姓名', trigger: 'blur' }
-					],
-					area: [
-						{ required: true, message: '请输入前缀', trigger: 'blur' }
-					],
+					company_name: [{ required: true, message: '请输入公司名称', trigger: 'blur' }],
+					area: [{ required: true, message: '请输入销售区域', trigger: 'blur' }],
+					pay_time: [{ required: true, message: '请输入收款时间', trigger: 'blur' }],
+					customer_type: [{ required: true, message: '请输入客户类型', trigger: 'blur' }],
+					company_industry: [{ required: true, message: '请输入公司行业', trigger: 'blur' }],
+					robot_number: [{ required: true, message: '请输入机器人数量', trigger: 'blur' }],
+					customer_clues: [{ required: true, message: '请输入客户线索来源', trigger: 'blur' }],
+					// business_itself: [{ required: true, message: '请输入商务本身', trigger: 'blur' }],
+					number_pay_money: [{ required: true, message: '请输入号码费', trigger: 'blur' }],
+					// start_date: [{ required: true, message: '请输入前缀', trigger: 'blur' }],
+					// end_date: [{ required: true, message: '请输入前缀', trigger: 'blur' }],
+					call_customer_pay_money: [{ required: true, message: '请输入通信费客户自备线路', trigger: 'blur' }],
+					call_card_pay_money: [{ required: true, message: '请输入通信费卡槽费', trigger: 'blur' }],
+					call_year_pay_money: [{ required: true, message: '请输入通信费包年正常', trigger: 'blur' }],
+					robot_pay_money: [{ required: true, message: '请输入机器人费', trigger: 'blur' }],
+					pay_type: [{ required: true, message: '请输入付款方式', trigger: 'blur' }],
+					refunds: [{ required: true, message: '请输入是否返款', trigger: 'blur' }],
+					pay_voucher: [{ required: true, message: '请输入打款凭证', trigger: 'blur' }],
 
 				},
 				//新增界面数据
@@ -303,10 +373,10 @@
 					company_industry:'',
 					robot_number:'',
 					customer_clues:'',
-					business_itself:'',
+					// business_itself:'',
 					number_pay_money:'',
-					start_date:'',
-					end_date:'',
+					// start_date:'',
+					// end_date:'',
 					call_customer_pay_money:'',
 					call_card_pay_money:'',
 					call_year_pay_money:'',
@@ -314,17 +384,18 @@
 					pay_type:'',
 					refunds:'',
 					pay_voucher:'',
-				}
+				},
+				delFiles:[]
 
 			}
 		},
 		methods: {
 			handleCurrentChange(val) {
 				this.page = val;
-				this.getGatherList();
+				this.getTableList();
 			},
 			//获取table列表
-			getGatherList() {
+			getTableList() {
 				const data = {
 					page: this.page,
 					rows:10,
@@ -333,9 +404,95 @@
 				this.listLoading = true;
 				getCompanyCollectionByParam(data).then((res) => {
 					this.total = res.result.records;
-					this.list = res.result.data;
+					// this.list = res.result.data;
+					this.list=res.result.data.map(item=>{
+						if(item.pay_voucher){
+							item.pay_voucher=item.pay_voucher.split(',');
+						};
+						return item;
+					})
 					this.listLoading = false;
 				});
+			},
+			beforeUpload(file){
+				const isJPG = file.type === 'image/jpeg';
+				const isGIF = file.type === 'image/gif';
+				const isPNG = file.type === 'image/png';
+				const isBMP = file.type === 'image/bmp';
+				const isLt2M = file.size / 1024 / 1024 < 2;
+
+				if (!isJPG && !isGIF && !isPNG && !isBMP) {
+					this.common.errorTip('上传图片必须是JPG/GIF/PNG/BMP 格式!');
+				}
+				if (!isLt2M) {
+					this.common.errorTip('上传图片大小不能超过 2MB!');
+				}
+				return (isJPG || isBMP || isGIF || isPNG) && isLt2M;
+			},
+			onSuccess(response, file, fileList){
+				let files=[];
+				fileList.forEach(item=>{
+					if(item.response &&item.response.result){
+						files.push(item.response.result)
+					}
+				})
+				this.addForm.pay_voucher=files.join(',')
+			},
+			onEditSuccess(response, file, fileList){
+				let files=[];
+				fileList.forEach(item=>{
+					if(item.response &&item.response.result){
+						files.push(item.response.result)
+					}else if(item.url){
+						files.push(item.url);
+					}
+				})
+				this.editForm.pay_voucher=files.join(',')
+			},
+			handleRemove(file, fileList) {
+				let files=[];
+				fileList.forEach(item=>{
+					if(item.response &&item.response.result){
+						files.push(item.response.result)
+					}
+				})
+				this.addForm.pay_voucher=files.join(',')
+			},
+			handleEditRemove(file,fileList){
+				let files=[];
+				this.delFiles.push(file.url);
+				fileList.forEach(item=>{
+					if(item.response &&item.response.result){
+						files.push(item.response.result)
+					}else if(item.url){
+						files.push(item.url);
+					}
+				})
+				this.editForm.pay_voucher=files.join(',')
+				this.editForm.del_pic=this.delFiles.join(',')
+			},
+			//上传照片预览
+			handlePictureCardPreview(file) {
+        this.dialogImageUrl = file.url;
+        this.previewDialogVisible = true;
+			},
+			//提交审核
+			auditSubmit(row){
+				const data={
+					type:'1',
+					type_id:row.id
+				};
+				insertProcess(data).then(res=>{
+					this.$message({
+						message: res.errMsg,
+						type: 'success'
+					});
+					this.getTableList();
+				})
+			},
+			//重新提交审核
+			resubmit(row){
+				
 			},
 			//删除
 			handleDel(index, row) {
@@ -350,7 +507,7 @@
 							message: res.errMsg,
 							type: 'success'
 						});
-						this.getGatherList();
+						this.getTableList();
 					});
 				}).catch(() => {
 
@@ -360,6 +517,13 @@
 			handleEdit(index, row) {
 				this.editFormVisible = true;
 				this.editForm = Object.assign({}, row);
+				if(row.pay_voucher){
+					this.editFileList=row.pay_voucher.map(item=>{
+						let obj={};
+						obj['url']=item;
+						return obj;
+				  })
+				}
 			},
 			//显示新增界面
 			handleAdd() {
@@ -372,43 +536,52 @@
 					company_industry:'',
 					robot_number:'',
 					customer_clues:'',
-					business_itself:'',
+					// business_itself:'',
 					number_pay_money:'',
-					start_date:'',
-					end_date:'',
+					// start_date:'',
+					// end_date:'',
 					call_customer_pay_money:'',
 					call_card_pay_money:'',
 					call_year_pay_money:'',
 				};
+				this.fileList=[];
 			},
 			//编辑
 			editSubmit() {
-				this.editLoading = true;
-				const data = Object.assign({}, this.editForm);
-				updateCompanyCollectionById(data).then((res) => {
-					this.editLoading = false;
-					this.$message({
-						message: res.errMsg,
-						type: 'success'
-					});
-					this.$refs['editForm'].resetFields();
-					this.editFormVisible = false;
-					this.getGatherList();
+				this.$refs.editForm.validate((valid) => {
+					if (valid) {
+						this.editLoading = true;
+						const data = Object.assign({}, this.editForm);
+						updateCompanyCollectionById(data).then((res) => {
+							this.editLoading = false;
+							this.$message({
+								message: res.errMsg,
+								type: 'success'
+							});
+							this.$refs['editForm'].resetFields();
+							this.editFormVisible = false;
+							this.getTableList();
+						});
+					};
 				});
 			},
 			//新增
 			addSubmit() {
-				this.addLoading = true;
-				const data = Object.assign({}, this.addForm);
-				insertCompanyCollection(data).then((res) => {
-					this.addLoading = false;
-					this.$message({
-						message: res.errMsg,
-						type: 'success'
-					});
-					this.$refs['addForm'].resetFields();
-					this.addFormVisible = false;
-					this.getGatherList();
+				this.$refs.addForm.validate((valid) => {
+					if (valid) {
+						this.addLoading = true;
+						const data = Object.assign({}, this.addForm);
+						insertCompanyCollection(data).then((res) => {
+							this.addLoading = false;
+							this.$message({
+								message: res.errMsg,
+								type: 'success'
+							});
+							this.$refs['addForm'].resetFields();
+							this.addFormVisible = false;
+							this.getTableList();
+						});
+					};
 				});
 			},
 			getSTime(val){
@@ -425,7 +598,7 @@
 			}
 		},
 		mounted() {
-			this.getGatherList();
+			this.getTableList();
 		}
 	}
 
@@ -435,5 +608,13 @@
 .flex{
 	display: flex;
 	flex-direction: row;
+	justify-content: space-between;
+}
+.tableImg{
+	position: relative;
+}
+.tableImg .smallImg{
+	width: 100%;
+	max-height: 100%;
 }
 </style>

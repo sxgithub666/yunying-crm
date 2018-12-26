@@ -2,7 +2,8 @@ import babelpolyfill from 'babel-polyfill'
 import Vue from 'vue'
 import App from './App'
 import ElementUI from 'element-ui'
-import 'element-ui/lib/theme-default/index.css'
+import 'element-ui/lib/theme-chalk/index.css'
+// import 'element-ui/lib/theme-default/index.css'
 //import './assets/theme/theme-green/index.css'
 import VueRouter from 'vue-router'
 import store from './vuex/store'
@@ -13,11 +14,15 @@ import './assets/iconfonts/iconfont.css'
 // Mock.bootstrap();
 import 'font-awesome/css/font-awesome.min.css'
 import ZkTable from 'vue-table-with-tree-grid' 
+import preview from 'vue-photo-preview'
+import 'vue-photo-preview/dist/skin.css'
+
 
 Vue.use(ElementUI)
 Vue.use(VueRouter)
 Vue.use(Vuex)
 Vue.use(ZkTable)
+Vue.use(preview)
 
 
 //NProgress.configure({ showSpinner: false });

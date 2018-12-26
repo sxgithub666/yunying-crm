@@ -16,14 +16,14 @@
 		</el-col>
 
 		<!--列表-->
-		<el-table :data="list" highlight-current-row v-loading="listLoading" style="width: 100%;">
+		<el-table :data="list" border highlight-current-row v-loading="listLoading" style="width: 100%;">
 			<!-- <el-table-column type="selection" width="55">
 			</el-table-column> -->
 			<el-table-column type="index" width="60">
 			</el-table-column>
 			<el-table-column prop="customer_name" label="客户名称" width="100">
 			</el-table-column>
-			<el-table-column prop="reconciliation_time" label="对账时间" width="100">
+			<el-table-column prop="reconciliation_time" label="对账时间" width="180">
 			</el-table-column>
 			<el-table-column prop="income" label="收入" width="100">
 			</el-table-column>
@@ -33,17 +33,9 @@
 			</el-table-column>
 			<el-table-column prop="balance" label="余额" width="100">
 			</el-table-column>
-			<el-table-column prop="invoice_state" label="是否开票" width="180">
-        <template slot-scope="scope">
-					<span v-if="scope.row.invoice_state==0">未开票</span>
-					<span v-else>已开票</span>
-				</template>
-			</el-table-column>
-			<el-table-column prop="special_ticket" label="专票普票" width="180">
-			</el-table-column>
 			<el-table-column prop="amount_adjustment" label="调整金额" width="180">
 			</el-table-column>
-			<el-table-column prop="tax_point" label="税点" width="180">
+			<el-table-column prop="pay_record" label="缴费记录" width="180">
 			</el-table-column>
 			<el-table-column prop="remark" label="备注" width="180">
 			</el-table-column>
@@ -62,7 +54,7 @@
 		</el-col>
 
 		<!--编辑界面-->
-		<el-dialog title="编辑" v-model="editFormVisible" :close-on-click-modal="false">
+		<el-dialog title="编辑" :visible.sync="editFormVisible" :close-on-click-modal="false">
 			<el-form :model="editForm" label-width="80px" :rules="editFormRules" ref="editForm">
 				<el-form-item label="客户名称" prop="customer_name">
 					<el-input v-model="editForm.customer_name" auto-complete="off"></el-input>
@@ -83,20 +75,11 @@
 				<el-form-item label="余额">
 					<el-input v-model="editForm.balance" auto-complete="off"></el-input>
 				</el-form-item>
-				<el-form-item label="是否开票">
-          <el-radio-group v-model="editForm.invoice_state">
-						<el-radio :label="1">已开票</el-radio>
-						<el-radio :label="0">未开票</el-radio>
-					</el-radio-group>
-				</el-form-item>
-				<el-form-item label="专票普票">
-					<el-input v-model="editForm.special_ticket" auto-complete="off"></el-input>
-				</el-form-item>
 				<el-form-item label="调整金额">
 					<el-input v-model="editForm.amount_adjustment" auto-complete="off"></el-input>
 				</el-form-item>
-				<el-form-item label="税点">
-					<el-input v-model="editForm.tax_point" auto-complete="off"></el-input>
+				<el-form-item label="缴费记录">
+					<el-input v-model="editForm.pay_record" auto-complete="off"></el-input>
 				</el-form-item>
 				<el-form-item label="备注">
 					<el-input v-model="editForm.remark" auto-complete="off"></el-input>
@@ -109,7 +92,7 @@
 		</el-dialog>
 
 		<!--新增界面-->
-		<el-dialog title="新增" v-model="addFormVisible" :close-on-click-modal="false">
+		<el-dialog title="新增" :visible.sync="addFormVisible" :close-on-click-modal="false">
 			<el-form :model="addForm" label-width="80px" :rules="addFormRules" ref="addForm">
 				<el-form-item label="客户名称" prop="customer_name">
 					<el-input v-model="addForm.customer_name" auto-complete="off"></el-input>
@@ -132,20 +115,11 @@
 				<el-form-item label="余额">
 					<el-input v-model="addForm.balance" auto-complete="off"></el-input>
 				</el-form-item>
-				<el-form-item label="是否开票">
-          <el-radio-group v-model="addForm.invoice_state">
-						<el-radio :label="1">已开票</el-radio>
-						<el-radio :label="0">未开票</el-radio>
-					</el-radio-group>
-				</el-form-item>
-				<el-form-item label="专票普票">
-					<el-input v-model="addForm.special_ticket" auto-complete="off"></el-input>
-				</el-form-item>
 				<el-form-item label="调整金额">
 					<el-input v-model="addForm.amount_adjustment" auto-complete="off"></el-input>
 				</el-form-item>
-				<el-form-item label="税点">
-					<el-input v-model="addForm.tax_point" auto-complete="off"></el-input>
+				<el-form-item label="缴费记录">
+					<el-input v-model="addForm.pay_record" auto-complete="off"></el-input>
 				</el-form-item>
 				<el-form-item label="备注">
 					<el-input v-model="addForm.remark" auto-complete="off"></el-input>
@@ -192,10 +166,8 @@
 					reconciliation_cost:'',
 					account_name:'',
 					balance:'',
-					invoice_state:'',
-					special_ticket:'',
 					amount_adjustment:'',
-					tax_point:'',
+					pay_record:'',
 					remark:'',
 				},
 
@@ -218,10 +190,8 @@
 					reconciliation_cost:'',
 					account_name:'',
 					balance:'',
-					invoice_state:'',
-					special_ticket:'',
 					amount_adjustment:'',
-					tax_point:'',
+					pay_record:'',
 					remark:'',
 				}
 

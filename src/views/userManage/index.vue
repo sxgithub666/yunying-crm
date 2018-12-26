@@ -25,10 +25,7 @@
 		</el-col>
 
 		<!--列表-->
-		<el-table :data="users" 
-							highlight-current-row 
-							v-loading="listLoading"
-							style="width: 100%;">
+		<el-table :data="users" border highlight-current-row v-loading="listLoading" style="width: 100%;">
 			<el-table-column type="index" width="60">
 			</el-table-column>
 			<el-table-column prop="login_id" label="登录名" sortable>
@@ -37,12 +34,13 @@
 			</el-table-column>
 			<el-table-column prop="role_name" label="角色" sortable>
 			</el-table-column>
-			<!-- <el-table-column prop="mobile" label="手机号" sortable>
+			<!-- <el-table-column prop="password" label="密码" sortable>
 			</el-table-column>
 			<el-table-column prop="email" label="邮箱" sortable>
 			</el-table-column> -->
-			<el-table-column label="操作" width="150">
+			<el-table-column label="操作" width="260">
 				<template slot-scope="scope">
+					<el-button size="small" @click="initPwd(scope.$index, scope.row)">初始化密码</el-button>
 					<el-button size="small" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
 					<el-button type="danger" size="small" @click="handleDel(scope.$index, scope.row)">删除</el-button>
 				</template>
@@ -56,20 +54,25 @@
 		</el-col>
 
 		<!--编辑界面-->
-		<el-dialog title="编辑" v-model="editFormVisible" :close-on-click-modal="false">
+		<el-dialog title="编辑" :visible.sync="editFormVisible" :close-on-click-modal="false">
 			<el-form :model="editForm" label-width="80px" :rules="editFormRules" ref="editForm">
 				<el-form-item label="用户名" prop="user_name">
 					<el-input v-model="editForm.user_name" auto-complete="off"></el-input>
 				</el-form-item>
-				<el-form-item label="手机号">
-					<el-input v-model="editForm.mobile"></el-input>
+				<el-form-item label="密码">
+					<el-input v-model="editForm.password"></el-input>
 				</el-form-item>
 				<el-form-item label="角色" prop="role_id">
-					<el-checkbox-group v-model="editForm.role_id">
+					<el-radio-group v-model="editForm.role_id">
+						<el-radio  v-for="role in rolesList" :label="role.id" :key="role.id">
+							{{role.role_name}}
+						</el-radio>
+					</el-radio-group>
+					<!-- <el-checkbox-group v-model="editForm.role_id">
 						<el-checkbox class="checkbox" v-for="role in rolesList" :label="role.id" :key="role.id">
 							{{role.role_name}}
 						</el-checkbox>
-					</el-checkbox-group>
+					</el-checkbox-group> -->
 				</el-form-item>
 			</el-form>
 			<div slot="footer" class="dialog-footer">
@@ -79,7 +82,7 @@
 		</el-dialog>
 
 		<!--新增界面-->
-		<el-dialog title="新增" v-model="addFormVisible" :close-on-click-modal="false">
+		<el-dialog title="新增" :visible.sync="addFormVisible" :close-on-click-modal="false">
 			<el-form :model="addForm" label-width="80px" :rules="addFormRules" ref="addForm">
 				<el-form-item label="登录名" prop="login_id">
 					<el-input v-model="addForm.login_id" auto-complete="off"></el-input>
@@ -87,15 +90,20 @@
 				<el-form-item label="姓名" prop="user_name">
 					<el-input v-model="addForm.user_name" auto-complete="off"></el-input>
 				</el-form-item>
-				<el-form-item label="手机号">
-					<el-input v-model="addForm.mobile"></el-input>
+				<el-form-item label="密码">
+					<el-input v-model="addForm.password"></el-input>
 				</el-form-item>
 				<el-form-item label="角色" prop="role_id">
-					<el-checkbox-group v-model="addForm.role_id">
+					<el-radio-group v-model="addForm.role_id">
+						<el-radio  v-for="role in rolesList" :label="role.id" :key="role.id">
+							{{role.role_name}}
+						</el-radio>
+					</el-radio-group>
+					<!-- <el-checkbox-group v-model="addForm.role_id">
 						<el-checkbox class="checkbox" v-for="role in rolesList" :label="role.id" :key="role.id">
 							{{role.role_name}}
 						</el-checkbox>
-					</el-checkbox-group>
+					</el-checkbox-group> -->
 				</el-form-item>
 			</el-form>
 			<div slot="footer" class="dialog-footer">
@@ -108,7 +116,7 @@
 
 <script>
 	import util from '@/common/js/util'
-	import { getUserInfoByParam, deleteUserInfoById, updateUserInfoById, insertUserInfo ,getRoleInfoByParam} from '@/api/api';
+	import { getUserInfoByParam,getUserInfoById, deleteUserInfoById, updateUserInfoById, insertUserInfo ,getRoleInfoByParam} from '@/api/api';
 
 	export default {
 		data() {
@@ -134,8 +142,8 @@
 				//编辑界面数据
 				editForm: {
 					user_name: '',
-					mobile: '',
-					role_id:[]
+					password: '',
+					role_id:''
 				},
 				isAdmin:false,
 				addFormVisible: false,//新增界面是否显示
@@ -148,9 +156,9 @@
 				addForm: {
 					login_id:'',
 					user_name: '',
-					mobile: '',
+					password: '',
 					email: '',
-					role_id:[]
+					role_id:''
 				},
 				rolesList:[]
 
@@ -209,6 +217,29 @@
 
 				});
 			},
+			//初始化密码
+			initPwd(index,row){
+				this.$confirm('确认初始化密码吗?', '提示', {
+					type: 'warning'
+				}).then(() => {
+					this.listLoading = true;
+					const data = { 
+						login_id:row.login_id,
+						user_name:row.user_name,
+						role_name:row.role_name
+					 };
+					updateUserInfoById(data).then((res) => {
+						this.listLoading = false;
+						this.$message({
+							message: res.errMsg,
+							type: 'success'
+						});
+						this.getUsers();
+					});
+				}).catch(() => {
+
+				});
+			},
 			//显示编辑界面
 			handleEdit(index, row) {
 				this.editFormVisible = true;
@@ -235,8 +266,8 @@
 				this.addForm = {
 					login_id:'',
 					user_name: '',
-					mobile: '',
-					role_id:[]
+					password: '',
+					role_id:''
 				};
 			},
 			//新增

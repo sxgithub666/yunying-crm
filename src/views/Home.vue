@@ -16,13 +16,13 @@
 				<span class="title">运营部管理系统</span>
 			</el-col>
 			<el-col :span="4" class="userinfo">
-				<el-badge :is-dot="true" class="badge">
+				<!-- <el-badge :is-dot="true" class="badge">
 					<i class="message iconfont icon-tongzhi"></i>
-				</el-badge>
+				</el-badge> -->
 				<el-dropdown trigger="hover">
 					<span class="el-dropdown-link userinfo-inner">您好, {{sysUserName}}</span>
 					<el-dropdown-menu slot="dropdown">
-						<el-dropdown-item>个人中心</el-dropdown-item>
+						<el-dropdown-item @click.native="goBacklog">待办事项</el-dropdown-item>
 						<el-dropdown-item divided @click.native="logout">退出登录</el-dropdown-item>
 					</el-dropdown-menu>
 				</el-dropdown>
@@ -110,6 +110,10 @@
 				//console.log('handleclose');
 			},
 			handleselect: function (a, b) {
+			},
+			//待办事项
+			goBacklog(){
+				this.$router.push('/backlog')
 			},
 			//退出登录
 			logout: function () {
@@ -272,6 +276,15 @@
 				width: 160px;
 				.el-menu.el-menu-vertical-demo{
 					width: 100%!important;
+					background: #f2f2f2;
+				}
+				.el-menu.el-menu--inline{
+					background: #f2f2f2;
+				}
+				.el-menu-item:focus, 
+				.el-menu-item:hover,
+				.el-submenu__title:hover{
+					background: #eee;
 				}
 			}
 			.content-container {

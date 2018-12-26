@@ -66,4 +66,10 @@ body {
 .fade-leave-active {
 	opacity: 0;
 }
+.pswp{
+	z-index: 4000!important;
+}
+img{
+	cursor: pointer;
+}
 </style>

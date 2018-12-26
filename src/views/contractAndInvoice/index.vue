@@ -16,25 +16,41 @@
 		</el-col>
 
 		<!--列表-->
-		<el-table :data="list" highlight-current-row v-loading="listLoading" style="width: 100%;">
+		<el-table :data="list" border highlight-current-row v-loading="listLoading" style="width: 100%;">
 			<!-- <el-table-column type="selection" width="55">
 			</el-table-column> -->
 			<el-table-column type="index" width="60">
 			</el-table-column>
-			<el-table-column prop="company_name" label="公司名称" width="100">
+			<el-table-column prop="company_name" label="公司名称">
 			</el-table-column>
-			<el-table-column prop="invoice" label="是否开票" width="180">
+			<el-table-column prop="invoice" label="是否开票">
         <template slot-scope="scope">
 					<span v-if="scope.row.invoice==0">未开票</span>
-					<span v-else>已开票</span>
+					<span v-if="scope.row.invoice==1">已开票</span>
 				</template>
 			</el-table-column>
-			<el-table-column prop="scan_file" label="双方盖章扫描件" width="180">
-			</el-table-column>
-			<el-table-column prop="remark" label="备注" width="180">
-			</el-table-column>
-			<el-table-column label="操作" fixed="right" width="150">
+			<el-table-column prop="audit_status" label="状态" width="100" show-overflow-tooltip>
 				<template slot-scope="scope">
+					<el-button type="info" size="small" plain v-if="scope.row.audit_status==0">未审核</el-button>
+					<el-button type="primary" size="small" plain v-if="scope.row.audit_status==1">审核中</el-button>
+					<el-button type="success" size="small" plain v-if="scope.row.audit_status==2">审核通过</el-button>
+					<el-button type="danger" size="small" plain v-if="scope.row.audit_status==3">审核拒绝</el-button>
+				</template>
+			</el-table-column>
+			<el-table-column prop="scan_file" label="双方盖章扫描件" width="210">
+				<template slot-scope="scope">
+					<div class="tableImg" v-if="scope.row.scan_file">
+						<img v-for="(item,index)  in scope.row.scan_file" preview="0" class="smallImg" :src="item" :key="index" alt="" style="width: 40px;height: 40px;margin-right:5px;">
+					  <!-- <img class="bigImg" :src="scope.row.url" alt="">   -->
+					</div>
+				</template>
+			</el-table-column>
+			<el-table-column prop="remark" label="备注">
+			</el-table-column>
+			<el-table-column label="操作" fixed="right" width="260">
+				<template slot-scope="scope">
+					<el-button v-if="scope.row.audit_status==0" size="small" @click="auditSubmit(scope.row)">提交审核</el-button>
+					<el-button v-if="scope.row.audit_status==3" size="small" @click="auditSubmit(scope.row)">重新提交</el-button>
 					<el-button size="small" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
 					<el-button type="danger" size="small" @click="handleDel(scope.$index, scope.row)">删除</el-button>
 				</template>
@@ -48,19 +64,29 @@
 		</el-col>
 
 		<!--编辑界面-->
-		<el-dialog title="编辑" v-model="editFormVisible" :close-on-click-modal="false">
-			<el-form :model="editForm" label-width="80px" :rules="editFormRules" ref="editForm">
+		<el-dialog title="编辑" :visible.sync="editFormVisible" :close-on-click-modal="false">
+			<el-form :model="editForm" label-width="130px" :rules="editFormRules" ref="editForm">
 				<el-form-item label="公司名称" prop="company_name">
 					<el-input v-model="editForm.company_name" auto-complete="off"></el-input>
 				</el-form-item>
 				<el-form-item label="是否开票">
           <el-radio-group v-model="editForm.invoice">
-						<el-radio :label="1">已开票</el-radio>
-						<el-radio :label="0">未开票</el-radio>
+						<el-radio label="1">已开票</el-radio>
+						<el-radio label="0">未开票</el-radio>
 					</el-radio-group>
 				</el-form-item>
 				<el-form-item label="双方盖章扫描件">
-					<el-input v-model="editForm.scan_file" auto-complete="off"></el-input>
+					<el-upload ref="editUpload"
+					           :headers="headers"
+					           :action="uploadUrl"
+										 :file-list="editFileList"
+										 list-type="picture-card"
+										 :before-upload="beforeUpload"
+										 :on-success="onEditSuccess"
+										 :on-preview="handlePictureCardPreview"
+										 :on-remove="handleEditRemove">
+						<i class="el-icon-plus"></i>
+					</el-upload>
 				</el-form-item>
 				<el-form-item label="备注">
 					<el-input v-model="editForm.remark" auto-complete="off"></el-input>
@@ -73,19 +99,31 @@
 		</el-dialog>
 
 		<!--新增界面-->
-		<el-dialog title="新增" v-model="addFormVisible" :close-on-click-modal="false">
-			<el-form :model="addForm" label-width="80px" :rules="addFormRules" ref="addForm">
+		<el-dialog title="新增" :visible.sync="addFormVisible" :close-on-click-modal="false">
+			<el-form :model="addForm" label-width="130px" :rules="addFormRules" ref="addForm">
 				<el-form-item label="公司名称" prop="company_name">
 					<el-input v-model="addForm.company_name" auto-complete="off"></el-input>
 				</el-form-item>
 				<el-form-item label="是否开票">
           <el-radio-group v-model="addForm.invoice">
-						<el-radio :label="1">已开票</el-radio>
-						<el-radio :label="0">未开票</el-radio>
+						<el-radio label="1">已开票</el-radio>
+						<el-radio label="0">未开票</el-radio>
 					</el-radio-group>
 				</el-form-item>
 				<el-form-item label="双方盖章扫描件">
-					<el-input v-model="addForm.scan_file" auto-complete="off"></el-input>
+					<el-upload ref="addUpload"
+					           :headers="headers"
+					           :action="uploadUrl"
+										 :file-list="fileList"
+										 list-type="picture-card"
+										 :before-upload="beforeUpload"
+										 :on-success="onSuccess"
+										 :on-preview="handlePictureCardPreview"
+										 :on-remove="handleRemove">
+						<i class="el-icon-plus"></i>
+					</el-upload>
+					
+					<!-- <el-input v-model="addForm.scan_file" auto-complete="off"></el-input> -->
 				</el-form-item>
 				<el-form-item label="备注">
 					<el-input v-model="addForm.remark" auto-complete="off"></el-input>
@@ -97,11 +135,14 @@
 				<el-button type="primary" @click.native="addSubmit" :loading="addLoading">提交</el-button>
 			</div>
 		</el-dialog>
+		<el-dialog :visible.sync="previewDialogVisible">
+			<img width="100%" :src="dialogImageUrl" alt="">
+		</el-dialog>
 	</section>
 </template>
 
 <script>
-	import { getContractProcessByParam, insertContractProcess, updateContractProcessById, deleteContractProcessById} from '../../api/api';
+	import { getContractProcessByParam, insertContractProcess, updateContractProcessById, deleteContractProcessById, insertProcess } from '../../api/api';
 
 	export default {
 		data() {
@@ -130,6 +171,7 @@
 					invoice:'',
 					scan_file:'',
 					remark:'',
+					del_pic:''
 				},
 
 				addFormVisible: false,//新增界面是否显示
@@ -149,8 +191,15 @@
 					invoice:'',
 					scan_file:'',
 					remark:'',
-				}
-
+				},
+				dialogImageUrl: '',
+				previewDialogVisible: false,
+				headers:{authorLoginId:JSON.parse(sessionStorage.getItem('user')).login_id},
+				uploadUrl:'api/clouddo-crm/upload/uploadFile',
+				fileList:[],
+				editFileList:[],
+				formDate:'',
+				delFiles:[]
 			}
 		},
 		methods: {
@@ -169,9 +218,100 @@
 				this.listLoading = true;
 				getContractProcessByParam(data).then((res) => {
 					this.total = res.result.records;
-					this.list = res.result.data;
+					this.list=res.result.data.map(item=>{
+						if(item.scan_file){
+							item.scan_file=item.scan_file.split(',');
+						};
+						return item;
+					})
 					this.listLoading = false;
 				});
+			},
+			uploadFile(file){
+				this.formDate.append('file', file.file);
+			},
+			beforeUpload(file){
+				const isJPG = file.type === 'image/jpeg';
+				const isGIF = file.type === 'image/gif';
+				const isPNG = file.type === 'image/png';
+				const isBMP = file.type === 'image/bmp';
+				const isLt2M = file.size / 1024 / 1024 < 2;
+
+				if (!isJPG && !isGIF && !isPNG && !isBMP) {
+					this.common.errorTip('上传图片必须是JPG/GIF/PNG/BMP 格式!');
+				}
+				if (!isLt2M) {
+					this.common.errorTip('上传图片大小不能超过 2MB!');
+				}
+				return (isJPG || isBMP || isGIF || isPNG) && isLt2M;
+			},
+			onSuccess(response, file, fileList){
+				console.log(fileList);
+				let files=[];
+				fileList.forEach(item=>{
+					if(item.response &&item.response.result){
+						files.push(item.response.result)
+					}
+				})
+				this.addForm.scan_file=files.join(',')
+			},
+			onEditSuccess(response, file, fileList){
+				console.log(fileList);
+				
+				let files=[];
+				fileList.forEach(item=>{
+					if(item.response &&item.response.result){
+						files.push(item.response.result)
+					}else if(item.url){
+						files.push(item.url);
+					}
+				})
+				this.editForm.scan_file=files.join(',')
+			},
+			handleRemove(file, fileList) {
+				let files=[];
+				fileList.forEach(item=>{
+					if(item.response &&item.response.result){
+						files.push(item.response.result)
+					}
+				})
+				this.addForm.scan_file=files.join(',')
+			},
+			handleEditRemove(file,fileList){
+				let files=[];
+				this.delFiles.push(file.url);
+				fileList.forEach(item=>{
+					if(item.response &&item.response.result){
+						files.push(item.response.result)
+					}else if(item.url){
+						files.push(item.url);
+					}
+				})
+				this.editForm.scan_file=files.join(',')
+				this.editForm.del_pic=this.delFiles.join(',')
+			},
+			//上传照片预览
+			handlePictureCardPreview(file) {
+        this.dialogImageUrl = file.url;
+        this.previewDialogVisible = true;
+			},
+			//提交审核
+			auditSubmit(row){
+				const data={
+					type:'2',
+					type_id:row.id
+				};
+				insertProcess(data).then(res=>{
+					this.$message({
+						message: res.errMsg,
+						type: 'success'
+					});
+					this.getTableList();
+				})
+			},
+			//重新提交审核
+			resubmit(row){
+				
 			},
 			//删除
 			handleDel(index, row) {
@@ -196,6 +336,14 @@
 			handleEdit(index, row) {
 				this.editFormVisible = true;
 				this.editForm = Object.assign({}, row);
+				if(row.scan_file){
+					this.editFileList=row.scan_file.map(item=>{
+						let obj={};
+						obj['url']=item;
+						return obj;
+				  })
+				}
+				
 			},
 			//显示新增界面
 			handleAdd() {
@@ -210,6 +358,7 @@
 					start_date:'',
 					end_date:'',
 				};
+				this.fileList=[];
 			},
 			//编辑
 			editSubmit() {
@@ -223,6 +372,7 @@
 					});
 					this.$refs['editForm'].resetFields();
 					this.editFormVisible = false;
+					this.delFiles=[];
 					this.getTableList();
 				});
 			},
@@ -230,6 +380,8 @@
 			addSubmit() {
 				this.addLoading = true;
 				const data = Object.assign({}, this.addForm);
+				console.log(this.fileList);
+				this.$refs.addUpload.submit();
 				insertContractProcess(data).then((res) => {
 					this.addLoading = false;
 					this.$message({
@@ -240,6 +392,7 @@
 					this.addFormVisible = false;
 					this.getTableList();
 				});
+				
 			},
 			getAddTime(val){
 				this.addForm.reconciliation_time=val;
@@ -261,4 +414,26 @@
 	display: flex;
 	flex-direction: row;
 }
+.tableImg{
+	position: relative;
+}
+.tableImg .smallImg{
+	width: 100%;
+	max-height: 100%;
+}
+/* .tableImg:hover .bigImg{
+	display: block;
+} */
+/* .tableImg .bigImg{
+	position: absolute;
+	top:0;
+	left: 200;
+	display: none;
+	z-index: 9999;
+	max-width: 450px;
+	max-height: 450px;
+	transition: all .3s ease;
+	outline:1px solid #eaeaea;
+	outline-offset:0px;
+} */
 </style>

@@ -1,7 +1,7 @@
 <template>
   <div class="login">
     <div class="loginbg">
-      <img src="../assets/images/bg1.jpg">
+      <img src="../assets/images/bg3.jpg">
     </div>
     <div class="loginForm">
       <el-form class="demo-ruleForm login-container" :model="ruleForm" :rules="rules" ref="ruleForm" label-position="left" label-width="0px">
@@ -58,6 +58,13 @@
       handleReset() {
         this.$refs.ruleForm.resetFields();
       },
+      createCompare(property){
+        return function(a,b){
+          var value1 = a[property];
+          var value2 = b[property];
+          return value1-value2;
+        }
+      },
       handleSubmit(ev) {
         var _this = this;
         this.$refs.ruleForm.validate((valid) => {
@@ -71,6 +78,7 @@
               if (errCode !== "200") {
                 this.$message({ message: errMsg, type: 'error' });
               } else {
+                result.userMenu=result.userMenu.sort(this.createCompare('order_num'));
                 sessionStorage.setItem('user', JSON.stringify(result.userInfo));
                 sessionStorage.setItem('menu', JSON.stringify(result.userMenu));
                 const path = result.userMenu[0].url;
@@ -132,14 +140,17 @@
       margin: 180px auto;
       width: 350px;
       padding: 35px 35px 15px 35px;
-      background: #fff;
-      border: 1px solid #eaeaea;
+      // background: #fff;
+      // border: 1px solid #eaeaea;
       box-shadow: 0 0 25px #cac6c6;
       .title {
-        font-size: 18px;
+        font-size: 20px;
+        font-family: SimSun;
         margin: 0px auto 40px auto;
         text-align: center;
-        color: #505458;
+        // color: #505458;
+        color: #fff;
+        letter-spacing: 2px;
       }
       .remember {
         margin: 0px 0px 35px 0px;

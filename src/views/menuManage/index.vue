@@ -34,7 +34,7 @@
       </template>
    </zk-table>
    <!--新增一级菜单-->
-		<el-dialog title="新增" v-model="addOneFormVisible" :close-on-click-modal="false">
+		<el-dialog title="新增" :visible.sync="addOneFormVisible" :close-on-click-modal="false">
 			<el-form :model="addOneForm" label-width="80px" ref="editForm">
 				<el-form-item label="名称" prop="name">
 					<el-input v-model="addOneForm.name" auto-complete="off"></el-input>
@@ -44,12 +44,15 @@
 				</el-form-item>
 				<el-form-item label="类型">
 					<el-radio-group v-model="addOneForm.type">
-						<el-radio class="radio" :label="1">菜单</el-radio>
-						<el-radio class="radio" :label="0">目录</el-radio>
+						<el-radio class="radio" label="1">菜单</el-radio>
+						<el-radio class="radio" label="0">目录</el-radio>
 					</el-radio-group>
 				</el-form-item>
         <el-form-item label="图标" prop="url">
 					<el-input v-model="addOneForm.icon" auto-complete="off"></el-input>
+				</el-form-item>
+        <el-form-item label="序号" prop="order_num">
+					<el-input v-model="addOneForm.order_num" auto-complete="off"></el-input>
 				</el-form-item>
 			</el-form>
 			<div slot="footer" class="dialog-footer">
@@ -58,7 +61,7 @@
 			</div>
 		</el-dialog>
    <!--编辑界面-->
-		<el-dialog title="编辑" v-model="editFormVisible" :close-on-click-modal="false">
+		<el-dialog title="编辑" :visible.sync="editFormVisible" :close-on-click-modal="false">
 			<el-form :model="editForm" label-width="80px" ref="editForm">
 				<el-form-item label="名称" prop="name">
 					<el-input v-model="editForm.name" auto-complete="off"></el-input>
@@ -68,12 +71,15 @@
 				</el-form-item>
 				<el-form-item label="类型">
 					<el-radio-group v-model="editForm.type">
-						<el-radio class="radio" :label="1">菜单</el-radio>
-						<el-radio class="radio" :label="0">目录</el-radio>
+						<el-radio class="radio" label="1">菜单</el-radio>
+						<el-radio class="radio" label="0">目录</el-radio>
 					</el-radio-group>
 				</el-form-item>
         <el-form-item label="图标" prop="url">
 					<el-input v-model="editForm.icon" auto-complete="off"></el-input>
+				</el-form-item>
+        <el-form-item label="序号" prop="order_num">
+					<el-input v-model="editForm.order_num" auto-complete="off"></el-input>
 				</el-form-item>
 			</el-form>
 			<div slot="footer" class="dialog-footer">
@@ -83,7 +89,7 @@
 		</el-dialog>
 
 		<!--新增界面-->
-		<el-dialog title="新增" v-model="addFormVisible" :close-on-click-modal="false">
+		<el-dialog title="新增" :visible.sync="addFormVisible" :close-on-click-modal="false">
 			<el-form :model="addForm" label-width="80px" ref="addForm">
 				<el-form-item label="名称" prop="name">
 					<el-input v-model="addForm.name" auto-complete="off"></el-input>
@@ -93,12 +99,15 @@
 				</el-form-item>
 				<el-form-item label="类型">
 					<el-radio-group v-model="addForm.type">
-						<el-radio class="radio" :label="1">菜单</el-radio>
-						<el-radio class="radio" :label="0">目录</el-radio>
+						<el-radio class="radio" label="1">菜单</el-radio>
+						<el-radio class="radio" label="0">目录</el-radio>
 					</el-radio-group>
 				</el-form-item>
         <el-form-item label="图标" prop="url">
 					<el-input v-model="addForm.icon" auto-complete="off"></el-input>
+				</el-form-item>
+        <el-form-item label="序号" prop="order_num">
+					<el-input v-model="addForm.order_num" auto-complete="off"></el-input>
 				</el-form-item>
 			</el-form>
 			<div slot="footer" class="dialog-footer">
@@ -165,19 +174,22 @@
           name:'',
           url:'',
           type:'',
-          icon:''
+          icon:'',
+          order_num:''
         },
         editForm:{
           name:'',
           url:'',
           type:'',
-          icon:''
+          icon:'',
+          order_num:''
         },
         addForm:{
           name:'',
           url:'',
           type:'',
-          icon:''
+          icon:'',
+          order_num:''
         },
         addId:''
       };
@@ -197,8 +209,17 @@
       getMenuList(){
         const data={};
         getMenuList(data).then(res=>{
-          this.data=res.result.data;
+          if(res.result && res.result.data.length>0){
+            this.data=res.result.data.sort(this.createCompare('order_num'));
+          }
         })
+      },
+      createCompare(property){
+        return function(a,b){
+          var value1 = a[property];
+          var value2 = b[property];
+          return value1-value2;
+        }
       },
       //新增一级菜单显示
       handleAddOne(){

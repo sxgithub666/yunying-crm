@@ -15,6 +15,8 @@ import RoleManage from './views/roleManage' //角色管理
 import PersonalCenter from './views/personalCenter' //个人中心
 import Reconciliation from './views/reconciliation' //对账信息
 import ContractAndInvoice from './views/contractAndInvoice' //合同和发票
+import SystemParam from './views/systemParam' //系统参数
+import Backlog from './views/backlog' //系统参数
 
 let routes = [
     {
@@ -75,31 +77,12 @@ let routes = [
         path: '/',
         component: Home,
         name: '',
-        iconCls: 'iconfont icon-hetong6',
-        leaf: true,//只有一个节点
-        children: [
-            { path: '/contract', component: Contract, name: '合同' }
-        ]
-    },
-    {
-        path: '/',
-        component: Home,
-        name: '',
-        iconCls: 'iconfont icon-fapiao1',
-        leaf: true,//只有一个节点
-        children: [
-            { path: '/invoice', component: Invoice, name: '发票' }
-        ]
-    },
-    {
-        path: '/',
-        component: Home,
-        name: '',
         iconCls: 'iconfont icon-yonghuguanli',
         children: [
             { path: '/userManage', component: UserManage, name: '用户管理' },
             { path: '/menuManage', component: MenuManage, name: '菜单管理' },
             { path: '/roleManage', component: RoleManage, name: '角色管理' },
+            { path: '/systemParam', component: SystemParam, name: '系统参数管理' },
         ]
     },
     {
@@ -119,7 +102,17 @@ let routes = [
         iconCls: 'iconfont icon-yonghuguanli',
         leaf: true,//只有一个节点
         children: [
-            { path: '/contractAndInvoice', component: ContractAndInvoice, name: '合同和发票' }
+            { path: '/contractAndInvoice', component: ContractAndInvoice, name: '合同发票' }
+        ]
+    },
+    {
+        path: '/',
+        component: Home,
+        name: '',
+        iconCls: 'iconfont icon-yonghuguanli',
+        leaf: true,//只有一个节点
+        children: [
+            { path: '/backlog', component: Backlog, name: '待办事项' }
         ]
     },
     {

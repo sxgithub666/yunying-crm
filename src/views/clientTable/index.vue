@@ -7,7 +7,7 @@
 					<el-input size="small" clearable v-model="filters.customer_name" placeholder="客户名称"></el-input>
 				</el-form-item>
 				<el-form-item>
-					<el-button type="primary" size="small" v-on:click="getClientList">查询</el-button>
+					<el-button type="primary" size="small" v-on:click="getTableList">查询</el-button>
 				</el-form-item>
 				<el-form-item>
 					<el-button type="primary" size="small" @click="handleAdd">新增</el-button>
@@ -16,7 +16,7 @@
 		</el-col>
 
 		<!--列表-->
-		<el-table :data="list" highlight-current-row v-loading="listLoading" style="width: 100%;">
+		<el-table :data="list" border highlight-current-row v-loading="listLoading" style="width: 100%;">
 			<!-- <el-table-column type="selection" width="55">
 			</el-table-column> -->
 			<el-table-column type="index" width="60">
@@ -29,6 +29,14 @@
 			</el-table-column>
 			<el-table-column prop="industry" label="行业" width="100">
 			</el-table-column>
+			<el-table-column prop="audit_status" label="状态" width="100" show-overflow-tooltip>
+				<template slot-scope="scope">
+					<el-button type="info" size="small" plain v-if="scope.row.audit_status==0">未审核</el-button>
+					<el-button type="primary" size="small" plain v-if="scope.row.audit_status==1">审核中</el-button>
+					<el-button type="success" size="small" plain v-if="scope.row.audit_status==2">审核通过</el-button>
+					<el-button type="danger" size="small" plain v-if="scope.row.audit_status==3">审核拒绝</el-button>
+				</template>
+			</el-table-column>
 			<el-table-column prop="number_charges" label="号码费" width="100">
 			</el-table-column>>
 			<el-table-column prop="charges" label="通信资费" width="100">
@@ -37,8 +45,10 @@
 			</el-table-column>
 			<el-table-column prop="end_date" label="关停时间" width="180">
 			</el-table-column>
-			<el-table-column label="操作" fixed="right" width="150">
+			<el-table-column label="操作" fixed="right" width="260">
 				<template slot-scope="scope">
+					<el-button v-if="scope.row.audit_status==0" size="small" @click="auditSubmit(scope.row)">提交审核</el-button>
+					<el-button v-if="scope.row.audit_status==3" size="small" @click="auditSubmit(scope.row)">重新提交</el-button>
 					<el-button size="small" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
 					<el-button type="danger" size="small" @click="handleDel(scope.$index, scope.row)">删除</el-button>
 				</template>
@@ -52,26 +62,32 @@
 		</el-col>
 
 		<!--编辑界面-->
-		<el-dialog title="编辑" v-model="editFormVisible" :close-on-click-modal="false">
+		<el-dialog title="编辑" :visible.sync="editFormVisible" :close-on-click-modal="false">
 			<el-form :model="editForm" label-width="80px" :rules="editFormRules" ref="editForm">
-				<el-form-item label="前缀" prop="prefix">
-					<el-input v-model="editForm.prefix" auto-complete="off"></el-input>
-				</el-form-item>
-				<el-form-item label="客户名称" prop="customer_name">
-					<el-input v-model="editForm.customer_name" auto-complete="off"></el-input>
-				</el-form-item>
-				<el-form-item label="业务归属">
-				  <el-input v-model="editForm.belong" auto-complete="off"></el-input>
-				</el-form-item>
-				<el-form-item label="行业">
-					<el-input v-model="editForm.industry" auto-complete="off"></el-input>
-				</el-form-item>
-				<el-form-item label="号码费">
-					<el-input v-model="editForm.number_charges" auto-complete="off"></el-input>
-				</el-form-item>
-				<el-form-item label="通信资费">
-					<el-input v-model="editForm.charges" auto-complete="off"></el-input>
-				</el-form-item>
+				<div class="flex">
+					<el-form-item label="前缀" prop="prefix">
+						<el-input v-model="editForm.prefix" auto-complete="off"></el-input>
+					</el-form-item>
+					<el-form-item label="客户名称" prop="customer_name">
+						<el-input v-model="editForm.customer_name" auto-complete="off"></el-input>
+					</el-form-item>
+				</div>
+				<div class="flex">
+					<el-form-item label="业务归属">
+						<el-input v-model="editForm.belong" auto-complete="off"></el-input>
+					</el-form-item>
+					<el-form-item label="行业">
+						<el-input v-model="editForm.industry" auto-complete="off"></el-input>
+					</el-form-item>
+				</div>
+				<div class="flex">
+					<el-form-item label="号码费">
+						<el-input v-model="editForm.number_charges" auto-complete="off"></el-input>
+					</el-form-item>
+					<el-form-item label="通信资费">
+						<el-input v-model="editForm.charges" auto-complete="off"></el-input>
+					</el-form-item>
+				</div>
 				<div class="flex">
 					<el-form-item label="开始时间">
 						<el-date-picker v-model="editForm.start_date" @change="getEditTime" value-format="yyyy-MM-dd HH:mm:ss" type="datetime" placeholder="选择开始日期时间">
@@ -90,27 +106,33 @@
 		</el-dialog>
 
 		<!--新增界面-->
-		<el-dialog title="新增" v-model="addFormVisible" :close-on-click-modal="false">
+		<el-dialog title="新增" :visible.sync="addFormVisible" :close-on-click-modal="false">
 			<el-form :model="addForm" label-width="80px" :rules="addFormRules" ref="addForm">
-				<el-form-item label="前缀" prop="prefix">
-					<el-input v-model="addForm.prefix" auto-complete="off"></el-input>
-				</el-form-item>
-				<el-form-item label="客户名称" prop="customer_name">
-					<el-input v-model="addForm.customer_name" auto-complete="off"></el-input>
-				</el-form-item>
-				<el-form-item label="业务归属">
-					<el-input v-model="addForm.belong" auto-complete="off"></el-input>
-				</el-form-item>
-				<el-form-item label="行业">
-					<el-input v-model="addForm.industry" auto-complete="off"></el-input>
-				</el-form-item>
-				<el-form-item label="号码费">
-					<el-input v-model="addForm.number_charges" auto-complete="off"></el-input>
-				</el-form-item>
-				</el-form-item>
-				<el-form-item label="通信资费">
-					<el-input v-model="addForm.charges" auto-complete="off"></el-input>
-				</el-form-item>
+				<div class="flex">
+					<el-form-item label="前缀" prop="prefix">
+						<el-input v-model="addForm.prefix" auto-complete="off"></el-input>
+					</el-form-item>
+					<el-form-item label="客户名称" prop="customer_name">
+						<el-input v-model="addForm.customer_name" auto-complete="off"></el-input>
+					</el-form-item>
+				</div>
+				<div class="flex">
+					<el-form-item label="业务归属">
+						<el-input v-model="addForm.belong" auto-complete="off"></el-input>
+					</el-form-item>
+					<el-form-item label="行业">
+						<el-input v-model="addForm.industry" auto-complete="off"></el-input>
+					</el-form-item>
+				</div>
+				<div class="flex">
+					<el-form-item label="号码费">
+						<el-input v-model="addForm.number_charges" auto-complete="off"></el-input>
+					</el-form-item>
+					</el-form-item>
+					<el-form-item label="通信资费">
+						<el-input v-model="addForm.charges" auto-complete="off"></el-input>
+					</el-form-item>
+				</div>
 				<div class="flex">
 					<el-form-item label="开始时间">
 						<el-date-picker v-model="addForm.start_date" @change="getSTime" value-format="yyyy-MM-dd HH:mm:ss" type="datetime" placeholder="选择开始日期时间">
@@ -131,7 +153,7 @@
 </template>
 
 <script>
-	import { getCustomerListByParam, insertCustomer, updateCustomerById, deleteCustomerById} from '../../api/api';
+	import { getCustomerListByParam, insertCustomer, updateCustomerById, deleteCustomerById, insertProcess} from '../../api/api';
 
 	export default {
 		data() {
@@ -194,10 +216,10 @@
 		methods: {
 			handleCurrentChange(val) {
 				this.page = val;
-				this.getClientList();
+				this.getTableList();
 			},
 			//获取table列表
-			getClientList() {
+			getTableList() {
 				const data = {
 					role_id:this.role_id,
 					page: this.page,
@@ -210,6 +232,24 @@
 					this.list = res.result.data;
 					this.listLoading = false;
 				});
+			},
+			//提交审核
+			auditSubmit(row){
+				const data={
+					type:'5',
+					type_id:row.id
+				};
+				insertProcess(data).then(res=>{
+					this.$message({
+						message: res.errMsg,
+						type: 'success'
+					});
+					this.getTableList();
+				})
+			},
+			//重新提交审核
+			resubmit(row){
+
 			},
 			//删除
 			handleDel(index, row) {
@@ -224,7 +264,7 @@
 							message: res.errMsg,
 							type: 'success'
 						});
-						this.getClientList();
+						this.getTableList();
 					});
 				}).catch(() => {
 
@@ -261,7 +301,7 @@
 					});
 					this.$refs['editForm'].resetFields();
 					this.editFormVisible = false;
-					this.getClientList();
+					this.getTableList();
 				});
 			},
 			//新增
@@ -276,7 +316,7 @@
 					});
 					this.$refs['addForm'].resetFields();
 					this.addFormVisible = false;
-					this.getClientList();
+					this.getTableList();
 				});
 			},
 			getSTime(val){
@@ -294,7 +334,7 @@
 		},
 		mounted() {
 			this.role_id=JSON.parse(sessionStorage.getItem('user')).role_id; 
-			this.getClientList();
+			this.getTableList();
 		}
 	}
 
@@ -304,5 +344,6 @@
 .flex{
 	display: flex;
 	flex-direction: row;
+	justify-content: space-between;
 }
 </style>

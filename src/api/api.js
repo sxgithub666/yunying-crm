@@ -23,7 +23,7 @@ axios.interceptors.request.use(
 // 添加一个响应拦截器
 axios.interceptors.response.use(function (response) {
   if (typeof response.data.errCode != undefined && response.data.errCode != 0) {
-    if (response.data.errCode == 300 || response.data.status || response.data.errCode === 503 || response.data.errCode === 506 || response.data.errCode === 404) {
+    if (response.data.errCode !="200") {
       Message({
         showClose: true,
         message: response.data.errMsg || '网络有误，请稍后重试',
@@ -43,8 +43,8 @@ axios.interceptors.response.use(function (response) {
   return Promise.reject(error);
 });
 
-let base = 'http://192.168.0.77:8081';
-// let base = 'http://192.168.0.216:8081';
+// let base = 'http://192.168.0.77:8091';
+let base = '/api/clouddo-crm';
 
 const POST = (url, params) => {
   return axios.post(`${base}${url}`, params).then(res => res.data)
@@ -57,6 +57,9 @@ export const login = params => {
 //用户管理页面
 export const getUserInfoByParam = params => {
   return POST('/userInfo/getUserInfoByParam', params)
+};
+export const getUserInfoById = params => {
+  return POST('/userInfo/getUserInfoById', params)
 };
 export const insertUserInfo = params => {
   return POST('/userInfo/insertUserInfo', params)
@@ -94,6 +97,9 @@ export const updateChannelById = params => {
 export const deleteChannelById = params => {
   return POST('/channel/deleteChannelById', params)
 };
+export const getChannelById = params => {
+  return POST('/channel/getChannelById', params)
+};
 
 //收款信息
 export const getCompanyCollectionByParam = params => {
@@ -108,6 +114,9 @@ export const updateCompanyCollectionById = params => {
 export const deleteCompanyCollectionById = params => {
   return POST('/collection/deleteCompanyCollectionById', params)
 };
+export const getCompanyCollectionById = params => {
+  return POST('/collection/getCompanyCollectionById', params)
+};
 
 //客户信息
 export const getCustomerListByParam = params => {
@@ -121,6 +130,9 @@ export const updateCustomerById = params => {
 };
 export const deleteCustomerById = params => {
   return POST('/customer/deleteCustomerById', params)
+};
+export const getCustomerById = params => {
+  return POST('/customer/getCustomerById', params)
 };
 
 //角色管理
@@ -158,6 +170,9 @@ export const updateXsznProcessById = params => {
 export const deleteXsznProcessById = params => {
   return POST('/xszn/deleteXsznProcessById', params)
 };
+export const getXsznProcessById = params => {
+  return POST('/xszn/getXsznProcessById', params)
+};
 
 //小水总机pass
 export const getZjPaasProcessByParam = params => {
@@ -171,6 +186,9 @@ export const updateZjPaasProcessById = params => {
 };
 export const deleteZjPaasProcessById = params => {
   return POST('/zjpaas/deleteZjPaasProcessById', params)
+};
+export const getZjPaasProcessById = params => {
+  return POST('/zjpaas/getZjPaasProcessById', params)
 };
 
 //财务对账信息
@@ -199,4 +217,38 @@ export const updateContractProcessById = params => {
 };
 export const deleteContractProcessById = params => {
   return POST('/contract/deleteContractProcessById', params)
+};
+export const getContractProcessById = params => {
+  return POST('/contract/getContractProcessById', params)
+};
+
+//系统参数管理
+
+export const getSystemParamByParam = params => {
+  return POST('/param/getSystemParamByParam', params)
+};
+export const insertSystemParam = params => {
+  return POST('/param/insertSystemParam', params)
+};
+export const updateSystemParamById = params => {
+  return POST('/param/updateSystemParamById', params)
+};
+export const deleteSystemParamById = params => {
+  return POST('/param/deleteSystemParamById', params)
+};
+
+//新增提交审核
+export const insertProcess = params => {
+  return POST('/process/insertProcess', params)
+};
+
+//待办事项
+export const getProcessByParam = params => {
+  return POST('/process/getProcessListByParam', params)
+};
+export const updateProcessById = params => {
+  return POST('/process/updateProcessById', params)
+};
+export const deleteProcessById = params => {
+  return POST('/process/deleteProcessById', params)
 };
