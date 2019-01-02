@@ -7,6 +7,9 @@
 					<el-input size="small" clearable v-model="filters.customer_name" placeholder="客户名称"></el-input>
 				</el-form-item>
 				<el-form-item>
+					<el-input size="small" clearable v-model="filters.user_name" placeholder="销售名称"></el-input>
+				</el-form-item>
+				<el-form-item>
 					<el-button type="primary" size="small" v-on:click="getTableList">查询</el-button>
 				</el-form-item>
 				<el-form-item>
@@ -43,12 +46,14 @@
 			</el-table-column>
 			<el-table-column prop="start_date" label="开通时间" width="180">
 			</el-table-column>
+			<el-table-column prop="user_name" label="所属销售" width="180">
+			</el-table-column>
 			<el-table-column prop="end_date" label="关停时间" width="180">
 			</el-table-column>
 			<el-table-column label="操作" fixed="right" width="260">
 				<template slot-scope="scope">
 					<el-button v-if="scope.row.audit_status==0" size="small" @click="auditSubmit(scope.row)">提交审核</el-button>
-					<el-button v-if="scope.row.audit_status==3" size="small" @click="auditSubmit(scope.row)">重新提交</el-button>
+					<el-button v-if="scope.row.audit_status==3" size="small" @click="resubmit(scope.row)">重新提交</el-button>
 					<el-button size="small" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
 					<el-button type="danger" size="small" @click="handleDel(scope.$index, scope.row)">删除</el-button>
 				</template>
@@ -66,34 +71,34 @@
 			<el-form :model="editForm" label-width="80px" :rules="editFormRules" ref="editForm">
 				<div class="flex">
 					<el-form-item label="前缀" prop="prefix">
-						<el-input v-model="editForm.prefix" auto-complete="off"></el-input>
+						<el-input v-model="editForm.prefix" clearable auto-complete="off"></el-input>
 					</el-form-item>
 					<el-form-item label="客户名称" prop="customer_name">
-						<el-input v-model="editForm.customer_name" auto-complete="off"></el-input>
+						<el-input v-model="editForm.customer_name" clearable auto-complete="off"></el-input>
 					</el-form-item>
 				</div>
 				<div class="flex">
-					<el-form-item label="业务归属">
-						<el-input v-model="editForm.belong" auto-complete="off"></el-input>
+					<el-form-item label="业务归属" prop="belong">
+						<el-input v-model="editForm.belong" clearable auto-complete="off"></el-input>
 					</el-form-item>
-					<el-form-item label="行业">
-						<el-input v-model="editForm.industry" auto-complete="off"></el-input>
-					</el-form-item>
-				</div>
-				<div class="flex">
-					<el-form-item label="号码费">
-						<el-input v-model="editForm.number_charges" auto-complete="off"></el-input>
-					</el-form-item>
-					<el-form-item label="通信资费">
-						<el-input v-model="editForm.charges" auto-complete="off"></el-input>
+					<el-form-item label="行业" prop="industry">
+						<el-input v-model="editForm.industry" clearable auto-complete="off"></el-input>
 					</el-form-item>
 				</div>
 				<div class="flex">
-					<el-form-item label="开始时间">
+					<el-form-item label="号码费" prop="number_charges">
+						<el-input v-model="editForm.number_charges" clearable auto-complete="off"></el-input>
+					</el-form-item>
+					<el-form-item label="通信资费" prop="charges">
+						<el-input v-model="editForm.charges" clearable auto-complete="off"></el-input>
+					</el-form-item>
+				</div>
+				<div class="flex">
+					<el-form-item label="开始时间" prop="start_date">
 						<el-date-picker v-model="editForm.start_date" @change="getEditTime" value-format="yyyy-MM-dd HH:mm:ss" type="datetime" placeholder="选择开始日期时间">
 						</el-date-picker>
 					</el-form-item>
-					<el-form-item label="关停时间">
+					<el-form-item label="关停时间" prop="end_date">
 						<el-date-picker v-model="editForm.end_date"  @change="getEditETime" value-format="yyyy-MM-dd HH:mm:ss" type="datetime" placeholder="选择结束日期时间">
 						</el-date-picker>
 					</el-form-item>
@@ -107,38 +112,38 @@
 
 		<!--新增界面-->
 		<el-dialog title="新增" :visible.sync="addFormVisible" :close-on-click-modal="false">
-			<el-form :model="addForm" label-width="80px" :rules="addFormRules" ref="addForm">
+			<el-form :model="addForm" label-width="80px" :rules="editFormRules" ref="addForm">
 				<div class="flex">
 					<el-form-item label="前缀" prop="prefix">
-						<el-input v-model="addForm.prefix" auto-complete="off"></el-input>
+						<el-input v-model="addForm.prefix" clearable auto-complete="off"></el-input>
 					</el-form-item>
 					<el-form-item label="客户名称" prop="customer_name">
-						<el-input v-model="addForm.customer_name" auto-complete="off"></el-input>
+						<el-input v-model="addForm.customer_name" clearable auto-complete="off"></el-input>
 					</el-form-item>
 				</div>
 				<div class="flex">
-					<el-form-item label="业务归属">
-						<el-input v-model="addForm.belong" auto-complete="off"></el-input>
+					<el-form-item label="业务归属" prop="belong">
+						<el-input v-model="addForm.belong" clearable auto-complete="off"></el-input>
 					</el-form-item>
-					<el-form-item label="行业">
-						<el-input v-model="addForm.industry" auto-complete="off"></el-input>
-					</el-form-item>
-				</div>
-				<div class="flex">
-					<el-form-item label="号码费">
-						<el-input v-model="addForm.number_charges" auto-complete="off"></el-input>
-					</el-form-item>
-					</el-form-item>
-					<el-form-item label="通信资费">
-						<el-input v-model="addForm.charges" auto-complete="off"></el-input>
+					<el-form-item label="行业" prop="industry">
+						<el-input v-model="addForm.industry" clearable auto-complete="off"></el-input>
 					</el-form-item>
 				</div>
 				<div class="flex">
-					<el-form-item label="开始时间">
+					<el-form-item label="号码费" prop="number_charges">
+						<el-input v-model="addForm.number_charges" clearable auto-complete="off"></el-input>
+					</el-form-item>
+					</el-form-item>
+					<el-form-item label="通信资费" prop="charges">
+						<el-input v-model="addForm.charges" clearable auto-complete="off"></el-input>
+					</el-form-item>
+				</div>
+				<div class="flex">
+					<el-form-item label="开始时间" prop="start_date">
 						<el-date-picker v-model="addForm.start_date" @change="getSTime" value-format="yyyy-MM-dd HH:mm:ss" type="datetime" placeholder="选择开始日期时间">
 						</el-date-picker>
 					</el-form-item>
-					<el-form-item label="关停时间">
+					<el-form-item label="关停时间" prop="end_date">
 						<el-date-picker v-model="addForm.end_date"  @change="getETime" value-format="yyyy-MM-dd HH:mm:ss" type="datetime" placeholder="选择结束日期时间">
 						</el-date-picker>
 					</el-form-item>
@@ -159,7 +164,8 @@
 		data() {
 			return {
 				filters: {
-					customer_name: ''
+					customer_name: '',
+					user_name:''
 				},
 				role_id:'',
 				list: [],
@@ -169,12 +175,14 @@
 				editFormVisible: false,//编辑界面是否显示
 				editLoading: false,
 				editFormRules: {
-					prefix: [
-						{ required: true, message: '请输入姓名', trigger: 'blur' }
-					],
-					customer_name: [
-						{ required: true, message: '请输入前缀', trigger: 'blur' }
-					],
+					prefix: [{ required: true, message: '请输入前缀', trigger: 'blur' }],
+					customer_name: [{ required: true, message: '请输入客户名称', trigger: 'blur' }],
+					belong: [{ required: true, message: '请输入业务归属', trigger: 'blur' }],
+					industry: [{ required: true, message: '请输入行业', trigger: 'blur' }],
+					number_charges: [{ required: true, message: '请输入号码费', trigger: 'blur' }],
+					charges: [{ required: true, message: '请输入通信资费', trigger: 'blur' }],
+					start_date: [{ required: true, message: '请输入开通时间', trigger: 'blur' }],
+					end_date: [{ required: true, message: '请输入关停时间', trigger: 'blur' }],
 				},
 				//编辑界面数据
 				editForm: {
@@ -224,7 +232,8 @@
 					role_id:this.role_id,
 					page: this.page,
 					rows:10,
-					prefix: this.filters.prefix
+					prefix: this.filters.prefix,
+					user_name:this.filters.user_name
 				};
 				this.listLoading = true;
 				getCustomerListByParam(data).then((res) => {
@@ -249,7 +258,17 @@
 			},
 			//重新提交审核
 			resubmit(row){
-
+				const data={
+					type:'5',
+					type_id:row.id
+				};
+				updateReProcessById(data).then(res=>{
+					this.$message({
+						message: res.errMsg,
+						type: 'success'
+					});
+					this.getTableList();
+				})
 			},
 			//删除
 			handleDel(index, row) {
@@ -291,32 +310,40 @@
 			},
 			//编辑
 			editSubmit() {
-				this.editLoading = true;
-				const data = Object.assign({}, this.editForm);
-				updateCustomerById(data).then((res) => {
-					this.editLoading = false;
-					this.$message({
-						message: res.errMsg,
-						type: 'success'
-					});
-					this.$refs['editForm'].resetFields();
-					this.editFormVisible = false;
-					this.getTableList();
+				this.$refs.editForm.validate((valid) => {
+					if (valid) {
+						this.editLoading = true;
+						const data = Object.assign({}, this.editForm);
+						updateCustomerById(data).then((res) => {
+							this.editLoading = false;
+							this.$message({
+								message: res.errMsg,
+								type: 'success'
+							});
+							this.$refs['editForm'].resetFields();
+							this.editFormVisible = false;
+							this.getTableList();
+						});
+					};
 				});
 			},
 			//新增
 			addSubmit() {
-				this.addLoading = true;
-				const data = Object.assign({}, this.addForm);
-				insertCustomer(data).then((res) => {
-					this.addLoading = false;
-					this.$message({
-						message: res.errMsg,
-						type: 'success'
-					});
-					this.$refs['addForm'].resetFields();
-					this.addFormVisible = false;
-					this.getTableList();
+				this.$refs.addForm.validate((valid) => {
+					if (valid) {
+						this.addLoading = true;
+						const data = Object.assign({}, this.addForm);
+						insertCustomer(data).then((res) => {
+							this.addLoading = false;
+							this.$message({
+								message: res.errMsg,
+								type: 'success'
+							});
+							this.$refs['addForm'].resetFields();
+							this.addFormVisible = false;
+							this.getTableList();
+						});
+					};
 				});
 			},
 			getSTime(val){

@@ -40,7 +40,7 @@
 			<el-table-column prop="scan_file" label="双方盖章扫描件" width="210">
 				<template slot-scope="scope">
 					<div class="tableImg" v-if="scope.row.scan_file">
-						<img v-for="(item,index)  in scope.row.scan_file" preview="0" class="smallImg" :src="item" :key="index" alt="" style="width: 40px;height: 40px;margin-right:5px;">
+						<img v-for="(item,index)  in scope.row.scan_file" preview="6" class="smallImg" :src="item" :key="index" alt="" style="width: 40px;height: 40px;margin-right:5px;">
 					  <!-- <img class="bigImg" :src="scope.row.url" alt="">   -->
 					</div>
 				</template>
@@ -50,7 +50,7 @@
 			<el-table-column label="操作" fixed="right" width="260">
 				<template slot-scope="scope">
 					<el-button v-if="scope.row.audit_status==0" size="small" @click="auditSubmit(scope.row)">提交审核</el-button>
-					<el-button v-if="scope.row.audit_status==3" size="small" @click="auditSubmit(scope.row)">重新提交</el-button>
+					<el-button v-if="scope.row.audit_status==3" size="small" @click="resubmit(scope.row)">重新提交</el-button>
 					<el-button size="small" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
 					<el-button type="danger" size="small" @click="handleDel(scope.$index, scope.row)">删除</el-button>
 				</template>
@@ -67,9 +67,9 @@
 		<el-dialog title="编辑" :visible.sync="editFormVisible" :close-on-click-modal="false">
 			<el-form :model="editForm" label-width="130px" :rules="editFormRules" ref="editForm">
 				<el-form-item label="公司名称" prop="company_name">
-					<el-input v-model="editForm.company_name" auto-complete="off"></el-input>
+					<el-input v-model="editForm.company_name" clearable auto-complete="off"></el-input>
 				</el-form-item>
-				<el-form-item label="是否开票">
+				<el-form-item label="是否开票" prop="invoice">
           <el-radio-group v-model="editForm.invoice">
 						<el-radio label="1">已开票</el-radio>
 						<el-radio label="0">未开票</el-radio>
@@ -89,7 +89,7 @@
 					</el-upload>
 				</el-form-item>
 				<el-form-item label="备注">
-					<el-input v-model="editForm.remark" auto-complete="off"></el-input>
+					<el-input v-model="editForm.remark" clearable auto-complete="off"></el-input>
 				</el-form-item>
 			</el-form>
 			<div slot="footer" class="dialog-footer">
@@ -100,11 +100,11 @@
 
 		<!--新增界面-->
 		<el-dialog title="新增" :visible.sync="addFormVisible" :close-on-click-modal="false">
-			<el-form :model="addForm" label-width="130px" :rules="addFormRules" ref="addForm">
+			<el-form :model="addForm" label-width="130px" :rules="editFormRules" ref="addForm">
 				<el-form-item label="公司名称" prop="company_name">
-					<el-input v-model="addForm.company_name" auto-complete="off"></el-input>
+					<el-input v-model="addForm.company_name" clearable auto-complete="off"></el-input>
 				</el-form-item>
-				<el-form-item label="是否开票">
+				<el-form-item label="是否开票" prop="invoice">
           <el-radio-group v-model="addForm.invoice">
 						<el-radio label="1">已开票</el-radio>
 						<el-radio label="0">未开票</el-radio>
@@ -126,7 +126,7 @@
 					<!-- <el-input v-model="addForm.scan_file" auto-complete="off"></el-input> -->
 				</el-form-item>
 				<el-form-item label="备注">
-					<el-input v-model="addForm.remark" auto-complete="off"></el-input>
+					<el-input v-model="addForm.remark" clearable auto-complete="off"></el-input>
 				</el-form-item>
 				</div>
 			</el-form>
@@ -142,7 +142,7 @@
 </template>
 
 <script>
-	import { getContractProcessByParam, insertContractProcess, updateContractProcessById, deleteContractProcessById, insertProcess } from '../../api/api';
+	import { getContractProcessByParam, insertContractProcess, updateContractProcessById, deleteContractProcessById, insertProcess, updateReProcessById} from '../../api/api';
 
 	export default {
 		data() {
@@ -158,12 +158,8 @@
 				editFormVisible: false,//编辑界面是否显示
 				editLoading: false,
 				editFormRules: {
-					company_name: [
-						{ required: true, message: '请输入姓名', trigger: 'blur' }
-					],
-					reconciliation_time: [
-						{ required: true, message: '请输入前缀', trigger: 'blur' }
-					],
+					company_name: [{ required: true, message: '请输入姓名', trigger: 'blur' }],
+					invoice: [{ required: true, message: '请输入是否开票', trigger: 'blur' }],
 				},
 				//编辑界面数据
 				editForm: {
@@ -311,7 +307,17 @@
 			},
 			//重新提交审核
 			resubmit(row){
-				
+				const data={
+					type:'2',
+					type_id:row.id
+				};
+				updateReProcessById(data).then(res=>{
+					this.$message({
+						message: res.errMsg,
+						type: 'success'
+					});
+					this.getTableList();
+				})
 			},
 			//删除
 			handleDel(index, row) {
@@ -362,37 +368,44 @@
 			},
 			//编辑
 			editSubmit() {
-				this.editLoading = true;
-				const data = Object.assign({}, this.editForm);
-				updateContractProcessById(data).then((res) => {
-					this.editLoading = false;
-					this.$message({
-						message: res.errMsg,
-						type: 'success'
-					});
-					this.$refs['editForm'].resetFields();
-					this.editFormVisible = false;
-					this.delFiles=[];
-					this.getTableList();
+				this.$refs.editForm.validate((valid) => {
+					if (valid) {
+						this.editLoading = true;
+						const data = Object.assign({}, this.editForm);
+						updateContractProcessById(data).then((res) => {
+							this.editLoading = false;
+							this.$message({
+								message: res.errMsg,
+								type: 'success'
+							});
+							this.$refs['editForm'].resetFields();
+							this.editFormVisible = false;
+							this.delFiles=[];
+							this.getTableList();
+						});
+					};
 				});
 			},
 			//新增
 			addSubmit() {
-				this.addLoading = true;
-				const data = Object.assign({}, this.addForm);
-				console.log(this.fileList);
-				this.$refs.addUpload.submit();
-				insertContractProcess(data).then((res) => {
-					this.addLoading = false;
-					this.$message({
-						message: res.errMsg,
-						type: 'success'
-					});
-					this.$refs['addForm'].resetFields();
-					this.addFormVisible = false;
-					this.getTableList();
+				this.$refs.addForm.validate((valid) => {
+					if (valid) {
+						this.addLoading = true;
+						const data = Object.assign({}, this.addForm);
+						console.log(this.fileList);
+						this.$refs.addUpload.submit();
+						insertContractProcess(data).then((res) => {
+							this.addLoading = false;
+							this.$message({
+								message: res.errMsg,
+								type: 'success'
+							});
+							this.$refs['addForm'].resetFields();
+							this.addFormVisible = false;
+							this.getTableList();
+						});
+				  };
 				});
-				
 			},
 			getAddTime(val){
 				this.addForm.reconciliation_time=val;

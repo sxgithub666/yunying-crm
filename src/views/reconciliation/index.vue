@@ -57,33 +57,41 @@
 		<el-dialog title="编辑" :visible.sync="editFormVisible" :close-on-click-modal="false">
 			<el-form :model="editForm" label-width="80px" :rules="editFormRules" ref="editForm">
 				<el-form-item label="客户名称" prop="customer_name">
-					<el-input v-model="editForm.customer_name" auto-complete="off"></el-input>
+					<el-input v-model="editForm.customer_name" clearable auto-complete="off"></el-input>
 				</el-form-item>
-				<el-form-item label="对账时间" prop="reconciliation_time">
-          <el-date-picker v-model="editForm.reconciliation_time" @change="getEditTime" value-format="yyyy-MM-dd HH:mm:ss" type="datetime" placeholder="选择收款日期时间">
-					</el-date-picker>
-				</el-form-item>
-				<el-form-item label="收入">
-					<el-input v-model="editForm.income" auto-complete="off"></el-input>
-				</el-form-item>
-				<el-form-item label="成本">
-					<el-input v-model="editForm.reconciliation_cost" auto-complete="off"></el-input>
-				</el-form-item>
-				<el-form-item label="账户名称">
-					<el-input v-model="editForm.account_name" auto-complete="off"></el-input>
-				</el-form-item>
-				<el-form-item label="余额">
-					<el-input v-model="editForm.balance" auto-complete="off"></el-input>
-				</el-form-item>
-				<el-form-item label="调整金额">
-					<el-input v-model="editForm.amount_adjustment" auto-complete="off"></el-input>
-				</el-form-item>
-				<el-form-item label="缴费记录">
-					<el-input v-model="editForm.pay_record" auto-complete="off"></el-input>
-				</el-form-item>
-				<el-form-item label="备注">
-					<el-input v-model="editForm.remark" auto-complete="off"></el-input>
-				</el-form-item>
+				<div class="flex">
+					<el-form-item label="对账时间" prop="reconciliation_time">
+						<el-date-picker v-model="editForm.reconciliation_time" @change="getEditTime" value-format="yyyy-MM-dd HH:mm:ss" type="datetime" placeholder="选择收款日期时间">
+						</el-date-picker>
+					</el-form-item>
+					<el-form-item label="收入" prop="income">
+						<el-input v-model="editForm.income" clearable auto-complete="off"></el-input>
+					</el-form-item>
+				</div>
+				<div class="flex">
+					<el-form-item label="成本" prop="reconciliation_cost">
+						<el-input v-model="editForm.reconciliation_cost" clearable auto-complete="off"></el-input>
+					</el-form-item>
+					<el-form-item label="账户名称" prop="account_name">
+						<el-input v-model="editForm.account_name" clearable auto-complete="off"></el-input>
+					</el-form-item>
+				</div>
+				<div class="flex">
+					<el-form-item label="余额" prop="balance">
+						<el-input v-model="editForm.balance" clearable auto-complete="off"></el-input>
+					</el-form-item>
+					<el-form-item label="调整金额" prop="amount_adjustment">
+						<el-input v-model="editForm.amount_adjustment" clearable auto-complete="off"></el-input>
+					</el-form-item>
+				</div>
+				<div class="flex">
+					<el-form-item label="缴费记录" prop="pay_record">
+						<el-input v-model="editForm.pay_record" clearable auto-complete="off"></el-input>
+					</el-form-item>
+					<el-form-item label="备注">
+						<el-input v-model="editForm.remark" clearable auto-complete="off"></el-input>
+					</el-form-item>
+				</div>
 			</el-form>
 			<div slot="footer" class="dialog-footer">
 				<el-button @click.native="editFormVisible = false">取消</el-button>
@@ -93,37 +101,42 @@
 
 		<!--新增界面-->
 		<el-dialog title="新增" :visible.sync="addFormVisible" :close-on-click-modal="false">
-			<el-form :model="addForm" label-width="80px" :rules="addFormRules" ref="addForm">
+			<el-form :model="addForm" label-width="80px" :rules="editFormRules" ref="addForm">
 				<el-form-item label="客户名称" prop="customer_name">
-					<el-input v-model="addForm.customer_name" auto-complete="off"></el-input>
+					<el-input v-model="addForm.customer_name" clearable auto-complete="off"></el-input>
 				</el-form-item>
-				<el-form-item label="对账时间" prop="reconciliation_time">
-					<el-date-picker v-model="addForm.reconciliation_time" @change="getAddTime" value-format="yyyy-MM-dd HH:mm:ss" type="datetime" placeholder="选择收款日期时间">
-					</el-date-picker>
-				</el-form-item>
-				<el-form-item label="收入">
-          <el-input v-model="addForm.income" auto-complete="off"></el-input>
-					
-				</el-form-item>
-				<el-form-item label="成本">
-          <el-input v-model="addForm.reconciliation_cost" auto-complete="off"></el-input>
-				</el-form-item>
-				<el-form-item label="账户名称">
-					<el-input v-model="addForm.account_name" auto-complete="off"></el-input>
-				</el-form-item>
-				</el-form-item>
-				<el-form-item label="余额">
-					<el-input v-model="addForm.balance" auto-complete="off"></el-input>
-				</el-form-item>
-				<el-form-item label="调整金额">
-					<el-input v-model="addForm.amount_adjustment" auto-complete="off"></el-input>
-				</el-form-item>
-				<el-form-item label="缴费记录">
-					<el-input v-model="addForm.pay_record" auto-complete="off"></el-input>
-				</el-form-item>
-				<el-form-item label="备注">
-					<el-input v-model="addForm.remark" auto-complete="off"></el-input>
-				</el-form-item>
+				<div class="flex">
+					<el-form-item label="对账时间" prop="reconciliation_time">
+						<el-date-picker v-model="addForm.reconciliation_time" @change="getAddTime" value-format="yyyy-MM-dd HH:mm:ss" type="datetime" placeholder="选择收款日期时间">
+						</el-date-picker>
+					</el-form-item>
+					<el-form-item label="收入" prop="income">
+						<el-input v-model="addForm.income" clearable auto-complete="off"></el-input>
+					</el-form-item>
+				</div>
+				<div class="flex">
+					<el-form-item label="成本" prop="reconciliation_cost">
+						<el-input v-model="addForm.reconciliation_cost" clearable auto-complete="off"></el-input>
+					</el-form-item>
+					<el-form-item label="账户名称" prop="account_name">
+						<el-input v-model="addForm.account_name" clearable auto-complete="off"></el-input>
+					</el-form-item>
+				</div>
+				<div class="flex">
+					<el-form-item label="余额" prop="balance">
+						<el-input v-model="addForm.balance" clearable auto-complete="off"></el-input>
+					</el-form-item>
+					<el-form-item label="调整金额" prop="amount_adjustment">
+						<el-input v-model="addForm.amount_adjustment" clearable auto-complete="off"></el-input>
+					</el-form-item>
+				</div>
+				<div class="flex">
+					<el-form-item label="缴费记录" prop="pay_record">
+						<el-input v-model="addForm.pay_record" clearable auto-complete="off"></el-input>
+					</el-form-item>
+					<el-form-item label="备注">
+						<el-input v-model="addForm.remark" clearable auto-complete="off"></el-input>
+					</el-form-item>
 				</div>
 			</el-form>
 			<div slot="footer" class="dialog-footer">
@@ -151,12 +164,14 @@
 				editFormVisible: false,//编辑界面是否显示
 				editLoading: false,
 				editFormRules: {
-					customer_name: [
-						{ required: true, message: '请输入姓名', trigger: 'blur' }
-					],
-					reconciliation_time: [
-						{ required: true, message: '请输入前缀', trigger: 'blur' }
-					],
+					customer_name: [{ required: true, message: '请输入客户名称', trigger: 'blur' }],
+					reconciliation_time: [{ required: true, message: '请输入对账时间', trigger: 'blur' }],
+					income: [{ required: true, message: '请输入收入', trigger: 'blur' }],
+					reconciliation_cost: [{ required: true, message: '请输入成本', trigger: 'blur' }],
+					account_name: [{ required: true, message: '请输入账户名称', trigger: 'blur' }],
+					balance: [{ required: true, message: '请输入余额', trigger: 'blur' }],
+					amount_adjustment: [{ required: true, message: '请输入调整金额', trigger: 'blur' }],
+					pay_record: [{ required: true, message: '请输入缴费记录', trigger: 'blur' }],
 				},
 				//编辑界面数据
 				editForm: {
@@ -173,15 +188,6 @@
 
 				addFormVisible: false,//新增界面是否显示
 				addLoading: false,
-				addFormRules: {
-					customer_name: [
-						{ required: true, message: '请输入姓名', trigger: 'blur' }
-					],
-					reconciliation_time: [
-						{ required: true, message: '请输入前缀', trigger: 'blur' }
-					],
-
-				},
 				//新增界面数据
 				addForm: {
 					customer_name:'',
@@ -257,32 +263,40 @@
 			},
 			//编辑
 			editSubmit() {
-				this.editLoading = true;
-				const data = Object.assign({}, this.editForm);
-				updateReconciliationById(data).then((res) => {
-					this.editLoading = false;
-					this.$message({
-						message: res.errMsg,
-						type: 'success'
-					});
-					this.$refs['editForm'].resetFields();
-					this.editFormVisible = false;
-					this.getTableList();
+				this.$refs.editForm.validate((valid) => {
+					if (valid) {
+						this.editLoading = true;
+						const data = Object.assign({}, this.editForm);
+						updateReconciliationById(data).then((res) => {
+							this.editLoading = false;
+							this.$message({
+								message: res.errMsg,
+								type: 'success'
+							});
+							this.$refs['editForm'].resetFields();
+							this.editFormVisible = false;
+							this.getTableList();
+						});
+					};
 				});
 			},
 			//新增
 			addSubmit() {
-				this.addLoading = true;
-				const data = Object.assign({}, this.addForm);
-				insertReconciliation(data).then((res) => {
-					this.addLoading = false;
-					this.$message({
-						message: res.errMsg,
-						type: 'success'
-					});
-					this.$refs['addForm'].resetFields();
-					this.addFormVisible = false;
-					this.getTableList();
+				this.$refs.addForm.validate((valid) => {
+					if (valid) {
+						this.addLoading = true;
+						const data = Object.assign({}, this.addForm);
+						insertReconciliation(data).then((res) => {
+							this.addLoading = false;
+							this.$message({
+								message: res.errMsg,
+								type: 'success'
+							});
+							this.$refs['addForm'].resetFields();
+							this.addFormVisible = false;
+							this.getTableList();
+						});
+					};
 				});
 			},
 			getAddTime(val){
@@ -304,5 +318,6 @@
 .flex{
 	display: flex;
 	flex-direction: row;
+	justify-content: space-between;
 }
 </style>

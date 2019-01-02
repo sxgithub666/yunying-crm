@@ -62,7 +62,7 @@
 			<el-table-column prop="pay_voucher" label="打款凭证" width="200">
 				<template slot-scope="scope">
 					<div class="tableImg" v-if="scope.row.pay_voucher">
-						<img v-for="(item,index) in scope.row.pay_voucher" class="smallImg" preview="4" :src="item" :key="index" alt="" style="width: 80px;height: 80px">
+						<img v-for="(item,index) in scope.row.pay_voucher" class="smallImg" preview="4" :src="item" :key="index" alt="" style="width: 40px;height: 40px;margin-right:5px;">
 					  <!-- <img class="bigImg" :src="scope.row.url" alt="">   -->
 					</div>
 				</template>
@@ -74,7 +74,7 @@
 			<el-table-column label="操作" fixed="right" width="260">
 				<template slot-scope="scope">
 					<el-button v-if="scope.row.audit_status==0" size="small" @click="auditSubmit(scope.row)">提交审核</el-button>
-					<el-button v-if="scope.row.audit_status==3" size="small" @click="auditSubmit(scope.row)">重新提交</el-button>
+					<el-button v-if="scope.row.audit_status==3" size="small" @click="resubmit(scope.row)">重新提交</el-button>
 					<el-button size="small" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
 					<el-button type="danger" size="small" @click="handleDel(scope.$index, scope.row)">删除</el-button>
 				</template>
@@ -92,54 +92,55 @@
 			<el-form :model="editForm" label-width="120px" :rules="editFormRules" ref="editForm">
 				<div class="flex">
 					<el-form-item label="销售区域" prop="area">
-						<el-input v-model="editForm.area" auto-complete="off"></el-input>
+						<el-input v-model="editForm.area" clearable auto-complete="off"></el-input>
 					</el-form-item>
 					<el-form-item label="公司名称" prop="company_name">
-						<el-input v-model="editForm.company_name" auto-complete="off"></el-input>
+						<el-input v-model="editForm.company_name" clearable auto-complete="off"></el-input>
 					</el-form-item>
 				</div>
 				<div class="flex">
-					<el-form-item label="收款时间">
+					<el-form-item label="收款时间" prop="pay_time">
 						<el-date-picker v-model="editForm.pay_time" @change="getEditTime" value-format="yyyy-MM-dd HH:mm:ss" type="datetime" placeholder="选择收款日期时间">
 						</el-date-picker>
 					</el-form-item>
-					<el-form-item label="收款金额">
-						<el-input v-model="editForm.pay_money" auto-complete="off"></el-input>
-					</el-form-item>
-				</div>
-				<div class="flex">
-					<el-form-item label="公司行业">
-						<el-input v-model="editForm.company_industry" auto-complete="off"></el-input>
-					</el-form-item>
-					<el-form-item label="号码需求">
-						<el-input v-model="editForm.need_phonenumber" auto-complete="off"></el-input>
-					</el-form-item>
-				</div>
-				<div class="flex">
-					<el-form-item label="业务类型">
-						<el-input v-model="editForm.business_type" auto-complete="off"></el-input>
-					</el-form-item>
-					<el-form-item label="付款方式">
-						<el-input v-model="editForm.pay_type" auto-complete="off"></el-input>
-					</el-form-item>
-				</div>
-				<div class="flex">
-					<el-form-item label="客户所在区域">
-						<el-input v-model="editForm.customer_region" auto-complete="off"></el-input>
-					</el-form-item>
-					<el-form-item label="是否返款">
+					<el-form-item label="是否返款" prop="refunds">
 						<el-radio-group v-model="editForm.refunds">
 							<el-radio label="1">已返款</el-radio>
 							<el-radio label="0">未返款</el-radio>
 						</el-radio-group>
 					</el-form-item>
+					
 				</div>
 				<div class="flex">
-					<el-form-item label="申请号码材料">
-						<el-input v-model="editForm.need_data" auto-complete="off"></el-input>
+					<el-form-item label="公司行业" prop="company_industry">
+						<el-input v-model="editForm.company_industry" clearable auto-complete="off"></el-input>
 					</el-form-item>
-					<el-form-item label="备注">
-						<el-input v-model="editForm.remark" auto-complete="off"></el-input>
+					<el-form-item label="号码需求" prop="need_phonenumber">
+						<el-input v-model="editForm.need_phonenumber" clearable auto-complete="off"></el-input>
+					</el-form-item>
+				</div>
+				<div class="flex">
+					<el-form-item label="业务类型" prop="business_type">
+						<el-input v-model="editForm.business_type" clearable auto-complete="off"></el-input>
+					</el-form-item>
+					<el-form-item label="付款方式" prop="pay_type">
+						<el-input v-model="editForm.pay_type" clearable auto-complete="off"></el-input>
+					</el-form-item>
+				</div>
+				<div class="flex">
+					<el-form-item label="客户所在区域" prop="customer_region">
+						<el-input v-model="editForm.customer_region" clearable auto-complete="off"></el-input>
+					</el-form-item>
+					<el-form-item label="收款金额" prop="pay_money">
+						<el-input v-model="editForm.pay_money" clearable auto-complete="off"></el-input>
+					</el-form-item>
+				</div>
+				<div class="flex">
+					<el-form-item label="申请号码材料" prop="need_data">
+						<el-input v-model="editForm.need_data" clearable auto-complete="off"></el-input>
+					</el-form-item>
+					<el-form-item label="备注" prop="remark">
+						<el-input v-model="editForm.remark" clearable auto-complete="off"></el-input>
 					</el-form-item>
 				</div>
 				<el-form-item label="打款凭证">
@@ -165,58 +166,59 @@
 
 		<!--新增界面-->
 		<el-dialog title="新增" :visible.sync="addFormVisible" :close-on-click-modal="false">
-			<el-form :model="addForm" label-width="120px" :rules="addFormRules" ref="addForm">
+			<el-form :model="addForm" label-width="120px" :rules="editFormRules" ref="addForm">
 				<div class="flex">
 					<el-form-item label="销售区域" prop="area">
-						<el-input v-model="addForm.area" auto-complete="off"></el-input>
+						<el-input v-model="addForm.area" clearable auto-complete="off"></el-input>
 					</el-form-item>
 					<el-form-item label="公司名称" prop="company_name">
-						<el-input v-model="addForm.company_name" auto-complete="off"></el-input>
+						<el-input v-model="addForm.company_name" clearable auto-complete="off"></el-input>
 					</el-form-item>
 				</div>
 				<div class="flex">
-					<el-form-item label="收款时间">
+					<el-form-item label="收款时间" prop="pay_time">
 						<el-date-picker v-model="addForm.pay_time" @change="getAddTime" value-format="yyyy-MM-dd HH:mm:ss" type="datetime" placeholder="选择收款日期时间">
 						</el-date-picker>
 					</el-form-item>
-					<el-form-item label="客户所在区域">
-						<el-input v-model="addForm.customer_region" auto-complete="off"></el-input>
-					</el-form-item>
-				</div>
-				<div class="flex">
-					<el-form-item label="公司行业">
-						<el-input v-model="addForm.company_industry" auto-complete="off"></el-input>
-					</el-form-item>
-					</el-form-item>
-					<el-form-item label="号码需求">
-						<el-input v-model="addForm.need_phonenumber" auto-complete="off"></el-input>
-					</el-form-item>
-				</div>
-				<div class="flex">
-					<el-form-item label="业务类型">
-						<el-input v-model="addForm.business_type" auto-complete="off"></el-input>
-					</el-form-item>
-					<el-form-item label="付款方式">
-						<el-input v-model="addForm.pay_type" auto-complete="off"></el-input>
-					</el-form-item>
-				</div>
-				<div class="flex">
-					<el-form-item label="收款金额">
-						<el-input v-model="addForm.pay_money" auto-complete="off"></el-input>
-					</el-form-item>
-					<el-form-item label="是否返款">
+					<el-form-item label="是否返款" prop="refunds">
 						<el-radio-group v-model="addForm.refunds">
 							<el-radio label="1">已返款</el-radio>
 							<el-radio label="0">未返款</el-radio>
 						</el-radio-group>
 					</el-form-item>
+					
 				</div>
 				<div class="flex">
-					<el-form-item label="申请号码材料">
-						<el-input v-model="addForm.need_data" auto-complete="off"></el-input>
+					<el-form-item label="公司行业" prop="company_industry">
+						<el-input v-model="addForm.company_industry" clearable auto-complete="off"></el-input>
 					</el-form-item>
-					<el-form-item label="备注">
-						<el-input v-model="addForm.remark" auto-complete="off"></el-input>
+					</el-form-item>
+					<el-form-item label="号码需求" prop="need_phonenumber">
+						<el-input v-model="addForm.need_phonenumber" clearable auto-complete="off"></el-input>
+					</el-form-item>
+				</div>
+				<div class="flex">
+					<el-form-item label="业务类型" prop="business_type">
+						<el-input v-model="addForm.business_type" clearable auto-complete="off"></el-input>
+					</el-form-item>
+					<el-form-item label="付款方式" prop="pay_type">
+						<el-input v-model="addForm.pay_type" clearable auto-complete="off"></el-input>
+					</el-form-item>
+				</div>
+				<div class="flex">
+					<el-form-item label="收款金额" prop="pay_money">
+						<el-input v-model="addForm.pay_money" clearable auto-complete="off"></el-input>
+					</el-form-item>
+					<el-form-item label="客户所在区域" prop="customer_region">
+						<el-input v-model="addForm.customer_region" clearable auto-complete="off"></el-input>
+					</el-form-item>
+				</div>
+				<div class="flex">
+					<el-form-item label="申请号码材料" prop="need_data">
+						<el-input v-model="addForm.need_data" clearable auto-complete="off"></el-input>
+					</el-form-item>
+					<el-form-item label="备注" prop="remark">
+						<el-input v-model="addForm.remark" clearable auto-complete="off"></el-input>
 					</el-form-item>
 				</div>
 				<el-form-item label="打款凭证">
@@ -246,7 +248,7 @@
 </template>
 
 <script>
-	import { getZjPaasProcessByParam, insertZjPaasProcess, updateZjPaasProcessById, deleteZjPaasProcessById} from '../../api/api';
+	import { getZjPaasProcessByParam, insertZjPaasProcess, updateZjPaasProcessById, deleteZjPaasProcessById ,updateReProcessById ,insertProcess} from '../../api/api';
 
 	export default {
 		data() {
@@ -262,12 +264,18 @@
 				editFormVisible: false,//编辑界面是否显示
 				editLoading: false,
 				editFormRules: {
-					area: [
-						{ required: true, message: '请输入姓名', trigger: 'blur' }
-					],
-					company_name: [
-						{ required: true, message: '请输入前缀', trigger: 'blur' }
-					],
+					area: [{ required: true, message: '请输入销售区域', trigger: 'blur' }],
+					company_name: [{ required: true, message: '请输入公司名称', trigger: 'blur'}],
+					type: [{ required: true, message: '请输入业务类型', trigger: 'blur'}],
+					pay_time: [{ required: true, message: '请输入收款时间', trigger: 'blur'}],
+					company_industry: [{ required: true, message: '请输入公司行业', trigger: 'blur'}],
+					pay_money: [{ required: true, message: '请输入收款金额', trigger: 'blur'}],
+					need_phonenumber: [{ required: true, message: '请输入号码需求', trigger: 'blur'}],
+					business_type: [{ required: true, message: '请输入业务类型', trigger: 'blur'}],
+					pay_type: [{ required: true, message: '请输入付款方式', trigger: 'blur'}],
+					customer_region: [{ required: true, message: '请输入客户所在区域', trigger: 'blur'}],
+					refunds: [{ required: true, message: '请输入是否返款', trigger: 'blur'}],
+					need_data: [{ required: true, message: '请输入申请号码材料', trigger: 'blur'}],
 				},
 				//编辑界面数据
 				editForm: {
@@ -297,15 +305,6 @@
 
 				addFormVisible: false,//新增界面是否显示
 				addLoading: false,
-				addFormRules: {
-					area: [
-						{ required: true, message: '请输入姓名', trigger: 'blur' }
-					],
-					company_name: [
-						{ required: true, message: '请输入前缀', trigger: 'blur' }
-					],
-
-				},
 				//新增界面数据
 				addForm: {
 					type:'1',
@@ -343,7 +342,12 @@
 				this.listLoading = true;
 				getZjPaasProcessByParam(data).then((res) => {
 					this.total = res.result.records;
-					this.list = res.result.data;
+					this.list = res.result.data.map(item=>{
+						if(item.pay_voucher){
+							item.pay_voucher=item.pay_voucher.split(',');
+						};
+						return item;
+					});;
 					this.listLoading = false;
 				});
 			},
@@ -425,7 +429,17 @@
 			},
 			//重新提交审核
 			resubmit(row){
-
+				const data={
+					type:'4',
+					type_id:row.id
+				};
+				updateReProcessById(data).then(res=>{
+					this.$message({
+						message: res.errMsg,
+						type: 'success'
+					});
+					this.getTableList();
+				})
 			},
 			//删除
 			handleDel(index, row) {
@@ -450,6 +464,15 @@
 			handleEdit(index, row) {
 				this.editFormVisible = true;
 				this.editForm = Object.assign({}, row);
+				if(row.pay_voucher){
+					this.editFileList=row.pay_voucher.map(item=>{
+						let obj={};
+						obj['url']=item;
+						return obj;
+				  })
+				}else{
+					this.editFileList=[];
+				}
 			},
 			//显示新增界面
 			handleAdd() {
@@ -469,32 +492,40 @@
 			},
 			//编辑
 			editSubmit() {
-				this.editLoading = true;
-				const data = Object.assign({}, this.editForm);
-				updateZjPaasProcessById(data).then((res) => {
-					this.editLoading = false;
-					this.$message({
-						message: res.errMsg,
-						type: 'success'
-					});
-					this.$refs['editForm'].resetFields();
-					this.editFormVisible = false;
-					this.getTableList();
+				this.$refs.editForm.validate((valid) => {
+					if (valid) {
+						this.editLoading = true;
+						const data = Object.assign({}, this.editForm);
+						updateZjPaasProcessById(data).then((res) => {
+							this.editLoading = false;
+							this.$message({
+								message: res.errMsg,
+								type: 'success'
+							});
+							this.$refs['editForm'].resetFields();
+							this.editFormVisible = false;
+							this.getTableList();
+						});
+					};
 				});
 			},
 			//新增
 			addSubmit() {
-				this.addLoading = true;
-				const data = Object.assign({}, this.addForm);
-				insertZjPaasProcess(data).then((res) => {
-					this.addLoading = false;
-					this.$message({
-						message: res.errMsg,
-						type: 'success'
-					});
-					this.$refs['addForm'].resetFields();
-					this.addFormVisible = false;
-					this.getTableList();
+				this.$refs.addForm.validate((valid) => {
+					if (valid) {
+						this.addLoading = true;
+						const data = Object.assign({}, this.addForm);
+						insertZjPaasProcess(data).then((res) => {
+							this.addLoading = false;
+							this.$message({
+								message: res.errMsg,
+								type: 'success'
+							});
+							this.$refs['addForm'].resetFields();
+							this.addFormVisible = false;
+							this.getTableList();
+						});
+					};
 				});
 			},
 			getAddTime(val){

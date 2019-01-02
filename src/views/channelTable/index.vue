@@ -74,7 +74,7 @@
 			<el-table-column label="操作" fixed="right" width="260">
 				<template slot-scope="scope">
 					<el-button v-if="scope.row.audit_status==0" size="small" @click="auditSubmit(scope.row)">提交审核</el-button>
-					<el-button v-if="scope.row.audit_status==3" size="small" @click="auditSubmit(scope.row)">重新提交</el-button>
+					<el-button v-if="scope.row.audit_status==3" size="small" @click="resubmit(scope.row)">重新提交</el-button>
 					<el-button size="small" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
 					<el-button type="danger" size="small" @click="handleDel(scope.$index, scope.row)">删除</el-button>
 				</template>
@@ -253,7 +253,7 @@
 </template>
 
 <script>
-	import { getChannelByParam, insertChannel, updateChannelById, deleteChannelById ,insertProcess} from '../../api/api';
+	import { getChannelByParam, insertChannel, updateChannelById, deleteChannelById ,insertProcess ,updateReProcessById} from '../../api/api';
 
 	export default {
 		data() {
@@ -377,7 +377,16 @@
 			},
 			//重新提交审核
 			resubmit(row){
-				
+				const data={
+					type:'0',
+					type_id:row.id}
+				updateReProcessById(data).then(res=>{
+					this.$message({
+						message: res.errMsg,
+						type: 'success'
+					});
+					this.getTableList();
+				})
 			},
 			//删除
 			handleDel(index, row) {

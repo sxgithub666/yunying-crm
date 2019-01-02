@@ -54,6 +54,7 @@ export const login = params => {
   return POST('/login/login', params)//登录
 };
 
+
 //用户管理页面
 export const getUserInfoByParam = params => {
   return POST('/userInfo/getUserInfoByParam', params)
@@ -251,4 +252,7 @@ export const updateProcessById = params => {
 };
 export const deleteProcessById = params => {
   return POST('/process/deleteProcessById', params)
+};
+export const updateReProcessById = params => {
+  return POST('/process/updateReProcessById', params)
 };

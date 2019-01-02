@@ -16,9 +16,9 @@
 				<span class="title">运营部管理系统</span>
 			</el-col>
 			<el-col :span="4" class="userinfo">
-				<!-- <el-badge :is-dot="true" class="badge">
-					<i class="message iconfont icon-tongzhi"></i>
-				</el-badge> -->
+				<el-badge :is-dot="hasBacklog" class="badge">
+					<i class="message el-icon-message" @click="goBacklog"></i>
+				</el-badge>
 				<el-dropdown trigger="hover">
 					<span class="el-dropdown-link userinfo-inner">您好, {{sysUserName}}</span>
 					<el-dropdown-menu slot="dropdown">
@@ -80,6 +80,7 @@
 </template>
 
 <script>
+import { getProcessByParam } from '../api/api';
 	export default {
 		data() {
 			return {
@@ -96,7 +97,8 @@
 					resource: '',
 					desc: ''
 				},
-				menu:[]
+				menu:[],
+				hasBacklog:false
 			}
 		},
 		methods: {
@@ -110,6 +112,24 @@
 				//console.log('handleclose');
 			},
 			handleselect: function (a, b) {
+			},
+			//获取是否有待办事项
+			isBacklog(){
+				const data={
+					page:1,
+					rows:10,
+					role_id:JSON.parse(sessionStorage.getItem('user')).role_id,
+					state:'0'
+				};
+				getProcessByParam(data).then(res=>{
+					if(res.result){
+						if(res.result.records==0){
+							this.hasBacklog=false;
+						}else{
+							this.hasBacklog=true;
+						}
+					}
+				})
 			},
 			//待办事项
 			goBacklog(){
@@ -145,7 +165,7 @@
 				user = JSON.parse(user);
 				this.sysUserName = user.user_name || '';
 			}
-
+			this.isBacklog();
 		}
 	}
 
@@ -165,13 +185,14 @@
 			background: $color-primary;
 			color:#fff;
 			.badge{
+				cursor: pointer;
 				margin-right: 40px;
 				.message{
-					font-size: 24px;
+					font-size: 20px;
 				}
 				.el-badge__content.is-fixed{
 					top: 20px;
-					right: 14px;
+					right: 5px;
 				}
 			} 
 			.userinfo {
