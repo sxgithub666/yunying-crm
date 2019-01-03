@@ -7,6 +7,9 @@
 					<el-input size="small" clearable v-model="filters.company_name" placeholder="公司名称"></el-input>
 				</el-form-item>
 				<el-form-item>
+					<el-input size="small" clearable v-model="filters.user_name" placeholder="添加人"></el-input>
+				</el-form-item>
+				<el-form-item>
 					<el-button type="primary" size="small" v-on:click="getTableList">查询</el-button>
 				</el-form-item>
 				<el-form-item>
@@ -35,10 +38,10 @@
 			</el-table-column>
 			<el-table-column prop="audit_status" label="状态" width="100" show-overflow-tooltip>
 				<template slot-scope="scope">
-					<el-button type="info" size="small" plain v-if="scope.row.audit_status==0">未审核</el-button>
-					<el-button type="primary" size="small" plain v-if="scope.row.audit_status==1">审核中</el-button>
-					<el-button type="success" size="small" plain v-if="scope.row.audit_status==2">审核通过</el-button>
-					<el-button type="danger" size="small" plain v-if="scope.row.audit_status==3">审核拒绝</el-button>
+					<el-button type="info" size="small" plain v-if="scope.row.audit_status==0">未审批</el-button>
+					<el-button type="primary" size="small" plain v-if="scope.row.audit_status==1">转发中</el-button>
+					<el-button type="success" size="small" plain v-if="scope.row.audit_status==2">审批通过</el-button>
+					<el-button type="danger" size="small" plain v-if="scope.row.audit_status==3">审批拒绝</el-button>
 				</template>
 			</el-table-column>
 			<el-table-column prop="company_industry" label="公司行业" width="100" show-overflow-tooltip>
@@ -75,14 +78,20 @@
 			<el-table-column prop="pay_voucher" label="打款凭证" width="200" show-overflow-tooltip>
 				<template slot-scope="scope">
 					<div class="tableImg" v-if="scope.row.pay_voucher">
-						<img v-for="(item,index) in scope.row.pay_voucher" class="smallImg" preview="2" :src="item" :key="index" alt="" style="width: 80px;height: 80px">
+						<img v-for="(item,index) in scope.row.pay_voucher" class="smallImg" preview="2" :src="item" :key="index" alt="" style="width: 40px;height: 40px;margin-right:5px;">
 					  <!-- <img class="bigImg" :src="scope.row.url" alt="">   -->
 					</div>
 				</template>
 			</el-table-column>
 			<el-table-column prop="robot_pay_money" label="机器人费" width="100" show-overflow-tooltip>
 			</el-table-column>
+			<el-table-column prop="user_name" label="添加人" width="100" show-overflow-tooltip>
+			</el-table-column>
 			<el-table-column prop="pay_type" label="付款方式" width="100" show-overflow-tooltip>
+				<template slot-scope="scope">
+					<span v-if="scope.row.pay_type==0">对公</span>
+					<span v-if="scope.row.pay_type==1">对私</span>
+				</template>
 			</el-table-column>
 			<el-table-column prop="refunds" label="是否返款" width="100" show-overflow-tooltip>
 				<template slot-scope="scope">
@@ -93,7 +102,7 @@
 			
 			<el-table-column label="操作" fixed="right" width="260">
 				<template slot-scope="scope">
-					<el-button v-if="scope.row.audit_status==0" size="small" @click="auditSubmit(scope.row)">提交审核</el-button>
+					<el-button v-if="scope.row.audit_status!=3" size="small" @click="auditSubmit(scope.row)">提交审核</el-button>
 					<el-button v-if="scope.row.audit_status==3" size="small" @click="resubmit(scope.row)">重新提交</el-button>
 					<el-button size="small" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
 					<el-button type="danger" size="small" @click="handleDel(scope.$index, scope.row)">删除</el-button>
@@ -128,7 +137,11 @@
 				</div>
 				<div class="flex">
 					<el-form-item label="付款方式" prop="pay_type">
-						<el-input v-model="editForm.pay_type" auto-complete="off"></el-input>
+						<el-select v-model="editForm.pay_type">
+							<el-option label="对公" value="0"></el-option>
+							<el-option label="对私" value="1"></el-option>
+						</el-select>
+						<!-- <el-input v-model="editForm.pay_type" auto-complete="off"></el-input> -->
 					</el-form-item>
 					
 					<el-form-item label="号码费" prop="number_pay_money">
@@ -151,42 +164,42 @@
 						</el-date-picker>
 					</el-form-item>
 					<el-form-item label="客户线索来源" prop="customer_clues">
-						<el-radio-group v-model="editForm.customer_clues" size="small">
-							<el-radio label="0">SEM</el-radio>
-							<el-radio label="1">公司</el-radio>
-							<el-radio label="2">商务本身</el-radio>
-						</el-radio-group>
+						<el-select v-model="editForm.customer_clues">
+							<el-option label="SEM" value="0"></el-option>
+							<el-option label="公司" value="1"></el-option>
+							<el-option label="商务本身" value="2"></el-option>
+						</el-select>
 					</el-form-item>
 				</div>
 				<div class="flex">
 					<el-form-item label="客户自备线路" prop="call_customer_pay_money">
-						<el-radio-group v-model="editForm.call_customer_pay_money" size="small">
-							<el-radio label="1">是</el-radio>
-							<el-radio label="0">否</el-radio>
-						</el-radio-group>
+						<el-select v-model="editForm.call_customer_pay_money">
+							<el-option label="是" value="1"></el-option>
+							<el-option label="否" value="0"></el-option>
+						</el-select>
 						<!-- <el-input v-model="editForm.call_customer_pay_money" auto-complete="off"></el-input> -->
 					</el-form-item>
 					<el-form-item label="是否返款" prop="refunds">
-						<el-radio-group v-model="editForm.refunds" size="small">
-							<el-radio label="1">已返款</el-radio>
-							<el-radio label="0">未返款</el-radio>
-						</el-radio-group>
+						<el-select v-model="editForm.refunds">
+							<el-option label="已返款" value="1"></el-option>
+							<el-option label="未返款" value="0"></el-option>
+						</el-select>
 					</el-form-item>
 				</div>
 				<div class="flex">
 					<el-form-item label="通信费" prop="call_year_pay_money">
-					<el-radio-group v-model="editForm.call_year_pay_money">
-						<el-radio label="0">月付</el-radio>
-						<el-radio label="1">季付</el-radio>
-						<el-radio label="2">年付</el-radio>
-						<el-radio label="3">测试(XXX)</el-radio>
-					</el-radio-group>
+					<el-select v-model="editForm.call_year_pay_money">
+						<el-option label="月付" value="0"></el-option>
+						<el-option label="季付" value="1"></el-option>
+						<el-option label="年付" value="2"></el-option>
+						<el-option label="测试(XXX)" value="3"></el-option>
+					</el-select>
 				</el-form-item>
 				<el-form-item label="客户类型" prop="customer_type">
-					<el-radio-group v-model="editForm.customer_type">
-						<el-radio label="1">直客</el-radio>
-						<el-radio label="0">渠道</el-radio>
-					</el-radio-group>
+					<el-select v-model="editForm.customer_type">
+						<el-option label="直客" value="1"></el-option>
+						<el-option label="渠道" value="0"></el-option>
+					</el-select>
 				</el-form-item>
 					
 				</div>
@@ -207,7 +220,7 @@
 			</el-form>
 			<div slot="footer" class="dialog-footer">
 				<el-button @click.native="editFormVisible = false">取消</el-button>
-				<el-button type="primary" @click.native="editSubmit" :loading="editLoading">提交</el-button>
+				<el-button type="primary" @click.native="editSubmit" >提交</el-button>
 			</div>
 		</el-dialog>
 
@@ -240,7 +253,11 @@
 				</div>
 				<div class="flex">
 					<el-form-item label="付款方式" prop="pay_type">
-						<el-input v-model="addForm.pay_type" auto-complete="off"></el-input>
+						<el-select v-model="addForm.pay_type">
+							<el-option label="对公" value="0"></el-option>
+							<el-option label="对私" value="1"></el-option>
+						</el-select>
+						<!-- <el-input v-model="addForm.pay_type" auto-complete="off"></el-input> -->
 					</el-form-item>
 					<el-form-item label="号码费" prop="number_pay_money">
 						<el-input v-model="addForm.number_pay_money" auto-complete="off"></el-input>
@@ -252,42 +269,42 @@
 						</el-date-picker>
 					</el-form-item>
 					<el-form-item label="客户自备线路" prop="call_customer_pay_money">
-						<el-radio-group v-model="addForm.call_customer_pay_money" size="small">
-							<el-radio label="1">是</el-radio>
-							<el-radio label="0">否</el-radio>
-						</el-radio-group>
+						<el-select v-model="addForm.call_customer_pay_money">
+							<el-option label="是" value="1"></el-option>
+							<el-option label="否" value="0"></el-option>
+						</el-select>
 						<!-- <el-input v-model="addForm.call_customer_pay_money" auto-complete="off"></el-input> -->
 					</el-form-item>
 				</div>
 				<div class="flex">
 					<el-form-item label="通信费" prop="call_year_pay_money">
-						<el-radio-group v-model="addForm.call_year_pay_money">
-							<el-radio label="0">月付</el-radio>
-							<el-radio label="1">季付</el-radio>
-							<el-radio label="2">年付</el-radio>
-							<el-radio label="3">测试(XXX)</el-radio>
-						</el-radio-group>
+						<el-select v-model="addForm.call_year_pay_money">
+							<el-option label="月付" value="0"></el-option>
+							<el-option label="季付" value="1"></el-option>
+							<el-option label="年付" value="2"></el-option>
+							<el-option label="测试(XXX)" value="3"></el-option>
+						</el-select>
 					</el-form-item>
 					<el-form-item label="客户类型" prop="customer_type">
-						<el-radio-group v-model="addForm.customer_type">
-							<el-radio label="1">直客</el-radio>
-							<el-radio label="0">渠道</el-radio>
-						</el-radio-group>
+						<el-select v-model="addForm.customer_type">
+							<el-option label="直客" value="0"></el-option>
+							<el-option label="渠道" value="1"></el-option>
+						</el-select>
 					</el-form-item>
 				</div>
 				<div class="flex">
 					<el-form-item label="客户线索来源" prop="customer_clues">
-						<el-radio-group v-model="addForm.customer_clues" size="small">
-							<el-radio label="0">SEM</el-radio>
-							<el-radio label="1">公司</el-radio>
-							<el-radio label="2">商务本身</el-radio>
-						</el-radio-group>
+						<el-select v-model="addForm.customer_clues">
+							<el-option label="SEM" value="0"></el-option>
+							<el-option label="公司" value="1"></el-option>
+							<el-option label="商务本身" value="2"></el-option>
+						</el-select>
 					</el-form-item>
 					<el-form-item label="是否返款" prop="refunds">
-						<el-radio-group v-model="addForm.refunds" size="small">
-							<el-radio label="1">已返款</el-radio>
-							<el-radio label="0">未返款</el-radio>
-						</el-radio-group>
+						<el-select v-model="addForm.refunds">
+							<el-option label="已返款" value="1"></el-option>
+							<el-option label="未返款" value="0"></el-option>
+						</el-select>
 					</el-form-item>
 				</div>
 				<el-form-item label="打款凭证" prop="pay_voucher">
@@ -307,7 +324,7 @@
 			</el-form>
 			<div slot="footer" class="dialog-footer">
 				<el-button @click.native="addFormVisible = false">取消</el-button>
-				<el-button type="primary" @click.native="addSubmit" :loading="addLoading">提交</el-button>
+				<el-button type="primary" @click.native="addSubmit" >提交</el-button>
 			</div>
 		</el-dialog>
 		<el-dialog :visible.sync="previewDialogVisible">
@@ -323,7 +340,8 @@
 		data() {
 			return {
 				filters: {
-					company_name: ''
+					company_name: '',
+					user_name: '',
 				},
 				list: [],
 				total: 0,
@@ -402,8 +420,8 @@
 					refunds:'',
 					pay_voucher:'',
 				},
-				delFiles:[]
-
+				delFiles:[],
+				role_id:''
 			}
 		},
 		methods: {
@@ -414,9 +432,11 @@
 			//获取table列表
 			getTableList() {
 				const data = {
+					role_id:this.role_id,
 					page: this.page,
 					rows:10,
-					company_name: this.filters.company_name
+					company_name: this.filters.company_name,
+					user_name: this.filters.user_name,
 				};
 				this.listLoading = true;
 				getCompanyCollectionByParam(data).then((res) => {
@@ -432,17 +452,24 @@
 				});
 			},
 			beforeUpload(file){
-				const isJPG = file.type === 'image/jpeg';
-				const isGIF = file.type === 'image/gif';
-				const isPNG = file.type === 'image/png';
-				const isBMP = file.type === 'image/bmp';
+				let fileType = file.name.substring(file.name.lastIndexOf(".")+1).toUpperCase();
+				const isJPG = fileType === 'JPG';
+				const isGIF = fileType === 'GIF';
+				const isPNG = fileType === 'PNG';
+				const isBMP = fileType === 'BMP';
 				const isLt2M = file.size / 1024 / 1024 < 2;
 
 				if (!isJPG && !isGIF && !isPNG && !isBMP) {
-					this.common.errorTip('上传图片必须是JPG/GIF/PNG/BMP 格式!');
+					this.$message({
+						message: '上传图片必须是JPG/GIF/PNG/BMP 格式!',
+						type: 'warning'
+					});
 				}
 				if (!isLt2M) {
-					this.common.errorTip('上传图片大小不能超过 2MB!');
+					this.$message({
+						message: '上传图片大小不能超过 2MB!',
+						type: 'warning'
+					});
 				}
 				return (isJPG || isBMP || isGIF || isPNG) && isLt2M;
 			},
@@ -578,6 +605,10 @@
 				this.$refs.editForm.validate((valid) => {
 					if (valid) {
 						this.editLoading = true;
+						// console.log(this.editForm.pay_voucher);
+						if(this.editForm.pay_voucher instanceof Array){
+							this.editForm.pay_voucher=this.editForm.pay_voucher.join(',');
+						}
 						const data = Object.assign({}, this.editForm);
 						updateCompanyCollectionById(data).then((res) => {
 							this.editLoading = false;
@@ -625,6 +656,7 @@
 			}
 		},
 		mounted() {
+			this.role_id=JSON.parse(sessionStorage.getItem('user')).role_id;
 			this.getTableList();
 		}
 	}

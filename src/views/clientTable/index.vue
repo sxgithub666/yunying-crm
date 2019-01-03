@@ -34,10 +34,10 @@
 			</el-table-column>
 			<el-table-column prop="audit_status" label="状态" width="100" show-overflow-tooltip>
 				<template slot-scope="scope">
-					<el-button type="info" size="small" plain v-if="scope.row.audit_status==0">未审核</el-button>
-					<el-button type="primary" size="small" plain v-if="scope.row.audit_status==1">审核中</el-button>
-					<el-button type="success" size="small" plain v-if="scope.row.audit_status==2">审核通过</el-button>
-					<el-button type="danger" size="small" plain v-if="scope.row.audit_status==3">审核拒绝</el-button>
+					<el-button type="info" size="small" plain v-if="scope.row.audit_status==0">未审批</el-button>
+					<el-button type="primary" size="small" plain v-if="scope.row.audit_status==1">转发中</el-button>
+					<el-button type="success" size="small" plain v-if="scope.row.audit_status==2">审批通过</el-button>
+					<el-button type="danger" size="small" plain v-if="scope.row.audit_status==3">审批拒绝</el-button>
 				</template>
 			</el-table-column>
 			<el-table-column prop="number_charges" label="号码费" width="100">
@@ -52,7 +52,7 @@
 			</el-table-column>
 			<el-table-column label="操作" fixed="right" width="260">
 				<template slot-scope="scope">
-					<el-button v-if="scope.row.audit_status==0" size="small" @click="auditSubmit(scope.row)">提交审核</el-button>
+					<el-button v-if="scope.row.audit_status!=3" size="small" @click="auditSubmit(scope.row)">提交审核</el-button>
 					<el-button v-if="scope.row.audit_status==3" size="small" @click="resubmit(scope.row)">重新提交</el-button>
 					<el-button size="small" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
 					<el-button type="danger" size="small" @click="handleDel(scope.$index, scope.row)">删除</el-button>
@@ -106,7 +106,7 @@
 			</el-form>
 			<div slot="footer" class="dialog-footer">
 				<el-button @click.native="editFormVisible = false">取消</el-button>
-				<el-button type="primary" @click.native="editSubmit" :loading="editLoading">提交</el-button>
+				<el-button type="primary" @click.native="editSubmit">提交</el-button>
 			</div>
 		</el-dialog>
 
@@ -151,7 +151,7 @@
 			</el-form>
 			<div slot="footer" class="dialog-footer">
 				<el-button @click.native="addFormVisible = false">取消</el-button>
-				<el-button type="primary" @click.native="addSubmit" :loading="addLoading">提交</el-button>
+				<el-button type="primary" @click.native="addSubmit">提交</el-button>
 			</div>
 		</el-dialog>
 	</section>
@@ -232,7 +232,7 @@
 					role_id:this.role_id,
 					page: this.page,
 					rows:10,
-					prefix: this.filters.prefix,
+					customer_name: this.filters.customer_name,
 					user_name:this.filters.user_name
 				};
 				this.listLoading = true;

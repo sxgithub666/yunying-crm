@@ -7,6 +7,9 @@
 					<el-input size="small" clearable v-model="filters.company_name" placeholder="公司名称"></el-input>
 				</el-form-item>
 				<el-form-item>
+					<el-input size="small" clearable v-model="filters.user_name" placeholder="添加人"></el-input>
+				</el-form-item>
+				<el-form-item>
 					<el-button type="primary" size="small" v-on:click="getTableList">查询</el-button>
 				</el-form-item>
 				<el-form-item>
@@ -35,10 +38,10 @@
 			</el-table-column>
 			<el-table-column prop="audit_status" label="状态" width="100" show-overflow-tooltip>
 				<template slot-scope="scope">
-					<el-button type="info" size="small" plain v-if="scope.row.audit_status==0">未审核</el-button>
-					<el-button type="primary" size="small" plain v-if="scope.row.audit_status==1">审核中</el-button>
-					<el-button type="success" size="small" plain v-if="scope.row.audit_status==2">审核通过</el-button>
-					<el-button type="danger" size="small" plain v-if="scope.row.audit_status==3">审核拒绝</el-button>
+					<el-button type="info" size="small" plain v-if="scope.row.audit_status==0">未审批</el-button>
+					<el-button type="primary" size="small" plain v-if="scope.row.audit_status==1">转发中</el-button>
+					<el-button type="success" size="small" plain v-if="scope.row.audit_status==2">审批通过</el-button>
+					<el-button type="danger" size="small" plain v-if="scope.row.audit_status==3">审批拒绝</el-button>
 				</template>
 			</el-table-column>
 			<el-table-column prop="pay_money" label="收款金额" width="100">
@@ -49,7 +52,13 @@
 			</el-table-column>
 			<el-table-column prop="business_type" label="业务类型" width="180">
 			</el-table-column>
-			<el-table-column prop="pay_type" label="付款方式" width="180">
+			<el-table-column prop="user_name" label="添加人" width="100">
+			</el-table-column>
+			<el-table-column prop="pay_type" label="付款方式" width="100">
+				<template slot-scope="scope">
+					<span v-if="scope.row.pay_type==0">对公</span>
+					<span v-if="scope.row.pay_type==1">对私</span>
+				</template>
 			</el-table-column>
 			<el-table-column prop="customer_region" label="客户所在区域" width="180">
 			</el-table-column>
@@ -62,18 +71,23 @@
 			<el-table-column prop="pay_voucher" label="打款凭证" width="200">
 				<template slot-scope="scope">
 					<div class="tableImg" v-if="scope.row.pay_voucher">
-						<img v-for="(item,index) in scope.row.pay_voucher" class="smallImg" preview="3" :src="item" :key="index" alt="" style="width: 40px;height: 40px;margin-right:5px;">
+						<img v-for="(item,index) in scope.row.pay_voucher" class="smallImg" :preview="index" :src="item" :key="index" alt="" style="width: 40px;height: 40px;margin-right:5px;">
 					  <!-- <img class="bigImg" :src="scope.row.url" alt="">   -->
 					</div>
 				</template>
 			</el-table-column>
-			<el-table-column prop="need_data" label="申请号码材料" width="180">
+			<el-table-column prop="need_data" label="申请号码材料" width="120">
+				<template slot-scope="scope">
+					<a :href="scope.row.need_data" download>
+					  <el-button v-if="scope.row.need_data" type="text" size="small">下载</el-button>
+					</a>
+				</template>
 			</el-table-column>
 			<el-table-column prop="remark" label="备注" width="180">
 			</el-table-column>
 			<el-table-column label="操作" fixed="right" width="260">
 				<template slot-scope="scope">
-					<el-button v-if="scope.row.audit_status==0" size="small" @click="auditSubmit(scope.row)">提交审核</el-button>
+					<el-button v-if="scope.row.audit_status!=3" size="small" @click="auditSubmit(scope.row)">提交审核</el-button>
 					<el-button v-if="scope.row.audit_status==3" size="small" @click="resubmit(scope.row)">重新提交</el-button>
 					<el-button size="small" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
 					<el-button type="danger" size="small" @click="handleDel(scope.$index, scope.row)">删除</el-button>
@@ -115,33 +129,49 @@
 					</el-form-item>
 				</div>
 				<div class="flex">
-					<el-form-item label="业务类型" prop="business_type">
-						<el-input v-model="editForm.business_type" clearable auto-complete="off"></el-input>
-					</el-form-item>
-					<el-form-item label="付款方式" prop="pay_type">
-						<el-input v-model="editForm.pay_type" clearable auto-complete="off"></el-input>
-					</el-form-item>
-				</div>
-				<div class="flex">
 					<el-form-item label="收款时间" prop="pay_time">
 						<el-date-picker v-model="editForm.pay_time" @change="getEditTime" value-format="yyyy-MM-dd HH:mm:ss" type="datetime" placeholder="选择收款日期时间">
 						</el-date-picker>
 					</el-form-item>
-					<el-form-item label="是否返款" prop="refunds">
-						<el-radio-group v-model="editForm.refunds">
-							<el-radio label="1">已返款</el-radio>
-							<el-radio label="0">未返款</el-radio>
-						</el-radio-group>
+					<el-form-item label="业务类型" prop="business_type">
+						<el-input v-model="editForm.business_type" clearable auto-complete="off"></el-input>
 					</el-form-item>
 				</div>
 				<div class="flex">
-					<el-form-item label="申请号码材料" prop="need_data">
-						<el-input v-model="editForm.need_data" clearable auto-complete="off"></el-input>
+					<el-form-item label="付款方式" prop="pay_type">
+						<el-select v-model="editForm.pay_type">
+							<el-option label="对公" value="0"></el-option>
+							<el-option label="对私" value="1"></el-option>
+						</el-select>
+						<!-- <el-input v-model="editForm.pay_type" clearable auto-complete="off"></el-input> -->
 					</el-form-item>
+					<el-form-item label="是否返款" prop="refunds">
+						<el-select v-model="editForm.refunds">
+							<el-option label="已返款" value="1"></el-option>
+							<el-option label="未返款" value="0"></el-option>
+						</el-select>
+					</el-form-item>
+				</div>
+				<div class="flex">
 					<el-form-item label="备注">
 						<el-input v-model="editForm.remark" clearable auto-complete="off"></el-input>
 					</el-form-item>
 				</div>
+				<el-form-item label="申请号码材料" prop="need_data">
+					<el-upload :headers="headers"
+										 :action="uploadUrl"
+										 :on-success="onEditNumSuccess"
+										 :on-change="uploadChange"
+										 :before-upload="onNumBeforeUpload"
+										 :show-file-list="false"
+										 multiple
+										 :limit="2"
+										 :file-list="numMaterialfileList">
+						<el-button size="small" type="primary">点击上传</el-button>
+						<span slot="tip" style="padding-left:10px;color:#E6A23C;" class="el-upload__tip">只能上传zip/rar文件</span>
+					</el-upload>
+					<!-- <el-input v-model="editForm.need_data" clearable auto-complete="off"></el-input> -->
+				</el-form-item>
 				<el-form-item label="打款凭证">
 						<!-- <el-input v-model="editForm.pay_voucher" auto-complete="off"></el-input> -->
 					<el-upload ref="editUpload"
@@ -159,7 +189,7 @@
 			</el-form>
 			<div slot="footer" class="dialog-footer">
 				<el-button @click.native="editFormVisible = false">取消</el-button>
-				<el-button type="primary" @click.native="editSubmit" :loading="editLoading">提交</el-button>
+				<el-button type="primary" @click.native="editSubmit" >提交</el-button>
 			</div>
 		</el-dialog>
 
@@ -184,12 +214,14 @@
 					</el-form-item>
 				</div>
 				<div class="flex">
+					<el-form-item label="收款时间" prop="pay_time">
+						<el-date-picker v-model="addForm.pay_time" @change="getAddTime" value-format="yyyy-MM-dd HH:mm:ss" type="datetime" placeholder="选择收款日期时间">
+						</el-date-picker>
+					</el-form-item>
 					<el-form-item label="业务类型" prop="business_type">
 						<el-input v-model="addForm.business_type" clearable auto-complete="off"></el-input>
 					</el-form-item>
-					<el-form-item label="付款方式" prop="pay_type">
-						<el-input v-model="addForm.pay_type" clearable auto-complete="off"></el-input>
-					</el-form-item>
+					
 				</div>
 				<div class="flex">
 					<el-form-item label="客户所在区域" prop="customer_region">
@@ -200,25 +232,41 @@
 					</el-form-item>
 				</div>
 				<div class="flex">
-					<el-form-item label="收款时间" prop="pay_time">
-						<el-date-picker v-model="addForm.pay_time" @change="getAddTime" value-format="yyyy-MM-dd HH:mm:ss" type="datetime" placeholder="选择收款日期时间">
-						</el-date-picker>
+					<el-form-item label="付款方式" prop="pay_type">
+						<el-select v-model="addForm.pay_type">
+							<el-option label="对公" value="0"></el-option>
+							<el-option label="对私" value="1"></el-option>
+						</el-select>
+						<!-- <el-input v-model="addForm.pay_type" clearable auto-complete="off"></el-input> -->
 					</el-form-item>
 					<el-form-item label="是否返款" prop="refunds">
-						<el-radio-group v-model="addForm.refunds">
-							<el-radio label="1">已返款</el-radio>
-							<el-radio label="0">未返款</el-radio>
-						</el-radio-group>
+						<el-select v-model="addForm.refunds">
+							<el-option label="已返款" value="1"></el-option>
+							<el-option label="未返款" value="0"></el-option>
+						</el-select>
 					</el-form-item>
 				</div>
 				<div class="flex">
-					<el-form-item label="申请号码材料" prop="need_data">
-						<el-input v-model="addForm.need_data" clearable auto-complete="off"></el-input>
+					<el-form-item label="申请号码材料" style="width:60%" prop="need_data">
+						<el-upload :headers="headers"
+											:action="uploadUrl"
+											:on-change="uploadChange"
+											:before-upload="onNumBeforeUpload"
+											:on-success="onAddNumSuccess"
+											:show-file-list="false"
+											multiple
+											:limit="2"
+											:file-list="numMaterialfileList">
+							<el-button size="small" type="primary">点击上传</el-button>
+							<span slot="tip" style="padding-left:10px;color:#E6A23C;" class="el-upload__tip">请上传zip/rar文件</span>
+						</el-upload>
+						<!-- <el-input v-model="addForm.need_data" clearable auto-complete="off"></el-input> -->
 					</el-form-item>
 					<el-form-item label="备注">
 						<el-input v-model="addForm.remark" clearable auto-complete="off"></el-input>
 					</el-form-item>
 				</div>
+				
 				<el-form-item label="打款凭证">
 						<!-- <el-input v-model="addForm.pay_voucher" auto-complete="off"></el-input> -->
 						<el-upload ref="addUpload"
@@ -229,14 +277,14 @@
 										 :before-upload="beforeUpload"
 										 :on-success="onSuccess"
 										 :on-preview="handlePictureCardPreview"
-										 :on-remove="handleRemove">
+										 :on-remove="handleNumRemove">
 						<i class="el-icon-plus"></i>
 					</el-upload>
 				</el-form-item>
 			</el-form>
 			<div slot="footer" class="dialog-footer">
 				<el-button @click.native="addFormVisible = false">取消</el-button>
-				<el-button type="primary" @click.native="addSubmit" :loading="addLoading">提交</el-button>
+				<el-button type="primary" @click.native="addSubmit" >提交</el-button>
 			</div>
 		</el-dialog>
 		<el-dialog :visible.sync="previewDialogVisible">
@@ -252,7 +300,8 @@
 		data() {
 			return {
 				filters: {
-					company_name: ''
+					company_name: '',
+					user_name: '',
 				},
 				role_id:'',
 				list: [],
@@ -273,7 +322,7 @@
 					pay_type: [{ required: true, message: '请输入付款方式', trigger: 'blur'}],
 					customer_region: [{ required: true, message: '请输入客户所在区域', trigger: 'blur'}],
 					refunds: [{ required: true, message: '请输入是否返款', trigger: 'blur'}],
-					need_data: [{ required: true, message: '请输入申请号码材料', trigger: 'blur'}],
+					// need_data: [{ required: true, message: '请输入申请号码材料', trigger: 'blur'}],
 				},
 				//编辑界面数据
 				editForm: {
@@ -320,7 +369,8 @@
 					pay_voucher:'',
 					need_data:'',
 					remark:'',
-				}
+				},
+				numMaterialfileList:[]
 
 			}
 		},
@@ -336,7 +386,8 @@
 					page: this.page,
 					rows:10,
 					type:'0',
-					area: this.filters.area
+					company_name: this.filters.company_name,
+					user_name: this.filters.user_name,
 				};
 				this.listLoading = true;
 				getZjPaasProcessByParam(data).then((res) => {
@@ -351,17 +402,24 @@
 				});
 			},
 			beforeUpload(file){
-				const isJPG = file.type === 'image/jpeg';
-				const isGIF = file.type === 'image/gif';
-				const isPNG = file.type === 'image/png';
-				const isBMP = file.type === 'image/bmp';
+				let fileType = file.name.substring(file.name.lastIndexOf(".")+1).toUpperCase();
+				const isJPG = fileType === 'JPG';
+				const isGIF = fileType === 'GIF';
+				const isPNG = fileType === 'PNG';
+				const isBMP = fileType === 'BMP';
 				const isLt2M = file.size / 1024 / 1024 < 2;
 
 				if (!isJPG && !isGIF && !isPNG && !isBMP) {
-					this.common.errorTip('上传图片必须是JPG/GIF/PNG/BMP 格式!');
+					this.$message({
+						message: '上传图片必须是JPG/GIF/PNG/BMP 格式!',
+						type: 'warning'
+					});
 				}
 				if (!isLt2M) {
-					this.common.errorTip('上传图片大小不能超过 2MB!');
+					this.$message({
+						message: '上传图片大小不能超过 2MB!',
+						type: 'warning'
+					});
 				}
 				return (isJPG || isBMP || isGIF || isPNG) && isLt2M;
 			},
@@ -411,6 +469,53 @@
 			handlePictureCardPreview(file) {
         this.dialogImageUrl = file.url;
         this.previewDialogVisible = true;
+			},
+			//号码材料上传zip包
+			onAddNumSuccess(response, file, fileList){
+				if(response.errCode==200){
+					this.$message({
+						message: response.errMsg,
+						type: 'success'
+					});
+					this.addForm.need_data=response.result;
+				}else{
+					this.$message({
+						message: response.errMsg,
+						type: 'warning'
+					});
+				}
+			},
+			onEditNumSuccess(response, file, fileList){
+				if(response.errCode==200){
+					this.$message({
+						message: response.errMsg,
+						type: 'success'
+					});
+					this.editForm.need_data=response.result;
+				}else{
+					this.$message({
+						message: response.errMsg,
+						type: 'warning'
+					});
+				}
+			},
+			onNumBeforeUpload(file){
+				let fileType=file.name.substring(file.name.lastIndexOf(".")+1).toUpperCase();;
+				if(fileType=='RAR' || fileType=='ZIP'){
+					return true;
+				}else{
+					this.$message({
+						message: '请上传zip/rar类型文件',
+						type: 'warning'
+					});
+					return false;
+				};
+			},
+			uploadChange(file, fileList){
+        this.numMaterialfileList=fileList.slice(-1);
+      },
+			handleNumRemove(){
+
 			},
 			//提交审核
 			auditSubmit(row){
@@ -492,6 +597,9 @@
 				this.$refs.editForm.validate((valid) => {
 					if (valid) {
 						this.editLoading = true;
+						if(this.editForm.pay_voucher instanceof Array){
+							this.editForm.pay_voucher=this.editForm.pay_voucher.join(',');
+						};
 						const data = Object.assign({}, this.editForm);
 						updateZjPaasProcessById(data).then((res) => {
 							this.editLoading = false;

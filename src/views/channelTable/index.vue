@@ -31,10 +31,10 @@
 			</el-table-column>
 			<el-table-column prop="audit_status" label="状态" width="110" show-overflow-tooltip>
 				<template slot-scope="scope">
-					<el-button type="info" size="small" plain v-if="scope.row.audit_status==0">未审核</el-button>
-					<el-button type="primary" size="small" plain v-if="scope.row.audit_status==1">审核中</el-button>
-					<el-button type="success" size="small" plain v-if="scope.row.audit_status==2">审核通过</el-button>
-					<el-button type="danger" size="small" plain v-if="scope.row.audit_status==3">审核拒绝</el-button>
+					<el-button type="info" size="small" plain v-if="scope.row.audit_status==0">未审批</el-button>
+					<el-button type="primary" size="small" plain v-if="scope.row.audit_status==1">转发中</el-button>
+					<el-button type="success" size="small" plain v-if="scope.row.audit_status==2">审批通过</el-button>
+					<el-button type="danger" size="small" plain v-if="scope.row.audit_status==3">审批拒绝</el-button>
 				</template>
 			</el-table-column>
 			<el-table-column prop="number" label="号码" width="150" show-overflow-tooltip>
@@ -73,7 +73,7 @@
 			</el-table-column>
 			<el-table-column label="操作" fixed="right" width="260">
 				<template slot-scope="scope">
-					<el-button v-if="scope.row.audit_status==0" size="small" @click="auditSubmit(scope.row)">提交审核</el-button>
+					<el-button v-if="scope.row.audit_status!=3" size="small" @click="auditSubmit(scope.row)">提交审核</el-button>
 					<el-button v-if="scope.row.audit_status==3" size="small" @click="resubmit(scope.row)">重新提交</el-button>
 					<el-button size="small" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
 					<el-button type="danger" size="small" @click="handleDel(scope.$index, scope.row)">删除</el-button>
@@ -151,16 +151,16 @@
 				</div>
 				<div class="flex">
 					<el-form-item label="是否开票" prop="invoice">
-						<el-radio-group v-model="editForm.invoice">
-							<el-radio label="1">已开票</el-radio>
-							<el-radio label="0">未开票</el-radio>
-						</el-radio-group>
+						<el-select v-model="editForm.invoice">
+							<el-option label="已开票" value="1"></el-option>
+							<el-option label="未开票" value="0"></el-option>
+						</el-select>
 					</el-form-item>
 					<el-form-item label="发票类型" prop="invoice_type">
-						<el-radio-group v-model="editForm.invoice_type">
-							<el-radio label="1">普票</el-radio>
-							<el-radio label="0">专票</el-radio>
-						</el-radio-group>
+						<el-select v-model="editForm.invoice_type">
+							<el-option label="普票" value="1"></el-option>
+							<el-option label="专票" value="0"></el-option>
+						</el-select>
 					</el-form-item>
 				</div>
 				<el-form-item label="税点" prop="tax_point">
@@ -169,7 +169,7 @@
 			</el-form>
 			<div slot="footer" class="dialog-footer">
 				<el-button @click.native="editFormVisible = false">取消</el-button>
-				<el-button type="primary" @click.native="editSubmit" :loading="editLoading">提交</el-button>
+				<el-button type="primary" @click.native="editSubmit">提交</el-button>
 			</div>
 		</el-dialog>
 
@@ -228,16 +228,16 @@
 				</div>
 				<div class="flex">
 					<el-form-item label="是否开票" prop="invoice">
-						<el-radio-group v-model="addForm.invoice">
-							<el-radio label="1">已开票</el-radio>
-							<el-radio label="0">未开票</el-radio>
-						</el-radio-group>
+						<el-select v-model="addForm.invoice">
+							<el-option label="已开票" value="1"></el-option>
+							<el-option label="未开票" value="0"></el-option>
+						</el-select>
 					</el-form-item>
 					<el-form-item label="发票类型" prop="invoice_type">
-						<el-radio-group v-model="addForm.invoice_type">
-							<el-radio label="1">普票</el-radio>
-							<el-radio label="0">专票</el-radio>
-						</el-radio-group>
+						<el-select v-model="addForm.invoice_type">
+							<el-option label="普票" value="1"></el-option>
+							<el-option label="专票" value="0"></el-option>
+						</el-select>
 					</el-form-item>
 				</div>
 				<el-form-item label="税点" prop="tax_point">
@@ -246,7 +246,7 @@
 			</el-form>
 			<div slot="footer" class="dialog-footer">
 				<el-button @click.native="addFormVisible = false">取消</el-button>
-				<el-button type="primary" @click.native="addSubmit" :loading="addLoading">提交</el-button>
+				<el-button type="primary" @click.native="addSubmit">提交</el-button>
 			</div>
 		</el-dialog>
 	</section>
@@ -256,7 +256,9 @@
 	import { getChannelByParam, insertChannel, updateChannelById, deleteChannelById ,insertProcess ,updateReProcessById} from '../../api/api';
 
 	export default {
+		
 		data() {
+			
 			return {
 				filters: {
 					name: ''

@@ -50,11 +50,14 @@ const POST = (url, params) => {
   return axios.post(`${base}${url}`, params).then(res => res.data)
 }
 
+//登录
 export const login = params => {
-  return POST('/login/login', params)//登录
+  return POST('/login/login', params)
 };
-
-
+//修改密码
+export const updateUserPassword = params => {
+  return POST('/userInfo/updateUserPassword', params)
+};
 //用户管理页面
 export const getUserInfoByParam = params => {
   return POST('/userInfo/getUserInfoByParam', params)

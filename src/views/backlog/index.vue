@@ -11,7 +11,7 @@
 				</el-form-item>
 			</el-form>
 		</el-col> -->
-
+		<div style="padding-bottom:20px"></div>
 		<!--列表-->
 		<el-table :data="users" border	highlight-current-row v-loading="listLoading" style="width: 100%;">
 			<el-table-column type="index" width="60">
@@ -22,7 +22,7 @@
 					<span v-if="scope.row.type==1">收款信息</span>
 					<span v-if="scope.row.type==2">合同与发票</span>
 					<span v-if="scope.row.type==3">小水智能</span>
-					<span v-if="scope.row.type==4">总机Paas</span>
+					<span v-if="scope.row.type==4">总机/Paas</span>
 					<span v-if="scope.row.type==5">客户信息</span>
 				</template>
 			</el-table-column>
@@ -71,8 +71,8 @@
 			<el-table-column label="操作" width="260">
 				<template slot-scope="scope">
 					<el-button size="small" @click="viewDetails(scope.$index, scope.row)">查看</el-button>
-					<el-button size="small" @click="handleTranspond(scope.$index, scope.row)">转发</el-button>
-					<el-button type="danger" size="small" @click="handleDel(scope.$index, scope.row)">删除</el-button>
+					<el-button v-if="role_id!=='0'" size="small" @click="handleTranspond(scope.$index, scope.row)">转发</el-button>
+					<el-button v-if="role_id!=='0'" type="danger" size="small" @click="handleDel(scope.$index, scope.row)">删除</el-button>
 				</template>
 			</el-table-column>
 		</el-table>
@@ -102,7 +102,7 @@
 			</div>
 		</el-dialog>
 		<!--查看通道信息-->
-		<el-dialog title="通道信息" :visible.sync="channelVisible" :close-on-click-modal="false">
+		<el-dialog title="通道信息"  :visible.sync="channelVisible" :close-on-click-modal="false">
 			<el-form :model="channelForm" label-width="100px">
 				<div class="flex">
 					<el-form-item label="通道名称" prop="name">
@@ -164,23 +164,23 @@
 				</div>
 				<div class="flex">
 					<el-form-item label="是否开票" prop="invoice">
-						<el-radio-group disabled v-model="channelForm.invoice">
-							<el-radio label="1">已开票</el-radio>
-							<el-radio label="0">未开票</el-radio>
-						</el-radio-group>
+						<el-select disabled v-model="channelForm.invoice">
+							<el-option label="已开票" value="1"></el-option>
+							<el-option label="未开票" value="0"></el-option>
+						</el-select>
 					</el-form-item>
 					<el-form-item label="发票类型" prop="invoice_type">
-						<el-radio-group disabled v-model="channelForm.invoice_type">
-							<el-radio label="1">普票</el-radio>
-							<el-radio label="0">专票</el-radio>
-						</el-radio-group>
+						<el-select disabled v-model="channelForm.invoice_type">
+							<el-option label="普票" value="1"></el-option>
+							<el-option label="专票" value="0"></el-option>
+						</el-select>
 					</el-form-item>
 				</div>
 				<el-form-item label="税点" prop="tax_point">
 					<el-input disabled v-model="channelForm.tax_point" auto-complete="off"></el-input>
 				</el-form-item>
 			</el-form>
-			<div slot="footer" class="dialog-footer">
+			<div v-if="role_id!=='0'" slot="footer" class="dialog-footer">
 				<el-button type="primary" @click.native="approve('2')">审核通过</el-button>
 				<el-button type="danger" @click.native="refused('3')">审核拒绝</el-button>
 			</div>
@@ -223,13 +223,13 @@
 					</el-form-item>
 				</div>
 			</el-form>
-			<div slot="footer" class="dialog-footer">
+			<div v-if="role_id!=='0'" slot="footer" class="dialog-footer">
 				<el-button type="primary" @click.native="approve('2')">审核通过</el-button>
 				<el-button type="danger" @click.native="refused('3')">审核拒绝</el-button>
 			</div>
 		</el-dialog>
 		<!--查看收款信息--> 
-		<el-dialog title="收款信息" width="57%" :visible.sync="gatheringVisible" :close-on-click-modal="false">
+		<el-dialog title="收款信息" :visible.sync="gatheringVisible" :close-on-click-modal="false">
 			<el-form :model="gatheringForm" label-width="100px">
 				<div class="flex">
 					<el-form-item label="公司名称" prop="company_name">
@@ -257,7 +257,11 @@
 				</div>
 				<div class="flex">
 					<el-form-item label="付款方式" prop="pay_type">
-						<el-input disabled v-model="gatheringForm.pay_type" auto-complete="off"></el-input>
+						<el-select disabled v-model="gatheringForm.pay_type">
+							<el-option label="对公" value="0"></el-option>
+							<el-option label="对私" value="1"></el-option>
+						</el-select>
+						<!-- <el-input disabled v-model="gatheringForm.pay_type" auto-complete="off"></el-input> -->
 					</el-form-item>
 					<el-form-item label="通信费卡槽费" prop="call_card_pay_money">
 						<el-input disabled v-model="gatheringForm.call_card_pay_money" auto-complete="off"></el-input>
@@ -269,57 +273,62 @@
 						</el-date-picker>
 					</el-form-item>
 					<el-form-item label="客户线索来源" prop="customer_clues">
-						<el-radio-group disabled v-model="gatheringForm.customer_clues" size="small">
-							<el-radio label="0">SEM</el-radio>
-							<el-radio label="1">公司</el-radio>
-							<el-radio label="2">商务本身</el-radio>
-						</el-radio-group>
+						<el-select disabled v-model="gatheringForm.customer_clues">
+							<el-option label="SEM" value="0"></el-option>
+							<el-option label="公司" value="1"></el-option>
+							<el-option label="商务本身" value="2"></el-option>
+						</el-select>
 					</el-form-item>
 				</div>
 				<div class="flex">
 					<el-form-item label="通信费" prop="call_year_pay_money">
-						<el-radio-group disabled v-model="gatheringForm.call_year_pay_money">
-							<el-radio label="0">月付</el-radio>
-							<el-radio label="1">季付</el-radio>
-							<el-radio label="2">年付</el-radio>
-							<el-radio label="3">测试(XXX)</el-radio>
-						</el-radio-group>
+						<el-select disabled v-model="gatheringForm.call_year_pay_money">
+							<el-option label="月付" value="0"></el-option>
+							<el-option label="季付" value="1"></el-option>
+							<el-option label="年付" value="2"></el-option>
+							<el-option label="测试(XXX)" value="3"></el-option>
+						</el-select>
 						<!-- <el-input v-model="gatheringForm.call_year_pay_money" auto-complete="off"></el-input> -->
 					</el-form-item>
 					<el-form-item label="客户类型" prop="customer_type">
-						<el-radio-group disabled v-model="gatheringForm.customer_type">
-							<el-radio label="1">直客</el-radio>
-							<el-radio label="0">渠道</el-radio>
-						</el-radio-group>
+						<el-select disabled v-model="gatheringForm.customer_type">
+							<el-option label="直客" value="1"></el-option>
+							<el-option label="渠道" value="0"></el-option>
+						</el-select>
 					</el-form-item>
 				</div>
 				<div class="flex">
 					<el-form-item label="客户自备线路" prop="call_customer_pay_money">
-						<el-radio-group disabled v-model="gatheringForm.call_customer_pay_money" size="small">
-							<el-radio label="1">是</el-radio>
-							<el-radio label="0">否</el-radio>
-						</el-radio-group>
+						<el-select disabled v-model="gatheringForm.call_customer_pay_money">
+							<el-option label="是" value="1"></el-option>
+							<el-option label="否" value="0"></el-option>
+						</el-select>
 						<!-- <el-input v-model="gatheringForm.call_customer_pay_money" auto-complete="off"></el-input> -->
 					</el-form-item>
 					<el-form-item label="是否返款" prop="refunds">
-						<el-radio-group disabled v-model="gatheringForm.refunds" size="small">
-							<el-radio label="1">已返款</el-radio>
-							<el-radio label="0">未返款</el-radio>
-						</el-radio-group>
+						<el-select disabled v-model="gatheringForm.refunds">
+							<el-option label="已返款" value="1"></el-option>
+							<el-option label="未返款" value="0"></el-option>
+						</el-select>
 					</el-form-item>
 				</div>
 					<el-form-item label="打款凭证" prop="pay_voucher">
-						<el-input disabled v-model="gatheringForm.pay_voucher" auto-complete="off"></el-input>
+						<div class="editImg">
+							<div class="item" v-for="(item,index) in gatheringFileList" :key="index">
+								<img class="smallImg" :preview="index" :src="item" alt="">
+							</div>
+						</div>
+						<!-- <el-input disabled v-model="gatheringForm.pay_voucher" auto-complete="off"></el-input> -->
 					</el-form-item>
 			</el-form>
-			<div slot="footer" class="dialog-footer">
+			<div v-if="role_id!=='0'" slot="footer" class="dialog-footer">
 			  <el-button type="primary" @click.native="approve('2')">审核通过</el-button>
 				<el-button type="danger" @click.native="refused('3')">审核拒绝</el-button>
 			</div>
 		</el-dialog>
 		<!--查看小水智能信息-->
 		<el-dialog title="小水智能信息" :visible.sync="robotVisible" :close-on-click-modal="false">
-			<el-form :model="robotForm" label-width="80px">
+			<el-form :model="robotForm" label-width="120px">
 				<div class="flex">
 					<el-form-item label="销售区域" prop="area">
 						<el-input v-model="robotForm.area" auto-complete="off"></el-input>
@@ -334,10 +343,10 @@
 						</el-date-picker>
 					</el-form-item>
 					<el-form-item label="客户类型">
-						<el-radio-group v-model="robotForm.customer_type">
-							<el-radio label="1">直客</el-radio>
-							<el-radio label="0">渠道</el-radio>
-						</el-radio-group>
+						<el-select v-model="robotForm.customer_type">
+							<el-option label="直客" value="1"></el-option>
+							<el-option label="渠道" value="0"></el-option>
+						</el-select>
 					</el-form-item>
 				</div>
 				<div class="flex">
@@ -358,10 +367,10 @@
 				</div>
 				<div class="flex">
 					<el-form-item label="客户自备线路">
-						<el-radio-group v-model="robotForm.call_customer_pay_money" size="small">
-							<el-radio label="1">是</el-radio>
-							<el-radio label="0">否</el-radio>
-						</el-radio-group>
+						<el-select v-model="robotForm.call_customer_pay_money">
+							<el-option label="是" value="1"></el-option>
+							<el-option label="否" value="0"></el-option>
+						</el-select>
 						<!-- <el-input v-model="robotForm.call_customer_pay_money" auto-complete="off"></el-input> -->
 					</el-form-item>
 					<el-form-item label="通信费卡槽费">
@@ -370,12 +379,12 @@
 				</div>
 				<div class="flex">
 					<el-form-item label="通信费">
-						<el-radio-group v-model="robotForm.call_year_pay_money">
-							<el-radio label="0">月付</el-radio>
-							<el-radio label="1">季付</el-radio>
-							<el-radio label="2">年付</el-radio>
-							<el-radio label="3">测试(XXX)</el-radio>
-						</el-radio-group>
+						<el-select v-model="robotForm.call_year_pay_money">
+							<el-option label="月付" value="0"></el-option>
+							<el-option label="季付" value="1"></el-option>
+							<el-option label="年付" value="2"></el-option>
+							<el-option label="测试(XXX)" value="3"></el-option>
+						</el-select>
 						<!-- <el-input v-model="robotForm.call_year_pay_money" auto-complete="off"></el-input> -->
 					</el-form-item>
 					<el-form-item label="机器人费">
@@ -386,7 +395,7 @@
 						<el-input v-model="robotForm.remark" auto-complete="off"></el-input>
 					</el-form-item>
 			</el-form>
-			<div slot="footer" class="dialog-footer">
+			<div v-if="role_id!=='0'" slot="footer" class="dialog-footer">
 				<el-button type="primary" @click.native="approve('2')">审核通过</el-button>
 				<el-button type="danger" @click.native="refused('3')">审核拒绝</el-button>
 			</div>
@@ -417,16 +426,20 @@
 					<el-input v-model="switchboardForm.business_type" auto-complete="off"></el-input>
 				</el-form-item>
 				<el-form-item label="付款方式">
-					<el-input v-model="switchboardForm.pay_type" auto-complete="off"></el-input>
+					<el-select v-model="switchboardForm.pay_type">
+						<el-option label="对公" value="0"></el-option>
+						<el-option label="对私" value="1"></el-option>
+					</el-select>
+					<!-- <el-input v-model="switchboardForm.pay_type" auto-complete="off"></el-input> -->
 				</el-form-item>
 				<el-form-item label="客户所在区域">
 					<el-input v-model="switchboardForm.customer_region" auto-complete="off"></el-input>
 				</el-form-item>
 				<el-form-item label="是否返款">
-					<el-radio-group v-model="switchboardForm.refunds">
-						<el-radio label="1">已返款</el-radio>
-						<el-radio label="0">未返款</el-radio>
-					</el-radio-group>
+					<el-select v-model="switchboardForm.refunds">
+						<el-option label="已返款" value="1"></el-option>
+						<el-option label="未返款" value="0"></el-option>
+					</el-select>
 				</el-form-item>
 				<el-form-item label="打款凭证">
 					<el-input v-model="switchboardForm.pay_voucher" auto-complete="off"></el-input>
@@ -438,14 +451,14 @@
 					<el-input v-model="switchboardForm.remark" auto-complete="off"></el-input>
 				</el-form-item>
 			</el-form>
-			<div slot="footer" class="dialog-footer">
+			<div v-if="role_id!=='0'" slot="footer" class="dialog-footer">
 				<el-button type="primary" @click.native="approve('2')">审核通过</el-button>
 				<el-button type="danger" @click.native="refused('3')">审核拒绝</el-button>
 			</div>
 		</el-dialog>
 		<!--查看语音Pass信息-->
 		<el-dialog title="总机Pass信息" :visible.sync="voicePassVisible" :close-on-click-modal="false">
-			<el-form :model="voicePassForm" label-width="80px">
+			<el-form :model="voicePassForm" label-width="100px">
 				<div class="flex">
 					<el-form-item label="销售区域" prop="area">
 						<el-input disabled v-model="voicePassForm.area" auto-complete="off"></el-input>
@@ -476,7 +489,11 @@
 						<el-input disabled v-model="voicePassForm.business_type" auto-complete="off"></el-input>
 					</el-form-item>
 					<el-form-item label="付款方式">
-						<el-input disabled v-model="voicePassForm.pay_type" auto-complete="off"></el-input>
+						<el-select disabled v-model="voicePassForm.pay_type">
+							<el-option label="对公" value="0"></el-option>
+							<el-option label="对私" value="1"></el-option>
+						</el-select>
+						<!-- <el-input disabled v-model="voicePassForm.pay_type" auto-complete="off"></el-input> -->
 					</el-form-item>
 				</div>
 				<div class="flex">
@@ -484,25 +501,33 @@
 						<el-input disabled v-model="voicePassForm.customer_region" auto-complete="off"></el-input>
 					</el-form-item>
 					<el-form-item label="是否返款">
-						<el-radio-group disabled v-model="voicePassForm.refunds">
-							<el-radio label="1">已返款</el-radio>
-							<el-radio label="0">未返款</el-radio>
-						</el-radio-group>
+						<el-select disabled v-model="voicePassForm.refunds">
+							<el-option label="已返款" value="1"></el-option>
+							<el-option label="未返款" value="0"></el-option>
+						</el-select>
 					</el-form-item>
 				</div>
 				<div class="flex">
-					<el-form-item label="申请号码所需材料">
-						<el-input disabled v-model="voicePassForm.need_data" auto-complete="off"></el-input>
+					<el-form-item label="申请号码材料">
+						<a :href="voicePassForm.need_data" download>
+							<el-button v-if="voicePassForm.need_data" type="text" size="small">下载</el-button>
+						</a>
+						<!-- <el-input disabled v-model="voicePassForm.need_data" auto-complete="off"></el-input> -->
 					</el-form-item>
 					<el-form-item label="备注">
 						<el-input disabled v-model="voicePassForm.remark" auto-complete="off"></el-input>
 					</el-form-item>
 				</div>
 				<el-form-item label="打款凭证">
-					<el-input disabled v-model="voicePassForm.pay_voucher" auto-complete="off"></el-input>
+					<div class="editImg">
+						<div class="item" v-for="(item,index) in voicePassFileList" :key="index">
+							<img class="smallImg" :preview="index" :src="item" alt="">
+						</div>
+					</div>
+					<!-- <el-input disabled v-model="voicePassForm.pay_voucher" auto-complete="off"></el-input> -->
 				</el-form-item>
 			</el-form>
-			<div slot="footer" class="dialog-footer">
+			<div v-if="role_id!=='0'" slot="footer" class="dialog-footer">
 				<el-button type="primary" @click.native="approve('2')">审核通过</el-button>
 				<el-button type="danger" @click.native="refused('3')">审核拒绝</el-button>
 			</div>
@@ -514,15 +539,15 @@
 					<el-input v-model="contractAndInvoiceForm.company_name" auto-complete="off"></el-input>
 				</el-form-item>
 				<el-form-item label="是否开票">
-          <el-radio-group v-model="contractAndInvoiceForm.invoice">
-						<el-radio label="1">已开票</el-radio>
-						<el-radio label="0">未开票</el-radio>
-					</el-radio-group>
+          <el-select v-model="contractAndInvoiceForm.invoice">
+						<el-option label="已开票" value="1"></el-option>
+						<el-option label="未开票" value="0"></el-option>
+					</el-select>
 				</el-form-item>
 				<el-form-item label="双方盖章扫描件">
 					<div class="editImg">
 						<div class="item" v-for="(item,index) in editFileList" :key="index">
-							<img class="smallImg" preview="1" :src="item" alt="">
+							<img class="smallImg" :preview="index" :src="item" alt="">
 							<!-- <img class="bigImg" :src="item" alt=""> -->
 						</div>
 					</div>
@@ -531,7 +556,7 @@
 					<el-input v-model="contractAndInvoiceForm.remark" auto-complete="off"></el-input>
 				</el-form-item>
 			</el-form>
-			<div slot="footer" class="dialog-footer">
+			<div v-if="role_id!=='0'" slot="footer" class="dialog-footer">
 				<el-button type="primary" @click.native="approve('2')">审核通过</el-button>
 				<el-button type="danger" @click.native="refused('3')">审核拒绝</el-button>
 			</div>
@@ -600,11 +625,13 @@
 					type:'',
 					id:''
 				},
-				editFileList:[]
+				editFileList:[],
+				voicePassFileList:[],
+				gatheringFileList:[],
 			}
 		},
 		mounted() {
-      this.role_id=JSON.parse(sessionStorage.getItem('user')).role_id; 
+			this.role_id=JSON.parse(sessionStorage.getItem('user')).role_id;
 			this.getTableList();
 			this.getRoleList();
 		},
@@ -693,6 +720,9 @@
 			showGathering(){
 				getCompanyCollectionById({id:this.showDilagForm.type_id}).then(res=>{
 					this.gatheringForm=res.result[0];
+					if(this.gatheringForm.pay_voucher){
+						this.gatheringFileList=this.gatheringForm.pay_voucher.split(',')
+					};
 					this.gatheringVisible=true;
 				})
 			},
@@ -717,6 +747,9 @@
 			showVoicePass(){
 				getZjPaasProcessById({id:this.showDilagForm.type_id}).then(res=>{
 					this.voicePassForm=res.result[0];
+					if(this.voicePassForm.pay_voucher){
+						this.voicePassFileList=this.voicePassForm.pay_voucher.split(',')
+					};
 					this.voicePassVisible=true;
 				})
 			},
@@ -836,6 +869,7 @@
 }
 .editImg .item .smallImg{
 	width: 100%;
+	height: 150px;
 }
 .el-radio{
 	  margin-left: 30px;

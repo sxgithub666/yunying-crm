@@ -7,6 +7,9 @@
 					<el-input size="small" clearable v-model="filters.company_name" placeholder="公司全称"></el-input>
 				</el-form-item>
 				<el-form-item>
+					<el-input size="small" clearable v-model="filters.user_name" placeholder="添加人"></el-input>
+				</el-form-item>
+				<el-form-item>
 					<el-button type="primary" size="small" v-on:click="getTableList">查询</el-button>
 				</el-form-item>
 				<el-form-item>
@@ -31,15 +34,17 @@
 			</el-table-column>
 			<el-table-column prop="audit_status" label="状态" width="100" show-overflow-tooltip>
 				<template slot-scope="scope">
-					<el-button type="info" size="small" plain v-if="scope.row.audit_status==0">未审核</el-button>
-					<el-button type="primary" size="small" plain v-if="scope.row.audit_status==1">审核中</el-button>
-					<el-button type="success" size="small" plain v-if="scope.row.audit_status==2">审核通过</el-button>
-					<el-button type="danger" size="small" plain v-if="scope.row.audit_status==3">审核拒绝</el-button>
+					<el-button type="info" size="small" plain v-if="scope.row.audit_status==0">未审批</el-button>
+					<el-button type="primary" size="small" plain v-if="scope.row.audit_status==1">转发中</el-button>
+					<el-button type="success" size="small" plain v-if="scope.row.audit_status==2">审批通过</el-button>
+					<el-button type="danger" size="small" plain v-if="scope.row.audit_status==3">审批拒绝</el-button>
 				</template>
 			</el-table-column>
 			<el-table-column prop="company_industry" label="公司行业" width="100">
 			</el-table-column>>
 			<el-table-column prop="robot_number" label="机器人数量" width="100">
+			</el-table-column>
+			<el-table-column prop="user_name" label="添加人" width="100">
 			</el-table-column>
 			<el-table-column prop="line_concurrency" label="线路并发数" width="180">
 			</el-table-column>
@@ -67,7 +72,7 @@
 			</el-table-column>
 			<el-table-column label="操作" fixed="right" width="260">
 				<template slot-scope="scope">
-					<el-button v-if="scope.row.audit_status==0" size="small" @click="auditSubmit(scope.row)">提交审核</el-button>
+					<el-button v-if="scope.row.audit_status!=3" size="small" @click="auditSubmit(scope.row)">提交审核</el-button>
 					<el-button v-if="scope.row.audit_status==3" size="small" @click="resubmit(scope.row)">重新提交</el-button>
 					<el-button size="small" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
 					<el-button type="danger" size="small" @click="handleDel(scope.$index, scope.row)">删除</el-button>
@@ -98,10 +103,10 @@
 						</el-date-picker>
 					</el-form-item>
 					<el-form-item label="客户自备线路" style="width:44%" prop="call_customer_pay_money">
-						<el-radio-group v-model="editForm.call_customer_pay_money" size="small">
-							<el-radio label="1">是</el-radio>
-							<el-radio label="0">否</el-radio>
-						</el-radio-group>
+						<el-select v-model="editForm.call_customer_pay_money">
+							<el-option label="是" value="1"></el-option>
+							<el-option label="否" value="0"></el-option>
+						</el-select>
 						<!-- <el-input v-model="editForm.call_customer_pay_money" auto-complete="off"></el-input> -->
 					</el-form-item>
 					
@@ -132,19 +137,19 @@
 				</div>
 				<div class="flex">
 					<el-form-item label="通信费" prop="call_year_pay_money">
-						<el-radio-group v-model="editForm.call_year_pay_money">
-							<el-radio label="0">月付</el-radio>
-							<el-radio label="1">季付</el-radio>
-							<el-radio label="2">年付</el-radio>
-							<el-radio label="3">测试(XXX)</el-radio>
-						</el-radio-group>
+						<el-select v-model="editForm.call_year_pay_money">
+							<el-option label="月付" value="0"></el-option>
+							<el-option label="季付" value="1"></el-option>
+							<el-option label="年付" value="2"></el-option>
+							<el-option label="测试(XXX)" value="3"></el-option>
+						</el-select>
 						<!-- <el-input v-model="editForm.call_year_pay_money" auto-complete="off"></el-input> -->
 					</el-form-item>
 					<el-form-item label="客户类型" prop="customer_type">
-						<el-radio-group v-model="editForm.customer_type">
-							<el-radio label="1">直客</el-radio>
-							<el-radio label="0">渠道</el-radio>
-						</el-radio-group>
+						<el-select v-model="editForm.customer_type">
+							<el-option label="直客" value="0"></el-option>
+							<el-option label="渠道" value="1"></el-option>
+						</el-select>
 					</el-form-item>
 					
 				</div>
@@ -154,7 +159,7 @@
 			</el-form>
 			<div slot="footer" class="dialog-footer">
 				<el-button @click.native="editFormVisible = false">取消</el-button>
-				<el-button type="primary" @click.native="editSubmit" :loading="editLoading">提交</el-button>
+				<el-button type="primary" @click.native="editSubmit" >提交</el-button>
 			</div>
 		</el-dialog>
 
@@ -175,10 +180,10 @@
 						</el-date-picker>
 					</el-form-item>
 					<el-form-item label="客户自备线路" style="width:44%" prop="call_customer_pay_money">
-						<el-radio-group v-model="addForm.call_customer_pay_money" size="small">
-							<el-radio label="1">是</el-radio>
-							<el-radio label="0">否</el-radio>
-						</el-radio-group>
+						<el-select v-model="addForm.call_customer_pay_money">
+							<el-option label="是" value="1"></el-option>
+							<el-option label="否" value="0"></el-option>
+						</el-select>
 						<!-- <el-input v-model="addForm.call_customer_pay_money" auto-complete="off"></el-input> -->
 					</el-form-item>
 				</div>
@@ -210,19 +215,19 @@
 				</div>
 				<div class="flex">
 					<el-form-item label="通信费" prop="call_year_pay_money">
-						<el-radio-group v-model="addForm.call_year_pay_money">
-							<el-radio label="0">月付</el-radio>
-							<el-radio label="1">季付</el-radio>
-							<el-radio label="2">年付</el-radio>
-							<el-radio label="3">测试(XXX)</el-radio>
-						</el-radio-group>
+						<el-select v-model="addForm.call_year_pay_money">
+							<el-option label="月付" value="0"></el-option>
+							<el-option label="季付" value="1"></el-option>
+							<el-option label="年付" value="2"></el-option>
+							<el-option label="测试(XXX)" value="3"></el-option>
+						</el-select>
 						<!-- <el-input v-model="addForm.call_year_pay_money" auto-complete="off"></el-input> -->
 					</el-form-item>
 					<el-form-item label="客户类型" prop="customer_type">
-						<el-radio-group v-model="addForm.customer_type">
-							<el-radio label="1">直客</el-radio>
-							<el-radio label="0">渠道</el-radio>
-						</el-radio-group>
+						<el-select v-model="addForm.customer_type">
+							<el-option label="直客" value="1"></el-option>
+							<el-option label="渠道" value="0"></el-option>
+						</el-select>
 					</el-form-item>
 					
 				</div>
@@ -232,7 +237,7 @@
 			</el-form>
 			<div slot="footer" class="dialog-footer">
 				<el-button @click.native="addFormVisible = false">取消</el-button>
-				<el-button type="primary" @click.native="addSubmit" :loading="addLoading">提交</el-button>
+				<el-button type="primary" @click.native="addSubmit" >提交</el-button>
 			</div>
 		</el-dialog>
 	</section>
@@ -245,7 +250,8 @@
 		data() {
 			return {
 				filters: {
-					company_name: ''
+					company_name: '',
+					user_name: '',
 				},
 				role_id:'',
 				list: [],
@@ -326,7 +332,8 @@
 					role_id:this.role_id,
 					page: this.page,
 					rows:10,
-					area: this.filters.area
+					company_name: this.filters.company_name,
+					user_name: this.filters.user_name,
 				};
 				this.listLoading = true;
 				getXsznProcessByParam(data).then((res) => {

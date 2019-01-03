@@ -4,7 +4,10 @@
 		<el-col :span="24" class="toolbar" style="padding-bottom: 0px;">
 			<el-form :inline="true" :model="filters">
 				<el-form-item>
-					<el-input size="small" clearable v-model="filters.reconciliation_time" placeholder="对账时间"></el-input>
+					<el-input size="small" clearable v-model="filters.company_name" placeholder="公司名称"></el-input>
+				</el-form-item>
+				<el-form-item>
+					<el-input size="small" clearable v-model="filters.user_name" placeholder="添加人"></el-input>
 				</el-form-item>
 				<el-form-item>
 					<el-button type="primary" size="small" v-on:click="getTableList">查询</el-button>
@@ -31,10 +34,10 @@
 			</el-table-column>
 			<el-table-column prop="audit_status" label="状态" width="100" show-overflow-tooltip>
 				<template slot-scope="scope">
-					<el-button type="info" size="small" plain v-if="scope.row.audit_status==0">未审核</el-button>
-					<el-button type="primary" size="small" plain v-if="scope.row.audit_status==1">审核中</el-button>
-					<el-button type="success" size="small" plain v-if="scope.row.audit_status==2">审核通过</el-button>
-					<el-button type="danger" size="small" plain v-if="scope.row.audit_status==3">审核拒绝</el-button>
+					<el-button type="info" size="small" plain v-if="scope.row.audit_status==0">未审批</el-button>
+					<el-button type="primary" size="small" plain v-if="scope.row.audit_status==1">转发中</el-button>
+					<el-button type="success" size="small" plain v-if="scope.row.audit_status==2">审批通过</el-button>
+					<el-button type="danger" size="small" plain v-if="scope.row.audit_status==3">审批拒绝</el-button>
 				</template>
 			</el-table-column>
 			<el-table-column prop="scan_file" label="双方盖章扫描件" width="210">
@@ -45,11 +48,13 @@
 					</div>
 				</template>
 			</el-table-column>
+			<el-table-column prop="user_name" label="添加人">
+			</el-table-column>
 			<el-table-column prop="remark" label="备注">
 			</el-table-column>
 			<el-table-column label="操作" fixed="right" width="260">
 				<template slot-scope="scope">
-					<el-button v-if="scope.row.audit_status==0" size="small" @click="auditSubmit(scope.row)">提交审核</el-button>
+					<el-button v-if="scope.row.audit_status!=3" size="small" @click="auditSubmit(scope.row)">提交审核</el-button>
 					<el-button v-if="scope.row.audit_status==3" size="small" @click="resubmit(scope.row)">重新提交</el-button>
 					<el-button size="small" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
 					<el-button type="danger" size="small" @click="handleDel(scope.$index, scope.row)">删除</el-button>
@@ -70,10 +75,10 @@
 					<el-input v-model="editForm.company_name" clearable auto-complete="off"></el-input>
 				</el-form-item>
 				<el-form-item label="是否开票" prop="invoice">
-          <el-radio-group v-model="editForm.invoice">
-						<el-radio label="1">已开票</el-radio>
-						<el-radio label="0">未开票</el-radio>
-					</el-radio-group>
+          <el-select v-model="editForm.invoice">
+						<el-option label="已开票" value="1"></el-option>
+						<el-option label="未开票" value="0"></el-option>
+					</el-select>
 				</el-form-item>
 				<el-form-item label="双方盖章扫描件">
 					<el-upload ref="editUpload"
@@ -94,7 +99,7 @@
 			</el-form>
 			<div slot="footer" class="dialog-footer">
 				<el-button @click.native="editFormVisible = false">取消</el-button>
-				<el-button type="primary" @click.native="editSubmit" :loading="editLoading">提交</el-button>
+				<el-button type="primary" @click.native="editSubmit" >提交</el-button>
 			</div>
 		</el-dialog>
 
@@ -105,10 +110,10 @@
 					<el-input v-model="addForm.company_name" clearable auto-complete="off"></el-input>
 				</el-form-item>
 				<el-form-item label="是否开票" prop="invoice">
-          <el-radio-group v-model="addForm.invoice">
-						<el-radio label="1">已开票</el-radio>
-						<el-radio label="0">未开票</el-radio>
-					</el-radio-group>
+          <el-select v-model="addForm.invoice">
+						<el-option label="已开票" value="1"></el-option>
+						<el-option label="未开票" value="0"></el-option>
+					</el-select>
 				</el-form-item>
 				<el-form-item label="双方盖章扫描件">
 					<el-upload ref="addUpload"
@@ -132,7 +137,7 @@
 			</el-form>
 			<div slot="footer" class="dialog-footer">
 				<el-button @click.native="addFormVisible = false">取消</el-button>
-				<el-button type="primary" @click.native="addSubmit" :loading="addLoading">提交</el-button>
+				<el-button type="primary" @click.native="addSubmit" >提交</el-button>
 			</div>
 		</el-dialog>
 		<el-dialog :visible.sync="previewDialogVisible">
@@ -148,7 +153,8 @@
 		data() {
 			return {
 				filters: {
-					reconciliation_time: ''
+					company_name: '',
+					user_name: '',
 				},
 				role_id:'',
 				list: [],
@@ -176,7 +182,7 @@
 					company_name: [
 						{ required: true, message: '请输入姓名', trigger: 'blur' }
 					],
-					reconciliation_time: [
+					company_name: [
 						{ required: true, message: '请输入前缀', trigger: 'blur' }
 					],
 
@@ -209,7 +215,8 @@
 					role_id:this.role_id,
 					page: this.page,
 					rows:10,
-					company_name: this.filters.company_name
+					company_name: this.filters.company_name,
+					user_name: this.filters.user_name,
 				};
 				this.listLoading = true;
 				getContractProcessByParam(data).then((res) => {
@@ -227,17 +234,24 @@
 				this.formDate.append('file', file.file);
 			},
 			beforeUpload(file){
-				const isJPG = file.type === 'image/jpeg';
-				const isGIF = file.type === 'image/gif';
-				const isPNG = file.type === 'image/png';
-				const isBMP = file.type === 'image/bmp';
+				let fileType = file.name.substring(file.name.lastIndexOf(".")+1).toUpperCase();
+				const isJPG = fileType === 'JPG';
+				const isGIF = fileType === 'GIF';
+				const isPNG = fileType === 'PNG';
+				const isBMP = fileType === 'BMP';
 				const isLt2M = file.size / 1024 / 1024 < 2;
 
 				if (!isJPG && !isGIF && !isPNG && !isBMP) {
-					this.common.errorTip('上传图片必须是JPG/GIF/PNG/BMP 格式!');
+					this.$message({
+						message: '上传图片必须是JPG/GIF/PNG/BMP 格式!',
+						type: 'warning'
+					});
 				}
 				if (!isLt2M) {
-					this.common.errorTip('上传图片大小不能超过 2MB!');
+					this.$message({
+						message: '上传图片大小不能超过 2MB!',
+						type: 'warning'
+					});
 				}
 				return (isJPG || isBMP || isGIF || isPNG) && isLt2M;
 			},
@@ -356,7 +370,7 @@
 				this.addFormVisible = true;
 				this.addForm = {
 					company_name:'',
-					reconciliation_time:'',
+					company_name:'',
 					income:'',
 					reconciliation_cost:'',
 					account_name:'',
@@ -371,6 +385,9 @@
 				this.$refs.editForm.validate((valid) => {
 					if (valid) {
 						this.editLoading = true;
+						if(this.editForm.scan_file instanceof Array){
+							this.editForm.scan_file=this.editForm.scan_file.join(',');
+						}
 						const data = Object.assign({}, this.editForm);
 						updateContractProcessById(data).then((res) => {
 							this.editLoading = false;
@@ -408,10 +425,10 @@
 				});
 			},
 			getAddTime(val){
-				this.addForm.reconciliation_time=val;
+				this.addForm.company_name=val;
 			},
 			getEditTime(val){
-				this.editForm.reconciliation_time=val;
+				this.editForm.company_name=val;
 			}
 		},
 		mounted() {

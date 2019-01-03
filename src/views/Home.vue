@@ -23,7 +23,8 @@
 					<span class="el-dropdown-link userinfo-inner">您好, {{sysUserName}}</span>
 					<el-dropdown-menu slot="dropdown">
 						<el-dropdown-item @click.native="goBacklog">待办事项</el-dropdown-item>
-						<el-dropdown-item divided @click.native="logout">退出登录</el-dropdown-item>
+						<el-dropdown-item @click.native="resetPassword">修改密码</el-dropdown-item>
+						<el-dropdown-item  @click.native="logout">退出登录</el-dropdown-item>
 					</el-dropdown-menu>
 				</el-dropdown>
 			</el-col>
@@ -76,11 +77,22 @@
 				</div>
 			</section>
 		</el-col>
+		<el-dialog title="修改密码" width="30%" :visible.sync="dialogVisible">
+			<el-form label-width="80px">
+				<el-form-item label="新密码" required>
+					<el-input v-model="newPassword" clearable placeholder="请输入新密码" auto-complete="off"></el-input>
+				</el-form-item>
+			</el-form>
+			<div slot="footer" class="dialog-footer">
+				<el-button @click.native="dialogVisible = false">取消</el-button>
+				<el-button type="primary" @click.native="resetSubmit" >提交</el-button>
+			</div>
+		</el-dialog>
 	</el-row>
 </template>
 
 <script>
-import { getProcessByParam } from '../api/api';
+import { getProcessByParam ,updateUserPassword} from '../api/api';
 	export default {
 		data() {
 			return {
@@ -98,7 +110,9 @@ import { getProcessByParam } from '../api/api';
 					desc: ''
 				},
 				menu:[],
-				hasBacklog:false
+				hasBacklog:false,
+				dialogVisible:false,
+				newPassword:''
 			}
 		},
 		methods: {
@@ -147,8 +161,6 @@ import { getProcessByParam } from '../api/api';
 				}).catch(() => {
 
 				});
-
-
 			},
 			//折叠导航栏
 			collapse:function(){
@@ -156,6 +168,32 @@ import { getProcessByParam } from '../api/api';
 			},
 			showMenu(i,status){
 				this.$refs.menuCollapsed.getElementsByClassName('submenu-hook-'+i)[0].style.display=status?'block':'none';
+			},
+			//显示修改密码
+			resetPassword(){
+				this.newPassword='';
+				this.dialogVisible=true;
+			},
+			//修改密码提交
+			resetSubmit(){
+				if(!this.newPassword){
+					this.$message({
+						message: '请输入新密码',
+						type: 'warning'
+					});
+					return;
+				};
+				const data={
+					id:JSON.parse(sessionStorage.getItem('user')).id,
+					password:this.newPassword
+				};
+				updateUserPassword(data).then(res=>{
+					this.$message({
+						message: res.errMsg,
+						type: 'success'
+					});
+					this.dialogVisible=false;
+				})
 			}
 		},
 		mounted() {
