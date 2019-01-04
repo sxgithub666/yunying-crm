@@ -15,6 +15,9 @@
 				<el-form-item>
 					<el-button type="primary" size="small" @click="handleAdd">新增</el-button>
 				</el-form-item>
+				<el-form-item>
+					<el-button type="primary" size="small" @click="exportExcel">导出</el-button>
+				</el-form-item>
 			</el-form>
 		</el-col>
 
@@ -24,17 +27,17 @@
 			</el-table-column> -->
 			<el-table-column type="index" width="60">
 			</el-table-column>
-			<el-table-column prop="area" label="销售区域" width="100">
+			<el-table-column prop="area" label="销售区域" width="100" show-overflow-tooltip>
 			</el-table-column>
-			<el-table-column prop="company_name" label="公司名称" width="100">
+			<el-table-column prop="company_name" label="公司名称" width="100" show-overflow-tooltip>
 			</el-table-column>
-			<el-table-column prop="type" label="业务类型" width="100">
+			<el-table-column prop="type" label="业务类型" width="80" show-overflow-tooltip>
 				<template slot-scope="scope">
 					<span v-if="scope.row.type==0">总机</span>
 					<span v-if="scope.row.type==1">语音paas</span>
 				</template>
 			</el-table-column>
-			<el-table-column prop="pay_time" label="收款时间" width="160">
+			<el-table-column prop="pay_time" label="收款时间" width="160" show-overflow-tooltip>
 			</el-table-column>
 			<el-table-column prop="audit_status" label="状态" width="100" show-overflow-tooltip>
 				<template slot-scope="scope">
@@ -44,31 +47,31 @@
 					<el-button type="danger" size="small" plain v-if="scope.row.audit_status==3">审批拒绝</el-button>
 				</template>
 			</el-table-column>
-			<el-table-column prop="pay_money" label="收款金额" width="100">
+			<el-table-column prop="pay_money" label="收款金额" width="80" show-overflow-tooltip>
 			</el-table-column>
-			<el-table-column prop="company_industry" label="公司行业" width="100">
+			<el-table-column prop="company_industry" label="公司行业" width="80" show-overflow-tooltip>
 			</el-table-column>
-			<el-table-column prop="need_phonenumber" label="号码需求" width="100">
+			<el-table-column prop="need_phonenumber" label="号码需求" width="80" show-overflow-tooltip>
 			</el-table-column>
-			<el-table-column prop="business_type" label="业务类型" width="180">
+			<el-table-column prop="business_type" label="业务类型" width="80" show-overflow-tooltip>
 			</el-table-column>
-			<el-table-column prop="user_name" label="添加人" width="100">
+			<el-table-column prop="user_name" label="添加人" width="80" show-overflow-tooltip>
 			</el-table-column>
-			<el-table-column prop="pay_type" label="付款方式" width="100">
+			<el-table-column prop="pay_type" label="付款方式" width="80" show-overflow-tooltip>
 				<template slot-scope="scope">
 					<span v-if="scope.row.pay_type==0">对公</span>
 					<span v-if="scope.row.pay_type==1">对私</span>
 				</template>
 			</el-table-column>
-			<el-table-column prop="customer_region" label="客户所在区域" width="180">
+			<el-table-column prop="customer_region" label="客户所在区域" width="110" show-overflow-tooltip>
 			</el-table-column>
-			<el-table-column prop="refunds" label="是否返款" width="180">
+			<el-table-column prop="refunds" label="是否返款" width="80" show-overflow-tooltip>
 				<template slot-scope="scope">
 					<span v-if="scope.row.refunds==0">未返款</span>
 					<span v-if="scope.row.refunds==1">已返款</span>
 				</template>
 			</el-table-column>
-			<el-table-column prop="pay_voucher" label="打款凭证" width="200">
+			<el-table-column prop="pay_voucher" label="打款凭证" width="200" show-overflow-tooltip>
 				<template slot-scope="scope">
 					<div class="tableImg" v-if="scope.row.pay_voucher">
 						<img v-for="(item,index) in scope.row.pay_voucher" class="smallImg" :preview="index" :src="item" :key="index" alt="" style="width: 40px;height: 40px;margin-right:5px;">
@@ -76,21 +79,21 @@
 					</div>
 				</template>
 			</el-table-column>
-			<el-table-column prop="need_data" label="申请号码材料" width="120">
+			<el-table-column prop="need_data" label="申请号码材料" width="110" show-overflow-tooltip>
 				<template slot-scope="scope">
 					<a :href="scope.row.need_data" download>
 					  <el-button v-if="scope.row.need_data" type="text" size="small">下载</el-button>
 					</a>
 				</template>
 			</el-table-column>
-			<el-table-column prop="remark" label="备注" width="180">
+			<el-table-column prop="remark" label="备注" width="100" show-overflow-tooltip>
 			</el-table-column>
 			<el-table-column label="操作" fixed="right" width="260">
 				<template slot-scope="scope">
 					<el-button v-if="scope.row.audit_status!=3" size="small" @click="auditSubmit(scope.row)">提交审核</el-button>
 					<el-button v-if="scope.row.audit_status==3" size="small" @click="resubmit(scope.row)">重新提交</el-button>
 					<el-button size="small" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
-					<el-button type="danger" size="small" @click="handleDel(scope.$index, scope.row)">删除</el-button>
+					<el-button v-if="role_id==='4'" type="danger" size="small" @click="handleDel(scope.$index, scope.row)">删除</el-button>
 				</template>
 			</el-table-column>
 		</el-table>
@@ -294,8 +297,8 @@
 </template>
 
 <script>
-	import { getZjPaasProcessByParam, insertZjPaasProcess, updateZjPaasProcessById, deleteZjPaasProcessById ,updateReProcessById ,insertProcess} from '../../api/api';
-
+	import { getZjPaasProcessByParam, insertZjPaasProcess, updateZjPaasProcessById, deleteZjPaasProcessById ,updateReProcessById ,insertProcess ,uploadSwitchboardByParam} from '../../api/api';
+  import rules from '@/common/js/rule'
 	export default {
 		data() {
 			return {
@@ -316,7 +319,7 @@
 					type: [{ required: true, message: '请输入业务类型', trigger: 'blur'}],
 					pay_time: [{ required: true, message: '请输入收款时间', trigger: 'blur'}],
 					company_industry: [{ required: true, message: '请输入公司行业', trigger: 'blur'}],
-					pay_money: [{ required: true, message: '请输入收款金额', trigger: 'blur'}],
+					pay_money: rules.numPot2,
 					need_phonenumber: [{ required: true, message: '请输入号码需求', trigger: 'blur'}],
 					business_type: [{ required: true, message: '请输入业务类型', trigger: 'blur'}],
 					pay_type: [{ required: true, message: '请输入付款方式', trigger: 'blur'}],
@@ -632,6 +635,22 @@
 						});
 					};
 				});
+			},
+			//导出
+			exportExcel(){
+				const data={
+					company_name:this.filters.company_name,
+					user_name:this.filters.user_name,
+					};
+				uploadSwitchboardByParam(data).then(res=>{
+					var aDom = document.createElement('a');
+					var evt = document.createEvent('HTMLEvents');
+					evt.initEvent('click', false, false);
+					aDom.download = true;
+					aDom.href = res.result;
+					aDom.dispatchEvent(evt);
+					aDom.click();
+				})
 			},
 			getAddTime(val){
 				this.addForm.pay_time=val;

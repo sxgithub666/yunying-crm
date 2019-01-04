@@ -12,6 +12,9 @@
 				<el-form-item>
 					<el-button type="primary" size="small" @click="handleAdd">新增</el-button>
 				</el-form-item>
+				<el-form-item>
+					<el-button type="primary" size="small" @click="exportExcel">导出</el-button>
+				</el-form-item>
 			</el-form>
 		</el-col>
 
@@ -23,7 +26,7 @@
 			</el-table-column>
 			<el-table-column prop="customer_name" label="客户名称" width="100">
 			</el-table-column>
-			<el-table-column prop="reconciliation_time" label="对账时间" width="180">
+			<el-table-column prop="reconciliation_time" label="对账时间" width="160" show-overflow-tooltip>
 			</el-table-column>
 			<el-table-column prop="income" label="收入" width="100">
 			</el-table-column>
@@ -33,16 +36,16 @@
 			</el-table-column>
 			<el-table-column prop="balance" label="余额" width="100">
 			</el-table-column>
-			<el-table-column prop="amount_adjustment" label="调整金额" width="180">
+			<el-table-column prop="amount_adjustment" label="调整金额" width="100">
 			</el-table-column>
-			<el-table-column prop="pay_record" label="缴费记录" width="180">
+			<el-table-column prop="pay_record" label="缴费记录" width="100">
 			</el-table-column>
-			<el-table-column prop="remark" label="备注" width="180">
+			<el-table-column prop="remark" label="备注" width="100">
 			</el-table-column>
 			<el-table-column label="操作" fixed="right" width="150">
 				<template slot-scope="scope">
 					<el-button size="small" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
-					<el-button type="danger" size="small" @click="handleDel(scope.$index, scope.row)">删除</el-button>
+					<el-button v-if="role_id==='4'" type="danger" size="small" @click="handleDel(scope.$index, scope.row)">删除</el-button>
 				</template>
 			</el-table-column>
 		</el-table>
@@ -148,8 +151,8 @@
 </template>
 
 <script>
-	import { getReconciliationByParam, insertReconciliation, updateReconciliationById, deleteReconciliationById} from '../../api/api';
-
+	import { getReconciliationByParam, insertReconciliation, updateReconciliationById, deleteReconciliationById ,uploadReconciliationByParam} from '../../api/api';
+  import rules from '@/common/js/rule'
 	export default {
 		data() {
 			return {
@@ -169,8 +172,8 @@
 					income: [{ required: true, message: '请输入收入', trigger: 'blur' }],
 					reconciliation_cost: [{ required: true, message: '请输入成本', trigger: 'blur' }],
 					account_name: [{ required: true, message: '请输入账户名称', trigger: 'blur' }],
-					balance: [{ required: true, message: '请输入余额', trigger: 'blur' }],
-					amount_adjustment: [{ required: true, message: '请输入调整金额', trigger: 'blur' }],
+					balance: rules.numPot2,
+					amount_adjustment: rules.numPot2,
 					pay_record: [{ required: true, message: '请输入缴费记录', trigger: 'blur' }],
 				},
 				//编辑界面数据
@@ -298,6 +301,21 @@
 						});
 					};
 				});
+			},
+			//导出
+			exportExcel(){
+				const data={
+					reconciliation_time:this.filters.reconciliation_time,
+					};
+				uploadReconciliationByParam(data).then(res=>{
+					var aDom = document.createElement('a');
+					var evt = document.createEvent('HTMLEvents');
+					evt.initEvent('click', false, false);
+					aDom.download = true;
+					aDom.href = res.result;
+					aDom.dispatchEvent(evt);
+					aDom.click();
+				})
 			},
 			getAddTime(val){
 				this.addForm.reconciliation_time=val;

@@ -104,6 +104,9 @@ export const deleteChannelById = params => {
 export const getChannelById = params => {
   return POST('/channel/getChannelById', params)
 };
+export const uploadChannelByParam = params => {
+  return POST('/channel/uploadChannelByParam', params)
+};
 
 //收款信息
 export const getCompanyCollectionByParam = params => {
@@ -121,6 +124,9 @@ export const deleteCompanyCollectionById = params => {
 export const getCompanyCollectionById = params => {
   return POST('/collection/getCompanyCollectionById', params)
 };
+export const uploadGatheringByParam = params => {
+  return POST('/collection/uploadCollectionByParam', params)
+};
 
 //客户信息
 export const getCustomerListByParam = params => {
@@ -137,6 +143,9 @@ export const deleteCustomerById = params => {
 };
 export const getCustomerById = params => {
   return POST('/customer/getCustomerById', params)
+};
+export const uploadClientTableByParam = params => {
+  return POST('/customer/uploadCustomerByParam', params)
 };
 
 //角色管理
@@ -176,6 +185,9 @@ export const deleteXsznProcessById = params => {
 };
 export const getXsznProcessById = params => {
   return POST('/xszn/getXsznProcessById', params)
+};
+export const uploadRobotByParam = params => {
+  return POST('/xszn/uploadXsznByParam', params)
 };
 
 //小水总机pass

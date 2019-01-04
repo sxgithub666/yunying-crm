@@ -72,7 +72,7 @@
 				<template slot-scope="scope">
 					<el-button size="small" @click="viewDetails(scope.$index, scope.row)">查看</el-button>
 					<el-button v-if="role_id!=='0'" size="small" @click="handleTranspond(scope.$index, scope.row)">转发</el-button>
-					<el-button v-if="role_id!=='0'" type="danger" size="small" @click="handleDel(scope.$index, scope.row)">删除</el-button>
+					<el-button v-if="role_id==='4'" type="danger" size="small" @click="handleDel(scope.$index, scope.row)">删除</el-button>
 				</template>
 			</el-table-column>
 		</el-table>
@@ -331,19 +331,19 @@
 			<el-form :model="robotForm" label-width="120px">
 				<div class="flex">
 					<el-form-item label="销售区域" prop="area">
-						<el-input v-model="robotForm.area" auto-complete="off"></el-input>
+						<el-input disabled v-model="robotForm.area" auto-complete="off"></el-input>
 					</el-form-item>
 					<el-form-item label="公司全称" prop="company_name">
-						<el-input v-model="robotForm.company_name" auto-complete="off"></el-input>
+						<el-input disabled v-model="robotForm.company_name" auto-complete="off"></el-input>
 					</el-form-item>
 				</div>
 				<div class="flex">
 					<el-form-item label="收款时间">
-						<el-date-picker v-model="robotForm.pay_time" value-format="yyyy-MM-dd HH:mm:ss" type="datetime" placeholder="选择收款日期时间">
+						<el-date-picker disabled v-model="robotForm.pay_time" value-format="yyyy-MM-dd HH:mm:ss" type="datetime" placeholder="选择收款日期时间">
 						</el-date-picker>
 					</el-form-item>
 					<el-form-item label="客户类型">
-						<el-select v-model="robotForm.customer_type">
+						<el-select disabled v-model="robotForm.customer_type">
 							<el-option label="直客" value="1"></el-option>
 							<el-option label="渠道" value="0"></el-option>
 						</el-select>
@@ -351,35 +351,35 @@
 				</div>
 				<div class="flex">
 					<el-form-item label="公司行业">
-						<el-input v-model="robotForm.company_industry" auto-complete="off"></el-input>
+						<el-input disabled v-model="robotForm.company_industry" auto-complete="off"></el-input>
 					</el-form-item>
 					<el-form-item label="机器人数量">
-						<el-input v-model="robotForm.robot_number" auto-complete="off"></el-input>
+						<el-input disabled v-model="robotForm.robot_number" auto-complete="off"></el-input>
 					</el-form-item>
 				</div>
 				<div class="flex">
 					<el-form-item label="线路并发数">
-						<el-input v-model="robotForm.line_concurrency" auto-complete="off"></el-input>
+						<el-input disabled v-model="robotForm.line_concurrency" auto-complete="off"></el-input>
 					</el-form-item>
 					<el-form-item label="号码费">
-						<el-input v-model="robotForm.number_pay_money" auto-complete="off"></el-input>
+						<el-input disabled v-model="robotForm.number_pay_money" auto-complete="off"></el-input>
 					</el-form-item>
 				</div>
 				<div class="flex">
 					<el-form-item label="客户自备线路">
-						<el-select v-model="robotForm.call_customer_pay_money">
+						<el-select disabled v-model="robotForm.call_customer_pay_money">
 							<el-option label="是" value="1"></el-option>
 							<el-option label="否" value="0"></el-option>
 						</el-select>
 						<!-- <el-input v-model="robotForm.call_customer_pay_money" auto-complete="off"></el-input> -->
 					</el-form-item>
 					<el-form-item label="通信费卡槽费">
-						<el-input v-model="robotForm.call_card_pay_money" auto-complete="off"></el-input>
+						<el-input disabled v-model="robotForm.call_card_pay_money" auto-complete="off"></el-input>
 					</el-form-item>
 				</div>
 				<div class="flex">
 					<el-form-item label="通信费">
-						<el-select v-model="robotForm.call_year_pay_money">
+						<el-select disabled v-model="robotForm.call_year_pay_money">
 							<el-option label="月付" value="0"></el-option>
 							<el-option label="季付" value="1"></el-option>
 							<el-option label="年付" value="2"></el-option>
@@ -388,11 +388,11 @@
 						<!-- <el-input v-model="robotForm.call_year_pay_money" auto-complete="off"></el-input> -->
 					</el-form-item>
 					<el-form-item label="机器人费">
-						<el-input v-model="robotForm.robot_pay_money" auto-complete="off"></el-input>
+						<el-input disabled v-model="robotForm.robot_pay_money" auto-complete="off"></el-input>
 					</el-form-item>
 				</div>
 					<el-form-item label="备注">
-						<el-input v-model="robotForm.remark" auto-complete="off"></el-input>
+						<el-input disabled v-model="robotForm.remark" auto-complete="off"></el-input>
 					</el-form-item>
 			</el-form>
 			<div v-if="role_id!=='0'" slot="footer" class="dialog-footer">

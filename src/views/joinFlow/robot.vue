@@ -15,6 +15,9 @@
 				<el-form-item>
 					<el-button type="primary" size="small" @click="handleAdd">新增</el-button>
 				</el-form-item>
+				<el-form-item>
+					<el-button type="primary" size="small" @click="exportExcel">导出</el-button>
+				</el-form-item>
 			</el-form>
 		</el-col>
 
@@ -24,13 +27,17 @@
 			</el-table-column> -->
 			<el-table-column type="index" width="60">
 			</el-table-column>
-			<el-table-column prop="area" label="销售区域" width="100">
+			<el-table-column prop="area" label="销售区域" width="100" show-overflow-tooltip>
 			</el-table-column>
-			<el-table-column prop="company_name" label="公司全称" width="100">
+			<el-table-column prop="company_name" label="公司全称" width="100" show-overflow-tooltip>
 			</el-table-column>
-			<el-table-column prop="pay_time" label="收款时间" width="160">
+			<el-table-column prop="pay_time" label="收款时间" width="160" show-overflow-tooltip>
 			</el-table-column>
-			<el-table-column prop="customer_type" label="客户类型" width="100">
+			<el-table-column prop="customer_type" label="客户类型" width="80" show-overflow-tooltip>
+				<template slot-scope="scope">
+					<span v-if="scope.row.customer_type==0">直客</span>
+					<span v-if="scope.row.customer_type==1">渠道</span>
+				</template>
 			</el-table-column>
 			<el-table-column prop="audit_status" label="状态" width="100" show-overflow-tooltip>
 				<template slot-scope="scope">
@@ -40,25 +47,25 @@
 					<el-button type="danger" size="small" plain v-if="scope.row.audit_status==3">审批拒绝</el-button>
 				</template>
 			</el-table-column>
-			<el-table-column prop="company_industry" label="公司行业" width="100">
+			<el-table-column prop="company_industry" label="公司行业" width="80" show-overflow-tooltip>
 			</el-table-column>>
-			<el-table-column prop="robot_number" label="机器人数量" width="100">
+			<el-table-column prop="robot_number" label="机器人数量" width="100" show-overflow-tooltip>
 			</el-table-column>
-			<el-table-column prop="user_name" label="添加人" width="100">
+			<el-table-column prop="user_name" label="添加人" width="70" show-overflow-tooltip>
 			</el-table-column>
-			<el-table-column prop="line_concurrency" label="线路并发数" width="180">
+			<el-table-column prop="line_concurrency" label="线路并发数" width="100" show-overflow-tooltip>
 			</el-table-column>
-			<el-table-column prop="number_pay_money" label="号码费" width="180">
+			<el-table-column prop="number_pay_money" label="号码费" width="100" show-overflow-tooltip>
 			</el-table-column>
-			<el-table-column prop="call_customer_pay_money" label="客户自备线路" width="100">
+			<el-table-column prop="call_customer_pay_money" label="客户自备线路" width="110" show-overflow-tooltip>
 				<template slot-scope="scope">
 					<span v-if="scope.row.call_customer_pay_money==0">否</span>
 					<span v-if="scope.row.call_customer_pay_money==1">是</span>
 				</template>
 			</el-table-column>
-			<el-table-column prop="call_card_pay_money" label="通信费卡槽费" width="180">
+			<el-table-column prop="call_card_pay_money" label="通信费卡槽费" width="110" show-overflow-tooltip>
 			</el-table-column>
-			<el-table-column prop="call_year_pay_money" label="通信费" width="180">
+			<el-table-column prop="call_year_pay_money" label="通信费" width="80" show-overflow-tooltip>
 				<template slot-scope="scope">
 					<span v-if="scope.row.call_year_pay_money==0">月付</span>
 					<span v-if="scope.row.call_year_pay_money==1">季付</span>
@@ -66,16 +73,16 @@
 					<span v-if="scope.row.call_year_pay_money==3">测试(XXX)</span>
 				</template>
 			</el-table-column>
-			<el-table-column prop="robot_pay_money" label="机器人费" width="180">
+			<el-table-column prop="robot_pay_money" label="机器人费" width="100" show-overflow-tooltip>
 			</el-table-column>
-			<el-table-column prop="remark" label="备注" width="180">
+			<el-table-column prop="remark" label="备注" width="100" show-overflow-tooltip>
 			</el-table-column>
 			<el-table-column label="操作" fixed="right" width="260">
 				<template slot-scope="scope">
 					<el-button v-if="scope.row.audit_status!=3" size="small" @click="auditSubmit(scope.row)">提交审核</el-button>
 					<el-button v-if="scope.row.audit_status==3" size="small" @click="resubmit(scope.row)">重新提交</el-button>
 					<el-button size="small" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
-					<el-button type="danger" size="small" @click="handleDel(scope.$index, scope.row)">删除</el-button>
+					<el-button v-if="role_id==='4'" type="danger" size="small" @click="handleDel(scope.$index, scope.row)">删除</el-button>
 				</template>
 			</el-table-column>
 		</el-table>
@@ -87,7 +94,7 @@
 		</el-col>
 
 		<!--编辑界面-->
-		<el-dialog title="编辑" width="57%" :visible.sync="editFormVisible" :close-on-click-modal="false">
+		<el-dialog title="编辑" width="55%" :visible.sync="editFormVisible" :close-on-click-modal="false">
 			<el-form :model="editForm" label-width="120px" :rules="editFormRules" ref="editForm">
 				<div class="flex">
 					<el-form-item label="销售区域" prop="area">
@@ -164,7 +171,7 @@
 		</el-dialog>
 
 		<!--新增界面-->
-		<el-dialog title="新增" width="57%" :visible.sync="addFormVisible" :close-on-click-modal="false">
+		<el-dialog title="新增" width="55%" :visible.sync="addFormVisible" :close-on-click-modal="false">
 			<el-form :model="addForm" label-width="120px" :rules="editFormRules" ref="addForm">
 				<div class="flex">
 					<el-form-item label="销售区域" prop="area">
@@ -244,8 +251,8 @@
 </template>
 
 <script>
-	import { getXsznProcessByParam, insertXsznProcess, updateXsznProcessById, deleteXsznProcessById ,updateReProcessById ,insertProcess} from '../../api/api';
-
+	import { getXsznProcessByParam, insertXsznProcess, updateXsznProcessById, deleteXsznProcessById ,updateReProcessById ,insertProcess ,uploadRobotByParam} from '../../api/api';
+  import rules from '@/common/js/rule'
 	export default {
 		data() {
 			return {
@@ -266,13 +273,13 @@
 					customer_type: [{ required: true, message: '请输入客户类型', trigger: 'blur'}],
 					pay_time: [{ required: true, message: '请输入收款时间', trigger: 'blur'}],
 					company_industry: [{ required: true, message: '请输入公司行业', trigger: 'blur'}],
-					robot_number: [{ required: true, message: '请输入机器人数量', trigger: 'blur'}],
-					line_concurrency: [{ required: true, message: '请输入线路并发数', trigger: 'blur'}],
-					number_pay_money: [{ required: true, message: '请输入号码费收款金额', trigger: 'blur'}],
+					robot_number: rules.InterNum,
+					line_concurrency: rules.InterNum,
+					number_pay_money: rules.numPot2,
 					call_customer_pay_money: [{ required: true, message: '请输入自备线路收款', trigger: 'blur'}],
-					call_card_pay_money: [{ required: true, message: '请输入卡槽费收款金额', trigger: 'blur'}],
+					call_card_pay_money: rules.numPot2,
 					call_year_pay_money: [{ required: true, message: '请输入包年正常收款金额', trigger: 'blur'}],
-					robot_pay_money: [{ required: true, message: '请输入机器人费收款金额', trigger: 'blur'}],
+					robot_pay_money: rules.numPot2,
 				},
 				//编辑界面数据
 				editForm: {
@@ -445,6 +452,22 @@
 						});
 					};
 				});
+			},
+			//导出
+			exportExcel(){
+				const data={
+					company_name:this.filters.company_name,
+					user_name:this.filters.user_name,
+					};
+				uploadRobotByParam(data).then(res=>{
+					var aDom = document.createElement('a');
+					var evt = document.createEvent('HTMLEvents');
+					evt.initEvent('click', false, false);
+					aDom.download = true;
+					aDom.href = res.result;
+					aDom.dispatchEvent(evt);
+					aDom.click();
+				})
 			},
 			getAddTime(val){
 				this.addForm.pay_time=val;

@@ -15,6 +15,9 @@
 				<el-form-item>
 					<el-button type="primary" size="small" @click="handleAdd">新增</el-button>
 				</el-form-item>
+				<el-form-item>
+					<el-button type="primary" size="small" @click="exportExcel">导出</el-button>
+				</el-form-item>
 			</el-form>
 		</el-col>
 
@@ -24,13 +27,13 @@
 			</el-table-column> -->
 			<el-table-column type="index" width="60">
 			</el-table-column>
-			<el-table-column prop="prefix" label="前缀" width="100">
+			<el-table-column prop="prefix" label="前缀" width="100" show-overflow-tooltip>
 			</el-table-column>
-			<el-table-column prop="customer_name" label="客户名称" width="100">
+			<el-table-column prop="customer_name" label="客户名称" width="100" show-overflow-tooltip>
 			</el-table-column>
-			<el-table-column prop="belong" label="业务归属" width="100">
+			<el-table-column prop="belong" label="业务归属" width="80" show-overflow-tooltip>
 			</el-table-column>
-			<el-table-column prop="industry" label="行业" width="100">
+			<el-table-column prop="industry" label="行业" width="80" show-overflow-tooltip
 			</el-table-column>
 			<el-table-column prop="audit_status" label="状态" width="100" show-overflow-tooltip>
 				<template slot-scope="scope">
@@ -40,22 +43,22 @@
 					<el-button type="danger" size="small" plain v-if="scope.row.audit_status==3">审批拒绝</el-button>
 				</template>
 			</el-table-column>
-			<el-table-column prop="number_charges" label="号码费" width="100">
+			<el-table-column prop="number_charges" label="号码费" width="80" show-overflow-tooltip>
 			</el-table-column>>
-			<el-table-column prop="charges" label="通信资费" width="100">
+			<el-table-column prop="charges" label="通信资费" width="80" show-overflow-tooltip>
 			</el-table-column>
-			<el-table-column prop="start_date" label="开通时间" width="180">
+			<el-table-column prop="start_date" label="开通时间" width="160" show-overflow-tooltip>
 			</el-table-column>
-			<el-table-column prop="user_name" label="所属销售" width="180">
+			<el-table-column prop="end_date" label="关停时间" width="160" show-overflow-tooltip>
 			</el-table-column>
-			<el-table-column prop="end_date" label="关停时间" width="180">
+			<el-table-column prop="user_name" label="所属销售" width="80" show-overflow-tooltip>
 			</el-table-column>
 			<el-table-column label="操作" fixed="right" width="260">
 				<template slot-scope="scope">
 					<el-button v-if="scope.row.audit_status!=3" size="small" @click="auditSubmit(scope.row)">提交审核</el-button>
 					<el-button v-if="scope.row.audit_status==3" size="small" @click="resubmit(scope.row)">重新提交</el-button>
 					<el-button size="small" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
-					<el-button type="danger" size="small" @click="handleDel(scope.$index, scope.row)">删除</el-button>
+					<el-button v-if="role_id==='4'" type="danger" size="small" @click="handleDel(scope.$index, scope.row)">删除</el-button>
 				</template>
 			</el-table-column>
 		</el-table>
@@ -158,8 +161,8 @@
 </template>
 
 <script>
-	import { getCustomerListByParam, insertCustomer, updateCustomerById, deleteCustomerById, insertProcess} from '../../api/api';
-
+	import { getCustomerListByParam, insertCustomer, updateCustomerById, deleteCustomerById, insertProcess ,uploadClientTableByParam} from '../../api/api';
+  import rules from '@/common/js/rule'
 	export default {
 		data() {
 			return {
@@ -179,8 +182,8 @@
 					customer_name: [{ required: true, message: '请输入客户名称', trigger: 'blur' }],
 					belong: [{ required: true, message: '请输入业务归属', trigger: 'blur' }],
 					industry: [{ required: true, message: '请输入行业', trigger: 'blur' }],
-					number_charges: [{ required: true, message: '请输入号码费', trigger: 'blur' }],
-					charges: [{ required: true, message: '请输入通信资费', trigger: 'blur' }],
+					number_charges: rules.numPot2,
+					charges: rules.numPot2,
 					start_date: [{ required: true, message: '请输入开通时间', trigger: 'blur' }],
 					end_date: [{ required: true, message: '请输入关停时间', trigger: 'blur' }],
 				},
@@ -345,6 +348,22 @@
 						});
 					};
 				});
+			},
+			//导出
+			exportExcel(){
+				const data={
+					customer_name:this.filters.customer_name,
+					user_name:this.filters.user_name
+					};
+				uploadClientTableByParam(data).then(res=>{
+					var aDom = document.createElement('a');
+					var evt = document.createEvent('HTMLEvents');
+					evt.initEvent('click', false, false);
+					aDom.download = true;
+					aDom.href = res.result;
+					aDom.dispatchEvent(evt);
+					aDom.click();
+				})
 			},
 			getSTime(val){
 				this.addForm.start_date=val;

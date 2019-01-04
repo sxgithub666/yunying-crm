@@ -12,6 +12,9 @@
 				<el-form-item>
 					<el-button type="primary" size="small" @click="handleAdd">新增</el-button>
 				</el-form-item>
+				<el-form-item>
+					<el-button type="primary" size="small" @click="exportExcel">导出</el-button>
+				</el-form-item>
 			</el-form>
 		</el-col>
 
@@ -29,14 +32,14 @@
 			</el-table-column>
 			<el-table-column prop="belong" label="业务归属" width="140" show-overflow-tooltip>
 			</el-table-column>
-			<el-table-column prop="audit_status" label="状态" width="110" show-overflow-tooltip>
+			<!-- <el-table-column prop="audit_status" label="状态" width="100" show-overflow-tooltip>
 				<template slot-scope="scope">
 					<el-button type="info" size="small" plain v-if="scope.row.audit_status==0">未审批</el-button>
 					<el-button type="primary" size="small" plain v-if="scope.row.audit_status==1">转发中</el-button>
 					<el-button type="success" size="small" plain v-if="scope.row.audit_status==2">审批通过</el-button>
 					<el-button type="danger" size="small" plain v-if="scope.row.audit_status==3">审批拒绝</el-button>
 				</template>
-			</el-table-column>
+			</el-table-column> -->
 			<el-table-column prop="number" label="号码" width="150" show-overflow-tooltip>
 			</el-table-column>
 			<el-table-column prop="address" label="地区" width="100" show-overflow-tooltip>
@@ -47,21 +50,21 @@
 			</el-table-column>
 			<el-table-column prop="attribute" label="通道属性" width="180" show-overflow-tooltip>
 			</el-table-column>
-			<el-table-column prop="start_date" label="开通时间" width="170" show-overflow-tooltip>
+			<el-table-column prop="start_date" label="开通时间" width="160" show-overflow-tooltip>
 			</el-table-column>
-			<el-table-column prop="end_date" label="关停时间" width="170" show-overflow-tooltip>
+			<el-table-column prop="end_date" label="关停时间" width="160" show-overflow-tooltip>
 			</el-table-column>
 			<el-table-column prop="communications_charges" label="通信资费" width="100" show-overflow-tooltip>
 			</el-table-column>
 			<el-table-column prop="number_charges" label="号码费" width="100" show-overflow-tooltip>
 			</el-table-column>
-			<el-table-column prop="invoice" label="是否开票" width="100" show-overflow-tooltip>
+			<el-table-column prop="invoice" label="是否开票" width="80" show-overflow-tooltip>
 				<template slot-scope="scope">
 					<span v-if="scope.row.invoice==0">未开票</span>
 					<span v-if="scope.row.invoice==1">已开票</span>
 				</template>
 			</el-table-column>
-			<el-table-column prop="invoice_type" label="发票类型" width="100" show-overflow-tooltip>
+			<el-table-column prop="invoice_type" label="发票类型" width="80" show-overflow-tooltip>
 				<template slot-scope="scope">
 					<span v-if="scope.row.invoice_type==0">专票</span>
 					<span v-if="scope.row.invoice_type==1">普票</span>
@@ -71,12 +74,12 @@
 			</el-table-column>
 			<el-table-column prop="remark" label="备注" show-overflow-tooltip>
 			</el-table-column>
-			<el-table-column label="操作" fixed="right" width="260">
+			<el-table-column label="操作" fixed="right" width="180">
 				<template slot-scope="scope">
-					<el-button v-if="scope.row.audit_status!=3" size="small" @click="auditSubmit(scope.row)">提交审核</el-button>
-					<el-button v-if="scope.row.audit_status==3" size="small" @click="resubmit(scope.row)">重新提交</el-button>
+					<!-- <el-button v-if="scope.row.audit_status!=3" size="small" @click="auditSubmit(scope.row)">提交审核</el-button>
+					<el-button v-if="scope.row.audit_status==3" size="small" @click="resubmit(scope.row)">重新提交</el-button> -->
 					<el-button size="small" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
-					<el-button type="danger" size="small" @click="handleDel(scope.$index, scope.row)">删除</el-button>
+					<el-button v-if="role_id==='4'" type="danger" size="small" @click="handleDel(scope.$index, scope.row)">删除</el-button>
 				</template>
 			</el-table-column>
 		</el-table>
@@ -201,6 +204,14 @@
 					</el-form-item>
 				</div>
 				<div class="flex">
+					<el-form-item label="地区" prop="address">
+						<el-input v-model="addForm.address" auto-complete="off"></el-input>
+					</el-form-item>
+					<el-form-item label="业务" prop="business">
+						<el-input v-model="addForm.business" auto-complete="off"></el-input>
+					</el-form-item>
+				</div>
+				<div class="flex">
 					<el-form-item label="开始时间" prop="start_date">
 						<el-date-picker v-model="addForm.start_date" @change="getSTime" value-format="yyyy-MM-dd HH:mm:ss" type="datetime" placeholder="选择开始日期时间">
 						</el-date-picker>
@@ -253,16 +264,16 @@
 </template>
 
 <script>
-	import { getChannelByParam, insertChannel, updateChannelById, deleteChannelById ,insertProcess ,updateReProcessById} from '../../api/api';
-
+	import { getChannelByParam, insertChannel, updateChannelById, deleteChannelById ,insertProcess ,updateReProcessById ,uploadChannelByParam} from '../../api/api';
+  import rules from '@/common/js/rule'
 	export default {
 		
 		data() {
-			
 			return {
 				filters: {
 					name: ''
 				},
+				role_id:'',
 				list: [],
 				total: 0,
 				page: 1,
@@ -312,12 +323,12 @@
 					attribute: [{ required: true, message: '请输入通道属性', trigger: 'blur' }],
 					start_date: [{ required: true, message: '请输入开始时间', trigger: 'blur' }],
 					end_date: [{ required: true, message: '请输入关停时间', trigger: 'blur' }],
-					charges: [{ required: true, message: '请输入通信费', trigger: 'blur' }],
-					communications_charges: [{ required: true, message: '请输入通信资费', trigger: 'blur' }],
-					number_charges: [{ required: true, message: '请输入号码费', trigger: 'blur' }],
+					charges: rules.numPot2,
+					communications_charges: rules.numPot2,
+					number_charges: rules.numPot2,
 					invoice: [{ required: true, message: '请输入是否开票', trigger: 'blur' }],
 					invoice_type: [{ required: true, message: '请输入发票类型', trigger: 'blur' }],
-					tax_point: [{ required: true, message: '请输入税点', trigger: 'blur' }],
+					tax_point: rules.numPot2,
 
 				},
 				//新增界面数据
@@ -472,6 +483,19 @@
 					};
 				});
 			},
+			//导出
+			exportExcel(){
+				const data={name:this.filters.name};
+				uploadChannelByParam(data).then(res=>{
+					var aDom = document.createElement('a');
+					var evt = document.createEvent('HTMLEvents');
+					evt.initEvent('click', false, false);
+					aDom.download = true;
+					aDom.href = res.result;
+					aDom.dispatchEvent(evt);
+					aDom.click();
+				})
+			},
 			getSTime(val){
 				this.addForm.start_date=val;
 			},
@@ -486,6 +510,7 @@
 			}
 		},
 		mounted() {
+			this.role_id=JSON.parse(sessionStorage.getItem('user')).role_id; 
 			this.getTableList();
 		}
 	}
