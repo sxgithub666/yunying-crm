@@ -17,6 +17,11 @@ import ZkTable from 'vue-table-with-tree-grid'
 import preview from 'vue-photo-preview'
 import 'vue-photo-preview/dist/skin.css'
 
+import 'vue-area-linkage/dist/index.css'; // v2 or higher
+
+import VueAreaLinkage from 'vue-area-linkage';
+
+Vue.use(VueAreaLinkage)
 
 Vue.use(ElementUI)
 Vue.use(VueRouter)

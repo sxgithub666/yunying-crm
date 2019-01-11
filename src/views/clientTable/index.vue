@@ -16,7 +16,7 @@
 					<el-button type="primary" size="small" @click="handleAdd">新增</el-button>
 				</el-form-item>
 				<el-form-item>
-					<el-button type="primary" size="small" @click="exportExcel">导出</el-button>
+					<el-button v-if="role_id==='4'" type="primary" size="small" @click="exportExcel">导出</el-button>
 				</el-form-item>
 			</el-form>
 		</el-col>
@@ -97,6 +97,14 @@
 					</el-form-item>
 				</div>
 				<div class="flex">
+					<el-form-item label="卡槽费" prop="call_card_pay_money">
+						<el-input v-model="editForm.call_card_pay_money" clearable auto-complete="off"></el-input>
+					</el-form-item>
+					<el-form-item label="地区" prop="area">
+						<area-cascader v-model="editForm.area" :level="1" type="text" :data="pcaa"></area-cascader> 
+					</el-form-item>
+				</div>
+				<div class="flex">
 					<el-form-item label="开始时间" prop="start_date">
 						<el-date-picker v-model="editForm.start_date" @change="getEditTime" value-format="yyyy-MM-dd HH:mm:ss" type="datetime" placeholder="选择开始日期时间">
 						</el-date-picker>
@@ -142,6 +150,14 @@
 					</el-form-item>
 				</div>
 				<div class="flex">
+					<el-form-item label="卡槽费" prop="call_card_pay_money">
+						<el-input v-model="addForm.call_card_pay_money" clearable auto-complete="off"></el-input>
+					</el-form-item>
+					<el-form-item label="地区" prop="area">
+						<area-cascader v-model="addForm.area" :level="1" type="text" :data="pcaa"></area-cascader> 
+					</el-form-item>
+				</div>
+				<div class="flex">
 					<el-form-item label="开始时间" prop="start_date">
 						<el-date-picker v-model="addForm.start_date" @change="getSTime" value-format="yyyy-MM-dd HH:mm:ss" type="datetime" placeholder="选择开始日期时间">
 						</el-date-picker>
@@ -162,7 +178,8 @@
 
 <script>
 	import { getCustomerListByParam, insertCustomer, updateCustomerById, deleteCustomerById, insertProcess ,uploadClientTableByParam} from '../../api/api';
-  import rules from '@/common/js/rule'
+	import rules from '@/common/js/rule'
+	import { pca, pcaa } from 'area-data'
 	export default {
 		data() {
 			return {
@@ -185,7 +202,9 @@
 					number_charges: rules.numPot2,
 					charges: rules.numPot2,
 					start_date: [{ required: true, message: '请输入开通时间', trigger: 'blur' }],
-					end_date: [{ required: true, message: '请输入关停时间', trigger: 'blur' }],
+					// end_date: [{ required: true, message: '请输入关停时间', trigger: 'blur' }],
+					call_card_pay_money: rules.numPot2,
+					area: [{ required: true, message: '请选择地区', trigger: 'blur' }]
 				},
 				//编辑界面数据
 				editForm: {
@@ -197,19 +216,12 @@
 					charges:'',
 					start_date:'',
 					end_date:'',
+					call_card_pay_money:'',
+					area:''
 				},
 
 				addFormVisible: false,//新增界面是否显示
 				addLoading: false,
-				addFormRules: {
-					prefix: [
-						{ required: true, message: '请输入姓名', trigger: 'blur' }
-					],
-					customer_name: [
-						{ required: true, message: '请输入前缀', trigger: 'blur' }
-					],
-
-				},
 				//新增界面数据
 				addForm: {
 					prefix:'',
@@ -220,7 +232,11 @@
 					charges:'',
 					start_date:'',
 					end_date:'',
-				}
+					call_card_pay_money:'',
+					area:''
+				},
+				pca: pca,
+				pcaa: pcaa
 
 			}
 		},
@@ -296,6 +312,9 @@
 			handleEdit(index, row) {
 				this.editFormVisible = true;
 				this.editForm = Object.assign({}, row);
+				if(typeof this.editForm.area==='string'){
+					this.editForm.area=this.editForm.area.split('/')
+				}
 			},
 			//显示新增界面
 			handleAdd() {
@@ -309,6 +328,8 @@
 					charges:'',
 					start_date:'',
 					end_date:'',
+					call_card_pay_money:'',
+					area:''
 				};
 			},
 			//编辑
@@ -316,6 +337,7 @@
 				this.$refs.editForm.validate((valid) => {
 					if (valid) {
 						this.editLoading = true;
+						this.editForm.area=this.editForm.area.join('/');
 						const data = Object.assign({}, this.editForm);
 						updateCustomerById(data).then((res) => {
 							this.editLoading = false;
@@ -335,6 +357,7 @@
 				this.$refs.addForm.validate((valid) => {
 					if (valid) {
 						this.addLoading = true;
+						this.addForm.area=this.addForm.area.join('/');
 						const data = Object.assign({}, this.addForm);
 						insertCustomer(data).then((res) => {
 							this.addLoading = false;

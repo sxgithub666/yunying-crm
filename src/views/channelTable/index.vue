@@ -13,7 +13,7 @@
 					<el-button type="primary" size="small" @click="handleAdd">新增</el-button>
 				</el-form-item>
 				<el-form-item>
-					<el-button type="primary" size="small" @click="exportExcel">导出</el-button>
+					<el-button v-if="role_id==='4'" type="primary" size="small" @click="exportExcel">导出</el-button>
 				</el-form-item>
 			</el-form>
 		</el-col>
@@ -26,7 +26,7 @@
 			</el-table-column>
 			<el-table-column prop="prefix" label="前缀" show-overflow-tooltip width="110">
 			</el-table-column>
-			<el-table-column prop="level" label="级别" show-overflow-tooltip>
+			<el-table-column prop="level" label="号码类型" show-overflow-tooltip>
 			</el-table-column>
 			<el-table-column prop="distance" label="市话长途" width="100" show-overflow-tooltip>
 			</el-table-column>
@@ -58,7 +58,7 @@
 			</el-table-column>
 			<el-table-column prop="number_charges" label="号码费" width="100" show-overflow-tooltip>
 			</el-table-column>
-			<el-table-column prop="invoice" label="是否开票" width="80" show-overflow-tooltip>
+			<!-- <el-table-column prop="invoice" label="是否开票" width="80" show-overflow-tooltip>
 				<template slot-scope="scope">
 					<span v-if="scope.row.invoice==0">未开票</span>
 					<span v-if="scope.row.invoice==1">已开票</span>
@@ -71,7 +71,7 @@
 				</template>
 			</el-table-column>
 			<el-table-column prop="tax_point" label="税点" width="100" show-overflow-tooltip>
-			</el-table-column>
+			</el-table-column> -->
 			<el-table-column prop="remark" label="备注" show-overflow-tooltip>
 			</el-table-column>
 			<el-table-column label="操作" fixed="right" width="180">
@@ -102,7 +102,7 @@
 					</el-form-item>
 				</div>
 				<div class="flex">
-					<el-form-item label="级别" prop="level">
+					<el-form-item label="号码类型" prop="level">
 						<el-input v-model="editForm.level" auto-complete="off"></el-input>
 					</el-form-item>
 					<el-form-item label="市话长途" prop="distance">
@@ -136,14 +136,7 @@
 					</el-form-item>
 				</div>
 			  </div>
-				<div class="flex">
-					<el-form-item label="通道属性" prop="attribute">
-						<el-input v-model="editForm.attribute" auto-complete="off"></el-input>
-					</el-form-item>
-					<el-form-item label="通信费" prop="charges">
-						<el-input v-model="editForm.charges" auto-complete="off"></el-input>
-					</el-form-item>
-				</div>
+				
 				<div class="flex">
 					<el-form-item label="通信资费" prop="communications_charges">
 						<el-input v-model="editForm.communications_charges" auto-complete="off"></el-input>
@@ -152,7 +145,7 @@
 						<el-input v-model="editForm.number_charges" auto-complete="off"></el-input>
 					</el-form-item>
 				</div>
-				<div class="flex">
+				<!-- <div class="flex">
 					<el-form-item label="是否开票" prop="invoice">
 						<el-select v-model="editForm.invoice">
 							<el-option label="已开票" value="1"></el-option>
@@ -165,9 +158,17 @@
 							<el-option label="专票" value="0"></el-option>
 						</el-select>
 					</el-form-item>
-				</div>
-				<el-form-item label="税点" prop="tax_point">
-					<el-input v-model="editForm.tax_point" auto-complete="off"></el-input>
+				</div> -->
+				<!-- <div class="flex">
+					<el-form-item label="税点" prop="tax_point">
+						<el-input v-model="editForm.tax_point" auto-complete="off"></el-input>
+					</el-form-item>
+					<el-form-item label="通信费" prop="charges">
+						<el-input v-model="editForm.charges" auto-complete="off"></el-input>
+					</el-form-item>
+				</div> -->
+				<el-form-item label="通道属性" prop="attribute">
+					<el-input type="textarea" :rows="2" v-model="editForm.attribute" auto-complete="off"></el-input>
 				</el-form-item>
 			</el-form>
 			<div slot="footer" class="dialog-footer">
@@ -188,7 +189,7 @@
 					</el-form-item>
 				</div>
 				<div class="flex">
-					<el-form-item label="级别" prop="level">
+					<el-form-item label="号码类型" prop="level">
 						<el-input v-model="addForm.level" auto-complete="off"></el-input>
 					</el-form-item>
 					<el-form-item label="市话长途" prop="distance">
@@ -221,14 +222,7 @@
 						</el-date-picker>
 					</el-form-item>
 				</div>
-				<div class="flex">
-					<el-form-item label="通道属性" prop="attribute">
-						<el-input v-model="addForm.attribute" auto-complete="off"></el-input>
-					</el-form-item>
-					<el-form-item label="通信费" prop="charges">
-						<el-input v-model="addForm.charges" auto-complete="off"></el-input>
-					</el-form-item>
-				</div>
+				
 				<div class="flex">
 					<el-form-item label="通信资费" prop="communications_charges">
 						<el-input v-model="addForm.communications_charges" auto-complete="off"></el-input>
@@ -237,7 +231,7 @@
 						<el-input v-model="addForm.number_charges" auto-complete="off"></el-input>
 					</el-form-item>
 				</div>
-				<div class="flex">
+				<!-- <div class="flex">
 					<el-form-item label="是否开票" prop="invoice">
 						<el-select v-model="addForm.invoice">
 							<el-option label="已开票" value="1"></el-option>
@@ -250,10 +244,19 @@
 							<el-option label="专票" value="0"></el-option>
 						</el-select>
 					</el-form-item>
-				</div>
-				<el-form-item label="税点" prop="tax_point">
-					<el-input v-model="addForm.tax_point" auto-complete="off"></el-input>
+				</div> -->
+				<!-- <div class="flex">
+					<el-form-item label="税点" prop="tax_point">
+						<el-input v-model="addForm.tax_point" auto-complete="off"></el-input>
+					</el-form-item>
+					<el-form-item label="通信费" prop="charges">
+						<el-input v-model="addForm.charges" auto-complete="off"></el-input>
+					</el-form-item>
+				</div> -->
+				<el-form-item label="通道属性" prop="attribute">
+					<el-input type="textarea" :rows="2" v-model="addForm.attribute" auto-complete="off"></el-input>
 				</el-form-item>
+				
 			</el-form>
 			<div slot="footer" class="dialog-footer">
 				<el-button @click.native="addFormVisible = false">取消</el-button>
@@ -314,7 +317,7 @@
 				addFormRules: {
 					name: [{ required: true, message: '请输入姓名', trigger: 'blur' }],
 					prefix: [{ required: true, message: '请输入前缀', trigger: 'blur' }],
-					level: [{ required: true, message: '请输入级别', trigger: 'blur' }],
+					level: [{ required: true, message: '请输入号码类型', trigger: 'blur' }],
 					distance: [{ required: true, message: '请输入市话长途', trigger: 'blur' }],
 					belong: [{ required: true, message: '请输入业务归属', trigger: 'blur' }],
 					number: [{ required: true, message: '请输入号码', trigger: 'blur' }],
@@ -322,7 +325,7 @@
 					business: [{ required: true, message: '请输入业务', trigger: 'blur' }],
 					attribute: [{ required: true, message: '请输入通道属性', trigger: 'blur' }],
 					start_date: [{ required: true, message: '请输入开始时间', trigger: 'blur' }],
-					end_date: [{ required: true, message: '请输入关停时间', trigger: 'blur' }],
+					// end_date: [{ required: true, message: '请输入关停时间', trigger: 'blur' }],
 					charges: rules.numPot2,
 					communications_charges: rules.numPot2,
 					number_charges: rules.numPot2,

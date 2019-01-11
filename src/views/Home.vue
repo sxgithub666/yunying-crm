@@ -115,6 +115,15 @@ import { getProcessByParam ,updateUserPassword} from '../api/api';
 				newPassword:''
 			}
 		},
+		// destroyed(){
+    //   if(window.getIsBacklogTimer){
+    //     clearInterval(window.getIsBacklogTimer);
+    //   }
+		// },
+		// beforeRouteLeave (to, from, next) {
+    //   clearInterval(window.getIsBacklogTimer);
+    //   next();
+    // },
 		methods: {
 			onSubmit() {
 				console.log('submit!');
@@ -127,6 +136,12 @@ import { getProcessByParam ,updateUserPassword} from '../api/api';
 			},
 			handleselect: function (a, b) {
 			},
+			//设置页面刷新定时器
+      refresh(){
+         window.getIsBacklogTimer=setInterval(()=>{
+            this.isBacklog();
+				 },10*60*1000);
+      },
 			//获取是否有待办事项
 			isBacklog(){
 				const data={
@@ -141,7 +156,8 @@ import { getProcessByParam ,updateUserPassword} from '../api/api';
 							this.hasBacklog=false;
 						}else{
 							this.hasBacklog=true;
-						}
+						};
+						// this.refresh()
 					}
 				})
 			},
@@ -204,6 +220,7 @@ import { getProcessByParam ,updateUserPassword} from '../api/api';
 				this.sysUserName = user.user_name || '';
 			}
 			this.isBacklog();
+			this.refresh();
 		}
 	}
 

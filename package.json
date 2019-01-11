@@ -10,6 +10,7 @@
     "build": "node build/build.js"
   },
   "dependencies": {
+    "area-data": "^5.0.6",
     "axios": "^0.15.3",
     "echarts": "^3.3.2",
     "element-ui": "^2.4.11",
@@ -19,6 +20,7 @@
     "npm": "^6.5.0",
     "nprogress": "^0.2.0",
     "vue": "^2.5.17",
+    "vue-area-linkage": "^5.1.0",
     "vue-photo-preview": "^1.1.2",
     "vue-router": "^2.3.0",
     "vue-table-with-tree-grid": "^0.2.4",

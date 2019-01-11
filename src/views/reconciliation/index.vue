@@ -12,9 +12,9 @@
 				<el-form-item>
 					<el-button type="primary" size="small" @click="handleAdd">新增</el-button>
 				</el-form-item>
-				<el-form-item>
-					<el-button type="primary" size="small" @click="exportExcel">导出</el-button>
-				</el-form-item>
+				<!-- <el-form-item>
+					<el-button v-if="role_id==='4'" type="primary" size="small" @click="exportExcel">导出</el-button>
+				</el-form-item> -->
 			</el-form>
 		</el-col>
 
@@ -32,12 +32,12 @@
 			</el-table-column>
 			<el-table-column prop="reconciliation_cost" label="成本" width="100">
 			</el-table-column>
-			<el-table-column prop="account_name" label="账户名称" width="100">
-			</el-table-column>
+			<!-- <el-table-column prop="account_name" label="账户名称" width="100">
+			</el-table-column> -->
 			<el-table-column prop="balance" label="余额" width="100">
 			</el-table-column>
-			<el-table-column prop="amount_adjustment" label="调整金额" width="100">
-			</el-table-column>
+			<!-- <el-table-column prop="amount_adjustment" label="调整金额" width="100">
+			</el-table-column> -->
 			<el-table-column prop="pay_record" label="缴费记录" width="100">
 			</el-table-column>
 			<el-table-column prop="remark" label="备注" width="100">
@@ -75,17 +75,18 @@
 					<el-form-item label="成本" prop="reconciliation_cost">
 						<el-input v-model="editForm.reconciliation_cost" clearable auto-complete="off"></el-input>
 					</el-form-item>
-					<el-form-item label="账户名称" prop="account_name">
-						<el-input v-model="editForm.account_name" clearable auto-complete="off"></el-input>
-					</el-form-item>
-				</div>
-				<div class="flex">
 					<el-form-item label="余额" prop="balance">
 						<el-input v-model="editForm.balance" clearable auto-complete="off"></el-input>
 					</el-form-item>
-					<el-form-item label="调整金额" prop="amount_adjustment">
+					<!-- <el-form-item label="账户名称" prop="account_name">
+						<el-input v-model="editForm.account_name" clearable auto-complete="off"></el-input>
+					</el-form-item> -->
+				</div>
+				<div class="flex">
+					
+					<!-- <el-form-item label="调整金额" prop="amount_adjustment">
 						<el-input v-model="editForm.amount_adjustment" clearable auto-complete="off"></el-input>
-					</el-form-item>
+					</el-form-item> -->
 				</div>
 				<div class="flex">
 					<el-form-item label="缴费记录" prop="pay_record">
@@ -121,17 +122,18 @@
 					<el-form-item label="成本" prop="reconciliation_cost">
 						<el-input v-model="addForm.reconciliation_cost" clearable auto-complete="off"></el-input>
 					</el-form-item>
-					<el-form-item label="账户名称" prop="account_name">
-						<el-input v-model="addForm.account_name" clearable auto-complete="off"></el-input>
-					</el-form-item>
-				</div>
-				<div class="flex">
 					<el-form-item label="余额" prop="balance">
 						<el-input v-model="addForm.balance" clearable auto-complete="off"></el-input>
 					</el-form-item>
-					<el-form-item label="调整金额" prop="amount_adjustment">
+					<!-- <el-form-item label="账户名称" prop="account_name">
+						<el-input v-model="addForm.account_name" clearable auto-complete="off"></el-input>
+					</el-form-item> -->
+				</div>
+				<div class="flex">
+					
+					<!-- <el-form-item label="调整金额" prop="amount_adjustment">
 						<el-input v-model="addForm.amount_adjustment" clearable auto-complete="off"></el-input>
-					</el-form-item>
+					</el-form-item> -->
 				</div>
 				<div class="flex">
 					<el-form-item label="缴费记录" prop="pay_record">
@@ -171,9 +173,9 @@
 					reconciliation_time: [{ required: true, message: '请输入对账时间', trigger: 'blur' }],
 					income: [{ required: true, message: '请输入收入', trigger: 'blur' }],
 					reconciliation_cost: [{ required: true, message: '请输入成本', trigger: 'blur' }],
-					account_name: [{ required: true, message: '请输入账户名称', trigger: 'blur' }],
+					// account_name: [{ required: true, message: '请输入账户名称', trigger: 'blur' }],
 					balance: rules.numPot2,
-					amount_adjustment: rules.numPot2,
+					// amount_adjustment: rules.numPot2,
 					pay_record: [{ required: true, message: '请输入缴费记录', trigger: 'blur' }],
 				},
 				//编辑界面数据

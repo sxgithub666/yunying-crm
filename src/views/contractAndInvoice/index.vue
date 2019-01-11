@@ -15,6 +15,9 @@
 				<el-form-item>
 					<el-button type="primary" size="small" @click="handleAdd">新增</el-button>
 				</el-form-item>
+				<el-form-item>
+					<el-button v-if="role_id==='4'" type="primary" size="small" @click="exportExcel">导出</el-button>
+				</el-form-item>
 			</el-form>
 		</el-col>
 
@@ -147,7 +150,7 @@
 </template>
 
 <script>
-	import { getContractProcessByParam, insertContractProcess, updateContractProcessById, deleteContractProcessById, insertProcess, updateReProcessById} from '../../api/api';
+	import { getContractProcessByParam, insertContractProcess, updateContractProcessById, deleteContractProcessById, insertProcess, updateReProcessById ,uploadContractByParam} from '../../api/api';
 
 	export default {
 		data() {
@@ -253,7 +256,8 @@
 						type: 'warning'
 					});
 				}
-				return (isJPG || isBMP || isGIF || isPNG) && isLt2M;
+				// return (isJPG || isBMP || isGIF || isPNG) && isLt2M;
+				return isJPG || isBMP || isGIF || isPNG;
 			},
 			onSuccess(response, file, fileList){
 				console.log(fileList);
@@ -423,6 +427,22 @@
 						});
 				  };
 				});
+			},
+			//导出
+			exportExcel(){
+				const data={
+					company_name:this.filters.company_name,
+					user_name:this.filters.user_name,
+					};
+				uploadContractByParam(data).then(res=>{
+					var aDom = document.createElement('a');
+					var evt = document.createEvent('HTMLEvents');
+					evt.initEvent('click', false, false);
+					aDom.download = true;
+					aDom.href = res.result;
+					aDom.dispatchEvent(evt);
+					aDom.click();
+				})
 			},
 			getAddTime(val){
 				this.addForm.company_name=val;

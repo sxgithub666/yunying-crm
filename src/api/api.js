@@ -45,6 +45,7 @@ axios.interceptors.response.use(function (response) {
 
 // let base = 'http://192.168.0.77:8091';
 let base = '/api/clouddo-crm';
+// let base = '/api';
 
 const POST = (url, params) => {
   return axios.post(`${base}${url}`, params).then(res => res.data)
@@ -206,6 +207,10 @@ export const deleteZjPaasProcessById = params => {
 export const getZjPaasProcessById = params => {
   return POST('/zjpaas/getZjPaasProcessById', params)
 };
+export const uploadSwitchboardByParam = params => {
+  return POST('/zjpaas/uploadZjPaasByParam', params)
+};
+
 
 //财务对账信息
 export const getReconciliationByParam = params => {
@@ -220,6 +225,9 @@ export const updateReconciliationById = params => {
 export const deleteReconciliationById = params => {
   return POST('/reconciliation/deleteReconciliationById', params)
 };
+// export const uploadReconciliationByParam = params => {
+//   return POST('/reconciliation/uploadReconciliationByParam', params)
+// };
 
 //接入流程（合同与发票）
 export const getContractProcessByParam = params => {
@@ -236,6 +244,9 @@ export const deleteContractProcessById = params => {
 };
 export const getContractProcessById = params => {
   return POST('/contract/getContractProcessById', params)
+};
+export const uploadContractByParam = params => {
+  return POST('/contract/uploadContractByParam', params)
 };
 
 //系统参数管理
@@ -270,4 +281,8 @@ export const deleteProcessById = params => {
 };
 export const updateReProcessById = params => {
   return POST('/process/updateReProcessById', params)
+};
+
+export const getCityById = params => {
+  return POST('/city/getCityById', params)
 };
