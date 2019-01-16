@@ -27,10 +27,20 @@
 			<el-table-column prop="prefix" label="前缀" show-overflow-tooltip width="110">
 			</el-table-column>
 			<el-table-column prop="level" label="号码类型" show-overflow-tooltip>
+				<template slot-scope="scope">
+					<span v-if="scope.row.level==0">大号</span>
+					<span v-if="scope.row.level==1">强显</span>
+					<span v-if="scope.row.level==2">手机号</span>
+				</template>
 			</el-table-column>
 			<el-table-column prop="distance" label="市话长途" width="100" show-overflow-tooltip>
 			</el-table-column>
 			<el-table-column prop="belong" label="业务归属" width="140" show-overflow-tooltip>
+				<template slot-scope="scope">
+					<span v-if="scope.row.level==0">小水总机</span>
+					<span v-if="scope.row.level==1">小水智能</span>
+					<span v-if="scope.row.level==2">语音PASS</span>
+				</template>
 			</el-table-column>
 			<!-- <el-table-column prop="audit_status" label="状态" width="100" show-overflow-tooltip>
 				<template slot-scope="scope">
@@ -42,7 +52,7 @@
 			</el-table-column> -->
 			<el-table-column prop="number" label="号码" width="150" show-overflow-tooltip>
 			</el-table-column>
-			<el-table-column prop="address" label="地区" width="100" show-overflow-tooltip>
+			<el-table-column prop="address" label="地区" width="150" show-overflow-tooltip>
 			</el-table-column>
 			<el-table-column prop="name" label="通道名称" width="260" show-overflow-tooltip>
 			</el-table-column>
@@ -102,27 +112,46 @@
 					</el-form-item>
 				</div>
 				<div class="flex">
-					<el-form-item label="号码类型" prop="level">
-						<el-input v-model="editForm.level" auto-complete="off"></el-input>
+					<el-form-item label="号码" prop="number">
+						<el-input v-model="editForm.number" auto-complete="off"></el-input>
 					</el-form-item>
 					<el-form-item label="市话长途" prop="distance">
 						<el-input v-model="editForm.distance" auto-complete="off"></el-input>
 					</el-form-item>
 				</div>
 				<div class="flex">
-					<el-form-item label="业务归属" prop="belong">
-						<el-input v-model="editForm.belong" auto-complete="off"></el-input>
-					</el-form-item>
-					<el-form-item label="号码" prop="number">
-						<el-input v-model="editForm.number" auto-complete="off"></el-input>
-					</el-form-item>
-				</div>
-				<div class="flex">
 					<el-form-item label="地区" prop="address">
-						<el-input v-model="editForm.address" auto-complete="off"></el-input>
+						<area-cascader v-model="editForm.address" :level="0" type="text" :data="pca"></area-cascader> 
+						<!-- <el-input v-model="editForm.address" auto-complete="off"></el-input> -->
 					</el-form-item>
 					<el-form-item label="业务" prop="business">
 						<el-input v-model="editForm.business" auto-complete="off"></el-input>
+					</el-form-item>
+				</div>
+				<div class="flex">
+					<el-form-item label="通信资费" prop="communications_charges">
+						<el-input v-model="editForm.communications_charges" auto-complete="off"></el-input>
+					</el-form-item>
+					<el-form-item label="号码费" prop="number_charges">
+						<el-input v-model="editForm.number_charges" auto-complete="off"></el-input>
+					</el-form-item>
+				</div>
+				<div class="flex">
+					<el-form-item label="业务归属" prop="belong">
+						<el-select v-model="editForm.belong">
+							<el-option label="小水总机" value="0"></el-option>
+							<el-option label="小水智能" value="1"></el-option>
+							<el-option label="语音PASS" value="2"></el-option>
+						</el-select>
+						<!-- <el-input v-model="editForm.belong" auto-complete="off"></el-input> -->
+					</el-form-item>
+					<el-form-item label="号码类型" prop="level">
+						<el-select v-model="editForm.level">
+							<el-option label="大号" value="0"></el-option>
+							<el-option label="强显" value="1"></el-option>
+							<el-option label="手机号" value="2"></el-option>
+						</el-select>
+						<!-- <el-input v-model="editForm.level" auto-complete="off"></el-input> -->
 					</el-form-item>
 				</div>
 				<div class="flex">
@@ -133,16 +162,6 @@
 					<el-form-item label="关停时间" prop="end_date">
 						<el-date-picker v-model="editForm.end_date"  @change="getEditETime" value-format="yyyy-MM-dd HH:mm:ss" type="datetime" placeholder="选择结束日期时间">
 						</el-date-picker>
-					</el-form-item>
-				</div>
-			  </div>
-				
-				<div class="flex">
-					<el-form-item label="通信资费" prop="communications_charges">
-						<el-input v-model="editForm.communications_charges" auto-complete="off"></el-input>
-					</el-form-item>
-					<el-form-item label="号码费" prop="number_charges">
-						<el-input v-model="editForm.number_charges" auto-complete="off"></el-input>
 					</el-form-item>
 				</div>
 				<!-- <div class="flex">
@@ -170,6 +189,11 @@
 				<el-form-item label="通道属性" prop="attribute">
 					<el-input type="textarea" :rows="2" v-model="editForm.attribute" auto-complete="off"></el-input>
 				</el-form-item>
+				<!-- <div class="flex"> -->
+				<el-form-item label="备注" prop="remark">
+					<el-input v-model="editForm.remark" auto-complete="off"></el-input>
+				</el-form-item>
+				<!-- </div> -->
 			</el-form>
 			<div slot="footer" class="dialog-footer">
 				<el-button @click.native="editFormVisible = false">取消</el-button>
@@ -189,27 +213,47 @@
 					</el-form-item>
 				</div>
 				<div class="flex">
-					<el-form-item label="号码类型" prop="level">
-						<el-input v-model="addForm.level" auto-complete="off"></el-input>
-					</el-form-item>
+					
 					<el-form-item label="市话长途" prop="distance">
 						<el-input v-model="addForm.distance" auto-complete="off"></el-input>
-					</el-form-item>
-				</div>
-				<div class="flex">
-					<el-form-item label="业务归属" prop="belong">
-						<el-input v-model="addForm.belong" auto-complete="off"></el-input>
 					</el-form-item>
 					<el-form-item label="号码" prop="number">
 						<el-input v-model="addForm.number" auto-complete="off"></el-input>
 					</el-form-item>
 				</div>
 				<div class="flex">
+					<el-form-item label="通信资费" prop="communications_charges">
+						<el-input v-model="addForm.communications_charges" auto-complete="off"></el-input>
+					</el-form-item>
+					<el-form-item label="号码费" prop="number_charges">
+						<el-input v-model="addForm.number_charges" auto-complete="off"></el-input>
+					</el-form-item>
+				</div>
+				<div class="flex">
 					<el-form-item label="地区" prop="address">
-						<el-input v-model="addForm.address" auto-complete="off"></el-input>
+						<area-cascader v-model="addForm.address" :level="0" type="text" :data="pca"></area-cascader> 
+						<!-- <el-input v-model="addForm.address" auto-complete="off"></el-input> -->
 					</el-form-item>
 					<el-form-item label="业务" prop="business">
 						<el-input v-model="addForm.business" auto-complete="off"></el-input>
+					</el-form-item>
+				</div>
+				<div class="flex">
+					<el-form-item label="业务归属" prop="belong">
+						<el-select v-model="addForm.belong">
+							<el-option label="小水总机" value="0"></el-option>
+							<el-option label="小水智能" value="1"></el-option>
+							<el-option label="语音PASS" value="2"></el-option>
+						</el-select>
+						<!-- <el-input v-model="addForm.belong" auto-complete="off"></el-input> -->
+					</el-form-item>
+					<el-form-item label="号码类型" prop="level">
+						<el-select v-model="addForm.level">
+							<el-option label="大号" value="0"></el-option>
+							<el-option label="强显" value="1"></el-option>
+							<el-option label="手机号" value="2"></el-option>
+						</el-select>
+						<!-- <el-input v-model="addForm.level" auto-complete="off"></el-input> -->
 					</el-form-item>
 				</div>
 				<div class="flex">
@@ -220,15 +264,6 @@
 					<el-form-item label="关停时间" prop="end_date">
 						<el-date-picker v-model="addForm.end_date"  @change="getETime" value-format="yyyy-MM-dd HH:mm:ss" type="datetime" placeholder="选择结束日期时间">
 						</el-date-picker>
-					</el-form-item>
-				</div>
-				
-				<div class="flex">
-					<el-form-item label="通信资费" prop="communications_charges">
-						<el-input v-model="addForm.communications_charges" auto-complete="off"></el-input>
-					</el-form-item>
-					<el-form-item label="号码费" prop="number_charges">
-						<el-input v-model="addForm.number_charges" auto-complete="off"></el-input>
 					</el-form-item>
 				</div>
 				<!-- <div class="flex">
@@ -256,7 +291,9 @@
 				<el-form-item label="通道属性" prop="attribute">
 					<el-input type="textarea" :rows="2" v-model="addForm.attribute" auto-complete="off"></el-input>
 				</el-form-item>
-				
+				<el-form-item label="备注" prop="remark">
+					<el-input v-model="addForm.remark" auto-complete="off"></el-input>
+				</el-form-item>
 			</el-form>
 			<div slot="footer" class="dialog-footer">
 				<el-button @click.native="addFormVisible = false">取消</el-button>
@@ -268,7 +305,8 @@
 
 <script>
 	import { getChannelByParam, insertChannel, updateChannelById, deleteChannelById ,insertProcess ,updateReProcessById ,uploadChannelByParam} from '../../api/api';
-  import rules from '@/common/js/rule'
+	import rules from '@/common/js/rule'
+	import { pca, pcaa } from 'area-data'
 	export default {
 		
 		data() {
@@ -354,7 +392,9 @@
 					invoice:'',
 					invoice_type:'',
 					tax_point:'',
-				}
+				},
+				pca: pca,
+				pcaa: pcaa
 
 			}
 		},
@@ -427,6 +467,9 @@
 			handleEdit(index, row) {
 				this.editFormVisible = true;
 				this.editForm = Object.assign({}, row);
+				if(typeof this.editForm.address==='string'){
+					this.editForm.address=this.editForm.address.split('/')
+				}
 			},
 			//显示新增界面
 			handleAdd() {
@@ -453,6 +496,7 @@
 				this.$refs.editForm.validate((valid) => {
 					if (valid) {
 						this.editLoading = true;
+						this.editForm.address=this.editForm.address.join('/');
 						const data = Object.assign({}, this.editForm);
 						updateChannelById(data).then((res) => {
 							this.editLoading = false;
@@ -472,6 +516,7 @@
 				this.$refs.addForm.validate((valid) => {
 					if (valid) {
 						this.addLoading = true;
+						this.addForm.address=this.addForm.address.join('/');
 						const data = Object.assign({}, this.addForm);
 						insertChannel(data).then((res) => {
 							this.addLoading = false;

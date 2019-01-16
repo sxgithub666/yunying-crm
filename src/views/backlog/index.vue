@@ -114,7 +114,12 @@
 				</div>
 				<div class="flex">
 					<el-form-item label="号码类型" prop="level">
-						<el-input disabled v-model="channelForm.level" auto-complete="off"></el-input>
+						<el-select disabled v-model="channelForm.level">
+							<el-option label="大号" value="0"></el-option>
+							<el-option label="强显" value="1"></el-option>
+							<el-option label="手机号" value="2"></el-option>
+						</el-select>
+						<!-- <el-input disabled v-model="channelForm.level" auto-complete="off"></el-input> -->
 					</el-form-item>
 					<el-form-item label="市话长途" prop="distance">
 						<el-input disabled v-model="channelForm.distance" auto-complete="off"></el-input>
@@ -122,7 +127,12 @@
 				</div>
 				<div class="flex">
 					<el-form-item label="业务归属" prop="belong">
-						<el-input disabled v-model="channelForm.belong" auto-complete="off"></el-input>
+						<el-select disabled v-model="channelForm.belong">
+							<el-option label="小水总机" value="0"></el-option>
+							<el-option label="小水智能" value="1"></el-option>
+							<el-option label="语音PASS" value="2"></el-option>
+						</el-select>
+						<!-- <el-input disabled v-model="channelForm.belong" auto-complete="off"></el-input> -->
 					</el-form-item>
 					<el-form-item label="号码" prop="number">
 						<el-input disabled v-model="channelForm.number" auto-complete="off"></el-input>
@@ -198,7 +208,12 @@
 				</div>
 				<div class="flex">
 					<el-form-item label="业务归属">
-						<el-input disabled v-model="clientForm.belong" auto-complete="off"></el-input>
+						<el-select disabled v-model="clientForm.belong">
+							<el-option label="小水总机" value="0"></el-option>
+							<el-option label="小水智能" value="1"></el-option>
+							<el-option label="语音PASS" value="2"></el-option>
+						</el-select>
+						<!-- <el-input disabled v-model="clientForm.belong" auto-complete="off"></el-input> -->
 					</el-form-item>
 					<el-form-item label="行业">
 						<el-input disabled v-model="clientForm.industry" auto-complete="off"></el-input>
@@ -298,7 +313,7 @@
 					</el-form-item>
 				</div>
 				<div class="flex">
-					<el-form-item label="项目归属" prop="projects_type">
+					<el-form-item label="业务归属" prop="projects_type">
 						<el-select disabled v-model="gatheringForm.projects_type">
 							<el-option label="小水智能" value="0"></el-option>
 							<el-option label="小水总机" value="1"></el-option>

@@ -331,7 +331,7 @@
 					pay_type: [{ required: true, message: '请输入付款方式', trigger: 'blur'}],
 					customer_region: [{ required: true, message: '请输入客户所在区域', trigger: 'blur'}],
 					refunds: [{ required: true, message: '请输入是否返款', trigger: 'blur'}],
-					need_data: [{ required: true, message: '请输入申请号码材料', trigger: 'blur'}],
+					need_data: [{ required: true, message: '请输入申请号码材料', trigger: 'change'}],
 					line_price: rules.numPot2,
 					sales_name:[{ required: true, message: '请输入销售经理', trigger: 'blur'}],
 				},

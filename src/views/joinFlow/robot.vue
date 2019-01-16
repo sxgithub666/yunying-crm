@@ -436,8 +436,8 @@
 					call_year_pay_money:rules.numPot2,
 					refunds: [{ required: true, message: '请输入是否到款', trigger: 'blur'}],
 					sales_name: [{ required: true, message: '请输入销售经理', trigger: 'blur'}],
-					verbal_trick: [{ required: true, message: '请上传话术', trigger: 'blur'}],
-					need_data: [{ required: true, message: '请上传号码申请材料', trigger: 'blur'}],
+					verbal_trick: [{ required: true, message: '请上传话术', trigger: 'change'}],
+					need_data: [{ required: true, message: '请上传号码申请材料', trigger: 'change'}],
 				},
 				//编辑界面数据
 				editForm: {

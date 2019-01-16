@@ -101,7 +101,7 @@
 						<el-input v-model="editForm.call_card_pay_money" clearable auto-complete="off"></el-input>
 					</el-form-item>
 					<el-form-item label="地区" prop="area">
-						<area-cascader v-model="editForm.area" :level="1" type="text" :data="pcaa"></area-cascader> 
+						<area-cascader v-model="editForm.area" :level="0" type="text" :data="pcaa"></area-cascader> 
 					</el-form-item>
 				</div>
 				<div class="flex">
@@ -154,7 +154,7 @@
 						<el-input v-model="addForm.call_card_pay_money" clearable auto-complete="off"></el-input>
 					</el-form-item>
 					<el-form-item label="地区" prop="area">
-						<area-cascader v-model="addForm.area" :level="1" type="text" :data="pcaa"></area-cascader> 
+						<area-cascader v-model="addForm.area" :level="0" type="text" :data="pcaa"></area-cascader> 
 					</el-form-item>
 				</div>
 				<div class="flex">
