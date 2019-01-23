@@ -4,7 +4,12 @@
 		<el-col :span="24" class="toolbar" style="padding-bottom: 0px;">
 			<el-form :inline="true" :model="filters">
 				<el-form-item>
-					<el-input size="small" clearable v-model="filters.reconciliation_time" placeholder="对账时间"></el-input>
+					<el-input size="small" clearable v-model="filters.customer_name" placeholder="客户名称"></el-input>
+				</el-form-item>
+				<el-form-item>
+					<el-date-picker size="small" v-model="filters.reconciliation_time" :picker-options="pickerOptions" @change="getFiltersTime" value-format="yyyy-MM-dd" type="date" placeholder="选择日期">
+					</el-date-picker>
+					<!-- <el-input size="small" clearable v-model="filters.reconciliation_time" placeholder="对账时间"></el-input> -->
 				</el-form-item>
 				<el-form-item>
 					<el-button type="primary" size="small" v-on:click="getTableList">查询</el-button>
@@ -12,9 +17,9 @@
 				<el-form-item>
 					<el-button type="primary" size="small" @click="handleAdd">新增</el-button>
 				</el-form-item>
-				<!-- <el-form-item>
+				<el-form-item>
 					<el-button v-if="role_id==='4'" type="primary" size="small" @click="exportExcel">导出</el-button>
-				</el-form-item> -->
+				</el-form-item>
 			</el-form>
 		</el-col>
 
@@ -32,13 +37,15 @@
 			</el-table-column>
 			<el-table-column prop="reconciliation_cost" label="成本" width="100">
 			</el-table-column>
-			<!-- <el-table-column prop="account_name" label="账户名称" width="100">
-			</el-table-column> -->
+			<el-table-column prop="vos_type" label="vos类型" width="100">
+			</el-table-column>
 			<el-table-column prop="balance" label="余额" width="100">
 			</el-table-column>
 			<!-- <el-table-column prop="amount_adjustment" label="调整金额" width="100">
 			</el-table-column> -->
 			<el-table-column prop="pay_record" label="缴费记录" width="100">
+			</el-table-column>
+			<el-table-column prop="payment_desc" label="缴费记录备注" width="100">
 			</el-table-column>
 			<el-table-column prop="remark" label="备注" width="100">
 			</el-table-column>
@@ -64,7 +71,7 @@
 				</el-form-item>
 				<div class="flex">
 					<el-form-item label="对账时间" prop="reconciliation_time">
-						<el-date-picker v-model="editForm.reconciliation_time" @change="getEditTime" value-format="yyyy-MM-dd HH:mm:ss" type="datetime" placeholder="选择收款日期时间">
+						<el-date-picker v-model="editForm.reconciliation_time" :picker-options="pickerOptions" @change="getEditTime" value-format="yyyy-MM-dd HH:mm:ss" type="datetime" placeholder="选择收款日期时间">
 						</el-date-picker>
 					</el-form-item>
 					<el-form-item label="收入" prop="income">
@@ -83,14 +90,19 @@
 					</el-form-item> -->
 				</div>
 				<div class="flex">
-					
+					<el-form-item label="缴费记录" prop="pay_record">
+						<el-input v-model="editForm.pay_record" clearable auto-complete="off"></el-input>
+					</el-form-item>
+					<el-form-item label="缴费记录备注" prop="payment_desc">
+						<el-input v-model="editForm.payment_desc" clearable auto-complete="off"></el-input>
+					</el-form-item>
 					<!-- <el-form-item label="调整金额" prop="amount_adjustment">
 						<el-input v-model="editForm.amount_adjustment" clearable auto-complete="off"></el-input>
 					</el-form-item> -->
 				</div>
 				<div class="flex">
-					<el-form-item label="缴费记录" prop="pay_record">
-						<el-input v-model="editForm.pay_record" clearable auto-complete="off"></el-input>
+					<el-form-item label="vos类型" prop="vos_type">
+						<el-input v-model="editForm.vos_type" clearable auto-complete="off"></el-input>
 					</el-form-item>
 					<el-form-item label="备注">
 						<el-input v-model="editForm.remark" clearable auto-complete="off"></el-input>
@@ -111,7 +123,7 @@
 				</el-form-item>
 				<div class="flex">
 					<el-form-item label="对账时间" prop="reconciliation_time">
-						<el-date-picker v-model="addForm.reconciliation_time" @change="getAddTime" value-format="yyyy-MM-dd HH:mm:ss" type="datetime" placeholder="选择收款日期时间">
+						<el-date-picker v-model="addForm.reconciliation_time" :picker-options="pickerOptions" @change="getAddTime" value-format="yyyy-MM-dd HH:mm:ss" type="datetime" placeholder="选择收款日期时间">
 						</el-date-picker>
 					</el-form-item>
 					<el-form-item label="收入" prop="income">
@@ -130,14 +142,19 @@
 					</el-form-item> -->
 				</div>
 				<div class="flex">
-					
+					<el-form-item label="缴费记录" prop="pay_record">
+						<el-input v-model="addForm.pay_record" clearable auto-complete="off"></el-input>
+					</el-form-item>
+					<el-form-item label="缴费记录备注" prop="payment_desc">
+						<el-input v-model="addForm.payment_desc" clearable auto-complete="off"></el-input>
+					</el-form-item>
 					<!-- <el-form-item label="调整金额" prop="amount_adjustment">
 						<el-input v-model="addForm.amount_adjustment" clearable auto-complete="off"></el-input>
 					</el-form-item> -->
 				</div>
 				<div class="flex">
-					<el-form-item label="缴费记录" prop="pay_record">
-						<el-input v-model="addForm.pay_record" clearable auto-complete="off"></el-input>
+					<el-form-item label="vos类型" prop="vos_type">
+						<el-input v-model="addForm.vos_type" clearable auto-complete="off"></el-input>
 					</el-form-item>
 					<el-form-item label="备注">
 						<el-input v-model="addForm.remark" clearable auto-complete="off"></el-input>
@@ -158,7 +175,33 @@
 	export default {
 		data() {
 			return {
+				pickerOptions: {
+          disabledDate(time) {
+            return time.getTime() > Date.now();
+          },
+          shortcuts: [{
+            text: '今天',
+            onClick(picker) {
+              picker.$emit('pick', new Date());
+            }
+          }, {
+            text: '昨天',
+            onClick(picker) {
+              const date = new Date();
+              date.setTime(date.getTime() - 3600 * 1000 * 24);
+              picker.$emit('pick', date);
+            }
+          }, {
+            text: '一周前',
+            onClick(picker) {
+              const date = new Date();
+              date.setTime(date.getTime() - 3600 * 1000 * 24 * 7);
+              picker.$emit('pick', date);
+            }
+          }]
+        },
 				filters: {
+					customer_name:'',
 					reconciliation_time: ''
 				},
 				role_id:'',
@@ -177,6 +220,8 @@
 					balance: rules.numPot2,
 					// amount_adjustment: rules.numPot2,
 					pay_record: [{ required: true, message: '请输入缴费记录', trigger: 'blur' }],
+					payment_desc: [{ required: true, message: '请输入缴费记录备注', trigger: 'blur' }],
+					vos_type: [{ required: true, message: '请输入vos类型', trigger: 'blur' }],
 				},
 				//编辑界面数据
 				editForm: {
@@ -189,6 +234,9 @@
 					amount_adjustment:'',
 					pay_record:'',
 					remark:'',
+					payment_desc:'',
+					vos_type:'',
+					
 				},
 
 				addFormVisible: false,//新增界面是否显示
@@ -204,6 +252,8 @@
 					amount_adjustment:'',
 					pay_record:'',
 					remark:'',
+					payment_desc:'',
+					vos_type:'',
 				}
 
 			}
@@ -264,6 +314,8 @@
 					balance:'',
 					start_date:'',
 					end_date:'',
+					payment_desc:'',
+					vos_type:'',
 				};
 			},
 			//编辑
@@ -307,8 +359,9 @@
 			//导出
 			exportExcel(){
 				const data={
+					customer_name:this.filters.customer_name,
 					reconciliation_time:this.filters.reconciliation_time,
-					};
+				};
 				uploadReconciliationByParam(data).then(res=>{
 					var aDom = document.createElement('a');
 					var evt = document.createEvent('HTMLEvents');
@@ -318,6 +371,9 @@
 					aDom.dispatchEvent(evt);
 					aDom.click();
 				})
+			},
+			getFiltersTime(val){
+				this.filters.reconciliation_time=val;
 			},
 			getAddTime(val){
 				this.addForm.reconciliation_time=val;

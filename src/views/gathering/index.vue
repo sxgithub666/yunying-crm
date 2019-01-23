@@ -3,11 +3,21 @@
 		<!--工具条-->
 		<el-col :span="24" class="toolbar" style="padding-bottom: 0px;">
 			<el-form :inline="true" :model="filters">
-				<el-form-item>
+				<el-form-item style="width:15%">
 					<el-input size="small" clearable v-model="filters.company_name" placeholder="公司名称"></el-input>
 				</el-form-item>
-				<el-form-item>
+				<el-form-item style="width:15%">
 					<el-input size="small" clearable v-model="filters.user_name" placeholder="添加人"></el-input>
+				</el-form-item>
+				<el-form-item style="width:15%">
+					<el-date-picker style="width:98%" size="small" v-model="filters.pay_time" @change="getFiltersPayTime" value-format="yyyy-MM-dd" type="date" placeholder="选择收款日期">
+					</el-date-picker>
+				</el-form-item>
+				<el-form-item style="width:15%">
+					<el-select size="small" v-model="filters.customer_type" placeholder="客户类型" clearable>
+						<el-option label="直客" value="1"></el-option>
+						<el-option label="渠道" value="0"></el-option>
+					</el-select>
 				</el-form-item>
 				<el-form-item>
 					<el-button type="primary" size="small" v-on:click="getTableList">查询</el-button>
@@ -461,6 +471,8 @@
 				filters: {
 					company_name: '',
 					user_name: '',
+					pay_time:'',
+					customer_type:''
 				},
 				list: [],
 				total: 0,
@@ -584,6 +596,8 @@
 					rows:10,
 					company_name: this.filters.company_name,
 					user_name: this.filters.user_name,
+					pay_time: this.filters.pay_time,
+					customer_type: this.filters.customer_type
 				};
 				this.listLoading = true;
 				getCompanyCollectionByParam(data).then((res) => {
@@ -862,7 +876,11 @@
 			},
 			getAddPayTime(val){
 				this.addForm.pay_time=val;
-			}
+			},
+			getFiltersPayTime(val){
+				this.filters.pay_time=val;
+			},
+
 		},
 		mounted() {
 			this.role_id=JSON.parse(sessionStorage.getItem('user')).role_id;

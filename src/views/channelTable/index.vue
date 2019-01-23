@@ -1,20 +1,63 @@
 <template>
 	<section>
 		<!--工具条-->
-		<el-col :span="24" class="toolbar" style="padding-bottom: 0px;">
+		<el-col :span="24">
+			<el-form :inline="true" class="flexEnd">
+				<el-form-item style="margin-bottom:0;">
+					<el-button v-if="role_id==='4'" type="primary" size="small" @click="exportExcel">导出</el-button>
+				</el-form-item>
+				<el-form-item style="margin-bottom:0;">
+					<el-upload :headers="headers"
+											:action="uploadUrl"
+											:before-upload="beforeUpload"
+											:on-change="uploadChange"
+											:on-success="onSuccess"
+											:show-file-list="false"
+											multiple
+											:limit="2"
+											:file-list="fileList">
+						<el-button v-if="role_id==='4'" type="primary" size="small">导入</el-button>
+					</el-upload>
+				</el-form-item>
+				<el-form-item style="margin-bottom:0;">
+					<div class="downloadTemplate" v-if="role_id==='4'" @click="downloadTemplate">下载导入模板</div>
+					<!-- <el-button v-if="role_id==='4'" type="text" size="mini">下载导入模板</el-button> -->
+				</el-form-item>
+			</el-form>
+		</el-col>
+		<el-col :span="24" class="toolbar mytoolbar" style="padding-bottom: 0px;margin-top:0px;">
 			<el-form :inline="true" :model="filters">
-				<el-form-item>
+				<el-form-item style="width:13%;margin-right:0;">
 					<el-input size="small" clearable v-model="filters.name" placeholder="通道名称"></el-input>
 				</el-form-item>
+				<el-form-item style="width:13%;margin-right:0;">
+					<el-input size="small" clearable v-model="filters.prefix" placeholder="通道前缀"></el-input>
+				</el-form-item>
+				<el-form-item style="width:13%;margin-right:0;">
+					<el-input size="small" clearable v-model="filters.number" placeholder="号码"></el-input>
+				</el-form-item>
+				<el-form-item style="width:15%;margin-right:0;">
+					<el-date-picker style="width:95%" size="small" v-model="filters.start_date" @change="getFiltersSTime" value-format="yyyy-MM-dd" type="date" placeholder="开始日期">
+					</el-date-picker>
+				</el-form-item>
+				<el-form-item style="width:15%;margin-right:0;">
+					<area-cascader v-model="filters.address" :level="0" type="text" placeholder="地区" :data="pca"></area-cascader> 
+				</el-form-item>
+				<el-form-item style="width:15%;margin-right:0;">
+					<el-select size="small" v-model="filters.belong" placeholder="业务归属">
+						<el-option label="小水总机" value="0"></el-option>
+						<el-option label="小水智能" value="1"></el-option>
+						<el-option label="语音PASS" value="2"></el-option>
+					</el-select> 
+				</el-form-item>
+
 				<el-form-item>
 					<el-button type="primary" size="small" v-on:click="getTableList">查询</el-button>
 				</el-form-item>
 				<el-form-item>
 					<el-button type="primary" size="small" @click="handleAdd">新增</el-button>
 				</el-form-item>
-				<el-form-item>
-					<el-button v-if="role_id==='4'" type="primary" size="small" @click="exportExcel">导出</el-button>
-				</el-form-item>
+				
 			</el-form>
 		</el-col>
 
@@ -37,9 +80,9 @@
 			</el-table-column>
 			<el-table-column prop="belong" label="业务归属" width="140" show-overflow-tooltip>
 				<template slot-scope="scope">
-					<span v-if="scope.row.level==0">小水总机</span>
-					<span v-if="scope.row.level==1">小水智能</span>
-					<span v-if="scope.row.level==2">语音PASS</span>
+					<span v-if="scope.row.belong==0">小水总机</span>
+					<span v-if="scope.row.belong==1">小水智能</span>
+					<span v-if="scope.row.belong==2">语音PASS</span>
 				</template>
 			</el-table-column>
 			<!-- <el-table-column prop="audit_status" label="状态" width="100" show-overflow-tooltip>
@@ -56,7 +99,7 @@
 			</el-table-column>
 			<el-table-column prop="name" label="通道名称" width="260" show-overflow-tooltip>
 			</el-table-column>
-			<el-table-column prop="business" label="业务" width="180" show-overflow-tooltip>
+			<el-table-column prop="business" label="业务类型" width="180" show-overflow-tooltip>
 			</el-table-column>
 			<el-table-column prop="attribute" label="通道属性" width="180" show-overflow-tooltip>
 			</el-table-column>
@@ -124,8 +167,15 @@
 						<area-cascader v-model="editForm.address" :level="0" type="text" :data="pca"></area-cascader> 
 						<!-- <el-input v-model="editForm.address" auto-complete="off"></el-input> -->
 					</el-form-item>
-					<el-form-item label="业务" prop="business">
-						<el-input v-model="editForm.business" auto-complete="off"></el-input>
+					<el-form-item label="业务类型" prop="business">
+						<el-select v-model="editForm.business" filterable clearable>
+							<el-option v-for="(item,index) in businessList"
+												 :label="item.label"
+												 :value="item.value"
+												 :key="index">
+							</el-option>
+						</el-select>
+						<!-- <el-input v-model="editForm.business" auto-complete="off"></el-input> -->
 					</el-form-item>
 				</div>
 				<div class="flex">
@@ -234,8 +284,15 @@
 						<area-cascader v-model="addForm.address" :level="0" type="text" :data="pca"></area-cascader> 
 						<!-- <el-input v-model="addForm.address" auto-complete="off"></el-input> -->
 					</el-form-item>
-					<el-form-item label="业务" prop="business">
-						<el-input v-model="addForm.business" auto-complete="off"></el-input>
+					<el-form-item label="业务类型" prop="business">
+						<el-select v-model="addForm.business" filterable clearable>
+							<el-option v-for="(item,index) in businessList"
+												 :label="item.label"
+												 :value="item.value"
+												 :key="index">
+							</el-option>
+						</el-select>
+						<!-- <el-input v-model="addForm.business" auto-complete="off"></el-input> -->
 					</el-form-item>
 				</div>
 				<div class="flex">
@@ -312,7 +369,12 @@
 		data() {
 			return {
 				filters: {
-					name: ''
+					name: '',
+					prefix: '',
+					number: '',
+					address: '',
+					belong: '',
+					start_date:''
 				},
 				role_id:'',
 				list: [],
@@ -349,7 +411,13 @@
 					invoice_type:'',
 					tax_point:'',
 				},
-
+				headers:{
+					authorLoginId:JSON.parse(sessionStorage.getItem('user')).login_id,
+					type:0
+					},
+				uploadUrl:'api/clouddo-crm/upload/exportExcel',
+				fileList:[],
+				
 				addFormVisible: false,//新增界面是否显示
 				addLoading: false,
 				addFormRules: {
@@ -394,8 +462,30 @@
 					tax_point:'',
 				},
 				pca: pca,
-				pcaa: pcaa
-
+				pcaa: pcaa,
+				businessList:[
+					{label:'调研',value:'调研'},
+					{label:'回访',value:'回访'},
+					{label:'装修',value:'装修'},
+					{label:'保险',value:'保险'},
+					{label:'教育',value:'教育'},
+					{label:'增值',value:'增值'},
+					{label:'邀约',value:'邀约'},
+					{label:'通知',value:'通知'},
+					{label:'催收',value:'催收'},
+					{label:'贷款',value:'贷款'},
+					{label:'房产',value:'房产'},
+					{label:'机器人催收',value:'机器人催收'},
+					{label:'酒水',value:'酒水'},
+					{label:'POS机',value:'POS机'},
+					{label:'AI股票',value:'AI股票'},
+					{label:'股票',value:'股票'},
+					{label:'代理记账',value:'代理记账'},
+					{label:'财税',value:'财税'},
+					{label:'信用卡',value:'信用卡'},
+					{label:'知识产权',value:'知识产权'},
+					{label:'物流',value:'物流'},
+				]
 			}
 		},
 		methods: {
@@ -408,7 +498,12 @@
 				const data = {
 					page: this.page,
 					rows:10,
-					name: this.filters.name
+					name: this.filters.name,
+					prefix: this.filters.prefix,
+					number: this.filters.number,
+					address: this.filters.address,
+					belong: this.filters.belong,
+					start_date: this.filters.start_date
 				};
 				this.listLoading = true;
 				getChannelByParam(data).then((res) => {
@@ -531,6 +626,33 @@
 					};
 				});
 			},
+			beforeUpload(file){
+				let fileType = file.name.substring(file.name.lastIndexOf(".")+1).toUpperCase();
+				const isXLS = fileType === 'XLS';
+				const isXLSX = fileType === 'XLSX';
+
+				if (!isXLS && !isXLSX) {
+					this.$message({
+						message: '上传图片必须是XLS/XLSX/ 格式!',
+						type: 'warning'
+					});
+				}
+				return isXLS || isXLSX ;
+			},
+			uploadChange(file, fileList){
+        this.fileList=fileList.slice(-1);
+			},
+			onSuccess(){
+				this.$message({
+					message: '导入成功！',
+					type: 'success'
+				});
+				this.getTableList();
+			},
+			//下载模板
+			downloadTemplate(){
+				window.open('../../../static/channelTemplate.xlsx')
+			},
 			//导出
 			exportExcel(){
 				const data={name:this.filters.name};
@@ -544,6 +666,7 @@
 					aDom.click();
 				})
 			},
+			
 			getSTime(val){
 				this.addForm.start_date=val;
 			},
@@ -555,7 +678,10 @@
 			},
 			getEditETime(val){
 				this.editForm.end_date=val;
-			}
+			},
+			getFiltersSTime(val){
+				this.filters.start_date=val;
+			},
 		},
 		mounted() {
 			this.role_id=JSON.parse(sessionStorage.getItem('user')).role_id; 
@@ -565,10 +691,33 @@
 
 </script>
 
-<style scoped>
+<style>
 .flex{
 	display: flex;
 	flex-direction: row;
 	justify-content: space-between;
 }
+.downloadTemplate{
+	font-size: 12px;
+	color: #409EFF;
+	cursor: pointer;
+}
+.flexEnd{
+	display: flex;
+	flex-direction: row;
+	justify-content: flex-end;
+	
+}
+.mytoolbar .area-select.large{
+	margin-top: 5px;
+	width: 162px;
+	height: 30px;
+}
+.mytoolbar .area-select .area-selected-trigger{
+	font-size: 14px;
+	line-height: 32px;
+	height: 32px;
+	color: #bbb;
+}
+
 </style>

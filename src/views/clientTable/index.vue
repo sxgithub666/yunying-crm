@@ -1,23 +1,65 @@
 <template>
 	<section>
 		<!--工具条-->
-		<el-col :span="24" class="toolbar" style="padding-bottom: 0px;">
+		<el-col :span="24">
+			<el-form :inline="true" class="flexEnd">
+				<el-form-item style="margin-bottom:0;">
+					<el-button v-if="role_id==='4'" type="primary" size="small" @click="exportExcel">导出</el-button>
+				</el-form-item>
+				<el-form-item style="margin-bottom:0;">
+					<el-upload :headers="headers"
+											:action="uploadUrl"
+											:before-upload="beforeUpload"
+											:on-change="uploadChange"
+											:on-success="onSuccess"
+											:show-file-list="false"
+											multiple
+											:limit="2"
+											:file-list="fileList">
+						<el-button v-if="role_id==='4'" type="primary" size="small">导入</el-button>
+					</el-upload>
+				</el-form-item>
+				<el-form-item style="margin-bottom:0;">
+					<div class="downloadTemplate" v-if="role_id==='4'" @click="downloadTemplate">下载导入模板</div>
+					<!-- <el-button v-if="role_id==='4'" type="text" size="mini">下载导入模板</el-button> -->
+				</el-form-item>
+			</el-form>
+		</el-col>
+		<el-col :span="24" class="toolbar mytoolbar" style="padding-bottom:0px;margin-top:0px;">
 			<el-form :inline="true" :model="filters">
-				<el-form-item>
+				<el-form-item style="width:13%;margin-right:0;">
 					<el-input size="small" clearable v-model="filters.customer_name" placeholder="客户名称"></el-input>
 				</el-form-item>
-				<el-form-item>
-					<el-input size="small" clearable v-model="filters.user_name" placeholder="销售名称"></el-input>
+				<el-form-item style="width:13%;margin-right:0;">
+					<el-input size="small" clearable v-model="filters.prefix" placeholder="前缀"></el-input>
 				</el-form-item>
+				<el-form-item style="width:13%;margin-right:0;">
+					<el-input size="small" clearable v-model="filters.number" placeholder="号码"></el-input>
+				</el-form-item>
+				<el-form-item style="width:15%;margin-right:0;">
+					<el-date-picker style="width:95%" size="small" v-model="filters.start_date" @change="getFiltersSTime" value-format="yyyy-MM-dd" type="date" placeholder="开始日期">
+					</el-date-picker>
+				</el-form-item>
+				<el-form-item style="width:15%;margin-right:0;">
+					<area-cascader v-model="filters.address" :level="0" type="text" placeholder="地区" :data="pca"></area-cascader> 
+				</el-form-item>
+				<el-form-item style="width:15%;margin-right:0;">
+					<el-select size="small" v-model="filters.belong" placeholder="业务归属">
+						<el-option label="小水总机" value="0"></el-option>
+						<el-option label="小水智能" value="1"></el-option>
+						<el-option label="语音PASS" value="2"></el-option>
+					</el-select> 
+				</el-form-item>
+				<!-- <el-form-item>
+					<el-input size="small" clearable v-model="filters.user_name" placeholder="销售名称"></el-input>
+				</el-form-item> -->
 				<el-form-item>
 					<el-button type="primary" size="small" v-on:click="getTableList">查询</el-button>
 				</el-form-item>
 				<el-form-item>
 					<el-button type="primary" size="small" @click="handleAdd">新增</el-button>
 				</el-form-item>
-				<el-form-item>
-					<el-button v-if="role_id==='4'" type="primary" size="small" @click="exportExcel">导出</el-button>
-				</el-form-item>
+				
 			</el-form>
 		</el-col>
 
@@ -32,6 +74,11 @@
 			<el-table-column prop="customer_name" label="客户名称" width="100" show-overflow-tooltip>
 			</el-table-column>
 			<el-table-column prop="belong" label="业务归属" width="80" show-overflow-tooltip>
+				<template slot-scope="scope">
+					<span v-if="scope.row.belong==0">小水总机</span>
+					<span v-if="scope.row.belong==1">小水智能</span>
+					<span v-if="scope.row.belong==2">语音PASS</span>
+				</template>
 			</el-table-column>
 			<el-table-column prop="industry" label="行业" width="80" show-overflow-tooltip
 			</el-table-column>
@@ -43,8 +90,10 @@
 					<el-button type="danger" size="small" plain v-if="scope.row.audit_status==3">审批拒绝</el-button>
 				</template>
 			</el-table-column>
+			<el-table-column prop="number" label="号码" width="120" show-overflow-tooltip>
+			</el-table-column>
 			<el-table-column prop="number_charges" label="号码费" width="80" show-overflow-tooltip>
-			</el-table-column>>
+			</el-table-column>
 			<el-table-column prop="charges" label="通信资费" width="80" show-overflow-tooltip>
 			</el-table-column>
 			<el-table-column prop="start_date" label="开通时间" width="160" show-overflow-tooltip>
@@ -82,7 +131,11 @@
 				</div>
 				<div class="flex">
 					<el-form-item label="业务归属" prop="belong">
-						<el-input v-model="editForm.belong" clearable auto-complete="off"></el-input>
+						<el-select v-model="editForm.belong">
+							<el-option label="小水总机" value="0"></el-option>
+							<el-option label="小水智能" value="1"></el-option>
+							<el-option label="语音PASS" value="2"></el-option>
+						</el-select>
 					</el-form-item>
 					<el-form-item label="行业" prop="industry">
 						<el-input v-model="editForm.industry" clearable auto-complete="off"></el-input>
@@ -114,6 +167,11 @@
 						</el-date-picker>
 					</el-form-item>
 				</div>
+				<div class="flex">
+					<el-form-item label="号码" prop="number">
+						<el-input v-model="editForm.number" clearable auto-complete="off"></el-input>
+					</el-form-item>
+				</div>
 			</el-form>
 			<div slot="footer" class="dialog-footer">
 				<el-button @click.native="editFormVisible = false">取消</el-button>
@@ -134,7 +192,11 @@
 				</div>
 				<div class="flex">
 					<el-form-item label="业务归属" prop="belong">
-						<el-input v-model="addForm.belong" clearable auto-complete="off"></el-input>
+						<el-select v-model="addForm.belong">
+							<el-option label="小水总机" value="0"></el-option>
+							<el-option label="小水智能" value="1"></el-option>
+							<el-option label="语音PASS" value="2"></el-option>
+						</el-select>
 					</el-form-item>
 					<el-form-item label="行业" prop="industry">
 						<el-input v-model="addForm.industry" clearable auto-complete="off"></el-input>
@@ -167,6 +229,11 @@
 						</el-date-picker>
 					</el-form-item>
 				</div>
+				<div class="flex">
+					<el-form-item label="号码" prop="number">
+						<el-input v-model="addForm.number" clearable auto-complete="off"></el-input>
+					</el-form-item>
+				</div>
 			</el-form>
 			<div slot="footer" class="dialog-footer">
 				<el-button @click.native="addFormVisible = false">取消</el-button>
@@ -185,7 +252,12 @@
 			return {
 				filters: {
 					customer_name: '',
-					user_name:''
+					user_name:'',
+					prefix: '',
+					number: '',
+					address: '',
+					belong: '',
+					start_date:''
 				},
 				role_id:'',
 				list: [],
@@ -204,7 +276,8 @@
 					start_date: [{ required: true, message: '请输入开通时间', trigger: 'blur' }],
 					// end_date: [{ required: true, message: '请输入关停时间', trigger: 'blur' }],
 					call_card_pay_money: rules.numPot2,
-					area: [{ required: true, message: '请选择地区', trigger: 'blur' }]
+					area: [{ required: true, message: '请选择地区', trigger: 'blur' }],
+					number: rules.InterNum,
 				},
 				//编辑界面数据
 				editForm: {
@@ -217,8 +290,15 @@
 					start_date:'',
 					end_date:'',
 					call_card_pay_money:'',
-					area:''
+					area:'',
+					number:'',
 				},
+				headers:{
+					authorLoginId:JSON.parse(sessionStorage.getItem('user')).login_id,
+					type:1
+					},
+				uploadUrl:'api/clouddo-crm/upload/exportExcel',
+				fileList:[],
 
 				addFormVisible: false,//新增界面是否显示
 				addLoading: false,
@@ -233,7 +313,8 @@
 					start_date:'',
 					end_date:'',
 					call_card_pay_money:'',
-					area:''
+					area:'',
+					number:'',
 				},
 				pca: pca,
 				pcaa: pcaa
@@ -252,7 +333,12 @@
 					page: this.page,
 					rows:10,
 					customer_name: this.filters.customer_name,
-					user_name:this.filters.user_name
+					user_name:this.filters.user_name,
+					prefix: this.filters.prefix,
+					number: this.filters.number,
+					address: this.filters.address,
+					belong: this.filters.belong,
+					start_date: this.filters.start_date
 				};
 				this.listLoading = true;
 				getCustomerListByParam(data).then((res) => {
@@ -329,7 +415,8 @@
 					start_date:'',
 					end_date:'',
 					call_card_pay_money:'',
-					area:''
+					area:'',
+					number:'',
 				};
 			},
 			//编辑
@@ -372,6 +459,33 @@
 					};
 				});
 			},
+			beforeUpload(file){
+				let fileType = file.name.substring(file.name.lastIndexOf(".")+1).toUpperCase();
+				const isXLS = fileType === 'XLS';
+				const isXLSX = fileType === 'XLSX';
+
+				if (!isXLS && !isXLSX) {
+					this.$message({
+						message: '上传图片必须是XLS/XLSX/ 格式!',
+						type: 'warning'
+					});
+				}
+				return isXLS || isXLSX ;
+			},
+			uploadChange(file, fileList){
+        this.fileList=fileList.slice(-1);
+			},
+			onSuccess(){
+				this.$message({
+					message: '导入成功！',
+					type: 'success'
+				});
+				this.getTableList();
+			},
+			//下载模板
+			downloadTemplate(){
+				window.open('../../../static/clientTemplate.xlsx')
+			},
 			//导出
 			exportExcel(){
 				const data={
@@ -399,7 +513,10 @@
 			},
 			getEditETime(val){
 				this.editForm.end_date=val;
-			}
+			},
+			getFiltersSTime(val){
+				this.filters.start_date=val;
+			},
 		},
 		mounted() {
 			this.role_id=JSON.parse(sessionStorage.getItem('user')).role_id; 
@@ -414,5 +531,27 @@
 	display: flex;
 	flex-direction: row;
 	justify-content: space-between;
+}
+.downloadTemplate{
+	font-size: 12px;
+	color: #409EFF;
+	cursor: pointer;
+}
+.flexEnd{
+	display: flex;
+	flex-direction: row;
+	justify-content: flex-end;
+	
+}
+.mytoolbar .area-select.large{
+	margin-top: 5px;
+	width: 162px;
+	height: 30px;
+}
+.mytoolbar .area-select .area-selected-trigger{
+	font-size: 14px;
+	line-height: 32px;
+	height: 32px;
+	color: #bbb;
 }
 </style>

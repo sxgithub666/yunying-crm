@@ -26,7 +26,7 @@
 					<span v-if="scope.row.type==5">客户信息</span>
 				</template>
 			</el-table-column>
-			<el-table-column prop="state" label="状态" sortable>
+			<el-table-column prop="state" label="状态" sortable width="100">
         <template slot-scope="scope">
 					<el-button type="info" size="small" plain v-if="scope.row.state==0">未审核</el-button>
 					<el-button type="primary" size="small" plain v-if="scope.row.state==1">转发中</el-button>
@@ -34,7 +34,7 @@
 					<el-button type="success" size="small" plain v-if="scope.row.state==2">审核通过</el-button>
 				</template>
 			</el-table-column>
-			<el-table-column prop="redirect_1" label="一级审核人" sortable>
+			<el-table-column prop="redirect_1" label="一级审核人" sortable width="120">
 				<template slot-scope="scope">
 					<span v-if="scope.row.redirect_1=='0'">销售</span>
 					<span v-if="scope.row.redirect_1=='1'">产品</span>
@@ -44,7 +44,7 @@
 					<span v-if="scope.row.redirect_1=='5'">客服</span>
 				</template>
 			</el-table-column>
-			<el-table-column prop="redirect_2" label="二级审核人" sortable>
+			<el-table-column prop="redirect_2" label="二级审核人" sortable width="120">
 				<template slot-scope="scope">
 					<span v-if="scope.row.redirect_2=='0'">销售</span>
 					<span v-if="scope.row.redirect_2=='1'">产品</span>
@@ -54,7 +54,7 @@
 					<span v-if="scope.row.redirect_2=='5'">客服</span>
 				</template>
 			</el-table-column>
-			<el-table-column prop="redirect_3" label="三级审核人" sortable>
+			<el-table-column prop="redirect_3" label="三级审核人" sortable width="120">
 				<template slot-scope="scope">
 					<span v-if="scope.row.redirect_3=='0'">销售</span>
 					<span v-if="scope.row.redirect_3=='1'">产品</span>
@@ -64,11 +64,18 @@
 					<span v-if="scope.row.redirect_3=='5'">客服</span>
 				</template>
 			</el-table-column>
-			<el-table-column prop="user_name" label="提交人" sortable>
+			<el-table-column prop="user_name" label="提交人" sortable width="100">
+			</el-table-column>
+			<el-table-column prop="operator_name" label="操作人" sortable width="100">
+			</el-table-column>
+			<el-table-column prop="suggest" label="审核意见" sortable width="120">
+				<template slot-scope="scope">
+					<div v-for="(item,index) in scope.row.suggest" :key="index">{{item}}</div>
+				</template>
 			</el-table-column>
 			<el-table-column prop="remark" label="备注" sortable>
 			</el-table-column>
-			<el-table-column label="操作" width="260">
+			<el-table-column label="操作" width="260" fixed="right">
 				<template slot-scope="scope">
 					<el-button size="small" @click="viewDetails(scope.$index, scope.row)">查看</el-button>
 					<el-button v-if="role_id!=='0'" size="small" @click="handleTranspond(scope.$index, scope.row)">转发</el-button>
@@ -142,7 +149,7 @@
 					<el-form-item label="地区" prop="address">
 						<el-input disabled v-model="channelForm.address" auto-complete="off"></el-input>
 					</el-form-item>
-					<el-form-item label="业务" prop="business">
+					<el-form-item label="业务类型" prop="business">
 						<el-input disabled v-model="channelForm.business" auto-complete="off"></el-input>
 					</el-form-item>
 				</div>
@@ -191,8 +198,8 @@
 				</el-form-item> -->
 			</el-form>
 			<div v-if="role_id!=='0'" slot="footer" class="dialog-footer">
-				<el-button type="primary" @click.native="approve('2')">审核通过</el-button>
-				<el-button type="danger" @click.native="refused('3')">审核拒绝</el-button>
+				<el-button type="primary" @click.native="check('2')">审核通过</el-button>
+				<el-button type="danger" @click.native="check('3')">审核拒绝</el-button>
 			</div>
 		</el-dialog>
 		<!--查看客户信息-->
@@ -245,10 +252,15 @@
 						</el-date-picker>
 					</el-form-item>
 				</div>
+				<div class="flex">
+					<el-form-item label="号码" prop="number">
+						<el-input disabled v-model="clientForm.number" clearable auto-complete="off"></el-input>
+					</el-form-item>
+				</div>
 			</el-form>
 			<div v-if="role_id!=='0'" slot="footer" class="dialog-footer">
-				<el-button type="primary" @click.native="approve('2')">审核通过</el-button>
-				<el-button type="danger" @click.native="refused('3')">审核拒绝</el-button>
+				<el-button type="primary" @click.native="check('2')">审核通过</el-button>
+				<el-button type="danger" @click.native="check('3')">审核拒绝</el-button>
 			</div>
 		</el-dialog>
 		<!--查看收款信息--> 
@@ -394,8 +406,8 @@
 					</el-form-item>
 			</el-form>
 			<div v-if="role_id!=='0'" slot="footer" class="dialog-footer">
-			  <el-button type="primary" @click.native="approve('2')">审核通过</el-button>
-				<el-button type="danger" @click.native="refused('3')">审核拒绝</el-button>
+			  <el-button type="primary" @click.native="check('2')">审核通过</el-button>
+				<el-button type="danger" @click.native="check('3')">审核拒绝</el-button>
 			</div>
 		</el-dialog>
 		<!--查看小水智能信息-->
@@ -505,8 +517,8 @@
 				</el-form-item>
 			</el-form>
 			<div v-if="role_id!=='0'" slot="footer" class="dialog-footer">
-				<el-button type="primary" @click.native="approve('2')">审核通过</el-button>
-				<el-button type="danger" @click.native="refused('3')">审核拒绝</el-button>
+				<el-button type="primary" @click.native="check('2')">审核通过</el-button>
+				<el-button type="danger" @click.native="check('3')">审核拒绝</el-button>
 			</div>
 		</el-dialog>
 		<!--查看小水总机信息-->
@@ -560,8 +572,8 @@
 				</el-form-item>
 			</el-form>
 			<div v-if="role_id!=='0'" slot="footer" class="dialog-footer">
-				<el-button type="primary" @click.native="approve('2')">审核通过</el-button>
-				<el-button type="danger" @click.native="refused('3')">审核拒绝</el-button>
+				<el-button type="primary" @click.native="check('2')">审核通过</el-button>
+				<el-button type="danger" @click.native="check('3')">审核拒绝</el-button>
 			</div>
 		</el-dialog> -->
 		<!--查看语音Pass信息-->
@@ -638,8 +650,8 @@
 				</el-form-item>
 			</el-form>
 			<div v-if="role_id!=='0'" slot="footer" class="dialog-footer">
-				<el-button type="primary" @click.native="approve('2')">审核通过</el-button>
-				<el-button type="danger" @click.native="refused('3')">审核拒绝</el-button>
+				<el-button type="primary" @click.native="check('2')">审核通过</el-button>
+				<el-button type="danger" @click.native="check('3')">审核拒绝</el-button>
 			</div>
 		</el-dialog>
 		<!--查看合同发票-->
@@ -667,8 +679,15 @@
 				</el-form-item>
 			</el-form>
 			<div v-if="role_id!=='0'" slot="footer" class="dialog-footer">
-				<el-button type="primary" @click.native="approve('2')">审核通过</el-button>
-				<el-button type="danger" @click.native="refused('3')">审核拒绝</el-button>
+				<el-button type="primary" @click.native="check('2')">审核通过</el-button>
+				<el-button type="danger" @click.native="check('3')">审核拒绝</el-button>
+			</div>
+		</el-dialog>
+		<el-dialog title="审核意见" :visible.sync="suggestVisible" width="30%" :append-to-body="true" :close-on-click-modal="false">
+			<el-input type="textarea" :rows="3" v-model="suggest"></el-input>
+			<div v-if="role_id!=='0'" slot="footer" class="dialog-footer">
+				<el-button type="primary" @click.native="suggestSubmit">提交</el-button>
+				<el-button type="danger" @click.native="suggestVisible=false">取消</el-button>
 			</div>
 		</el-dialog>
 	</div>
@@ -700,7 +719,10 @@
 				page: 1,
 				rows:10,
 				listLoading: false,
-        transpondVisible:false,
+				transpondVisible:false,
+				suggestVisible:false,
+				suggest:'',
+				checkState:'',
         role_id:'',
         rolesList:[],
         transpondForm:{
@@ -774,7 +796,12 @@
 				this.listLoading = true;
 				getProcessByParam(data).then((res) => {
 					this.total = res.result.records;
-					this.users = res.result.data;
+					this.users = res.result.data.map(item=>{
+						if(item.suggest){
+							item.suggest=item.suggest.split('|');
+						};
+						return item;
+					});
 					this.listLoading = false;
 				});
 			},
@@ -877,10 +904,9 @@
 					this.clientVisible=true;
 				});
 			},
-
-			//审核通过
-			approve(state){
-				const data=Object.assign({},this.showDilagForm,{state:state});
+			//审核意见提交
+			suggestSubmit(){
+				const data=Object.assign({},this.showDilagForm,{state:this.checkState,suggest:this.suggest});
 				updateProcessById(data).then(res=>{
 					switch (this.showDilagForm.type) {
 					case '0':
@@ -904,39 +930,45 @@
 					default:
 						break;
 					};
+					this.suggestVisible=false;
 					this.getTableList();
+					this.suggest="";
 				})
-
+			},
+			//审核通过/拒绝
+			check(state){
+				this.suggestVisible=true;
+				this.checkState=state;
 			},
 			//审核拒绝
-			refused(state){
-				const data=Object.assign({},this.showDilagForm,{state:state});
-				updateProcessById(data).then(res=>{
-					switch (this.showDilagForm.type) {
-					case '0':
-						this.channelVisible=false;
-						break;
-					case '1':
-						this.gatheringVisible=false;
-						break;
-					case '2':
-						this.contractAndInvoiceVisible=false;
-						break;
-					case '3':
-						this.robotVisible=false;
-						break;
-					case '4':
-						this.voicePassVisible=false;
-						break;
-					case '5':
-						this.clientVisible=false;
-						break;
-					default:
-						break;
-					};
-					this.getTableList();
-				})
-			},
+			// check(state){
+			// 	const data=Object.assign({},this.showDilagForm,{state:state});
+			// 	updateProcessById(data).then(res=>{
+			// 		switch (this.showDilagForm.type) {
+			// 		case '0':
+			// 			this.channelVisible=false;
+			// 			break;
+			// 		case '1':
+			// 			this.gatheringVisible=false;
+			// 			break;
+			// 		case '2':
+			// 			this.contractAndInvoiceVisible=false;
+			// 			break;
+			// 		case '3':
+			// 			this.robotVisible=false;
+			// 			break;
+			// 		case '4':
+			// 			this.voicePassVisible=false;
+			// 			break;
+			// 		case '5':
+			// 			this.clientVisible=false;
+			// 			break;
+			// 		default:
+			// 			break;
+			// 		};
+			// 		this.getTableList();
+			// 	})
+			// },
       //转发
       handleTranspond(index,row){
         this.transpondForm=Object.assign({},row);

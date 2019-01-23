@@ -108,6 +108,10 @@ export const getChannelById = params => {
 export const uploadChannelByParam = params => {
   return POST('/channel/uploadChannelByParam', params)
 };
+//导入
+export const exportExcel = params => {
+  return POST('/upload/exportExcel', params)
+};
 
 //收款信息
 export const getCompanyCollectionByParam = params => {
@@ -225,9 +229,9 @@ export const updateReconciliationById = params => {
 export const deleteReconciliationById = params => {
   return POST('/reconciliation/deleteReconciliationById', params)
 };
-// export const uploadReconciliationByParam = params => {
-//   return POST('/reconciliation/uploadReconciliationByParam', params)
-// };
+export const uploadReconciliationByParam = params => {
+  return POST('/reconciliation/uploadReconciliationByParam', params)
+};
 
 //接入流程（合同与发票）
 export const getContractProcessByParam = params => {
