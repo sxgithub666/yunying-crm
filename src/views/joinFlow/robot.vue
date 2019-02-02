@@ -15,8 +15,8 @@
 				</el-form-item>
 				<el-form-item style="width:15%">
 					<el-select size="small" v-model="filters.customer_type" placeholder="客户类型" clearable>
-						<el-option label="直客" value="1"></el-option>
-						<el-option label="渠道" value="0"></el-option>
+						<el-option label="直客" value="0"></el-option>
+						<el-option label="渠道" value="1"></el-option>
 					</el-select>
 				</el-form-item>
 				<el-form-item>
@@ -62,7 +62,7 @@
 			</el-table-column>>
 			<el-table-column prop="robot_number" label="机器人数量" width="100" show-overflow-tooltip>
 			</el-table-column>
-			<el-table-column prop="user_name" label="销售经理" width="70" show-overflow-tooltip>
+			<el-table-column prop="user_name" label="销售经理" width="90" show-overflow-tooltip>
 			</el-table-column>
 			<el-table-column prop="line_concurrency" label="线路并发数" width="100" show-overflow-tooltip>
 			</el-table-column>
@@ -84,14 +84,14 @@
 			</el-table-column> -->
 			<el-table-column prop="call_card_pay_money" label="卡槽费" width="110" show-overflow-tooltip>
 			</el-table-column>
-			<el-table-column prop="cost_interval" label="费用期间" width="80" show-overflow-tooltip>
+			<!-- <el-table-column prop="cost_interval" label="费用期间" width="80" show-overflow-tooltip>
 				<template slot-scope="scope">
 					<span v-if="scope.row.cost_interval==0">月付</span>
 					<span v-if="scope.row.cost_interval==1">季付</span>
 					<span v-if="scope.row.cost_interval==2">年付</span>
 					<span v-if="scope.row.cost_interval==3">测试</span>
 				</template>
-			</el-table-column>
+			</el-table-column> -->
 			<el-table-column prop="call_year_pay_money" label="通信费" width="80" show-overflow-tooltip>
 			</el-table-column>
 			<el-table-column prop="robot_pay_money" label="机器人费" width="100" show-overflow-tooltip>
@@ -199,24 +199,23 @@
 					</el-form-item>
 				</div>
 				<div class="flex">
-					<el-form-item label="费用期间" prop="cost_interval">
+					<!-- <el-form-item label="费用期间" prop="cost_interval">
 						<el-select v-model="editForm.cost_interval">
 							<el-option label="月付" value="0"></el-option>
 							<el-option label="季付" value="1"></el-option>
 							<el-option label="年付" value="2"></el-option>
 							<el-option label="测试" value="3"></el-option>
 						</el-select>
-						<!-- <el-input v-model="editForm.cost_interval" auto-complete="off"></el-input> -->
-					</el-form-item>
+					</el-form-item> -->
+					
+				</div>
+				<div class="flex">
 					<el-form-item label="客户类型" prop="customer_type">
 						<el-select v-model="editForm.customer_type">
 							<el-option label="直客" value="0"></el-option>
 							<el-option label="渠道" value="1"></el-option>
 						</el-select>
 					</el-form-item>
-				</div>
-				<div class="flex">
-					
 					<el-form-item label="备注">
 						<el-input v-model="editForm.remark" auto-complete="off"></el-input>
 					</el-form-item>
@@ -336,24 +335,23 @@
 					</el-form-item>
 				</div>
 				<div class="flex">
-					<el-form-item label="费用期间" prop="cost_interval">
+					<!-- <el-form-item label="费用期间" prop="cost_interval">
 						<el-select v-model="addForm.cost_interval">
 							<el-option label="月付" value="0"></el-option>
 							<el-option label="季付" value="1"></el-option>
 							<el-option label="年付" value="2"></el-option>
 							<el-option label="测试" value="3"></el-option>
 						</el-select>
-						<!-- <el-input v-model="addForm.cost_interval" auto-complete="off"></el-input> -->
-					</el-form-item>
-					<el-form-item label="客户类型" prop="customer_type">
-						<el-select v-model="addForm.customer_type">
-							<el-option label="直客" value="1"></el-option>
-							<el-option label="渠道" value="0"></el-option>
-						</el-select>
-					</el-form-item>
+					</el-form-item> -->
+					
 				</div>
 				<div class="flex">
-					
+					<el-form-item label="客户类型" prop="customer_type">
+						<el-select v-model="addForm.customer_type">
+							<el-option label="直客" value="0"></el-option>
+							<el-option label="渠道" value="1"></el-option>
+						</el-select>
+					</el-form-item>
 					<el-form-item label="备注">
 						<el-input v-model="addForm.remark" auto-complete="off"></el-input>
 					</el-form-item>
@@ -448,8 +446,8 @@
 					call_year_pay_money:rules.numPot2,
 					refunds: [{ required: true, message: '请输入是否到款', trigger: 'blur'}],
 					sales_name: [{ required: true, message: '请输入销售经理', trigger: 'blur'}],
-					verbal_trick: [{ required: true, message: '请上传话术', trigger: 'change'}],
-					need_data: [{ required: true, message: '请上传号码申请材料', trigger: 'change'}],
+					// verbal_trick: [{ required: true, message: '请上传话术', trigger: 'change blur'}],
+					// need_data: [{ required: true, message: '请上传号码申请材料', trigger: 'change blur'}],
 				},
 				//编辑界面数据
 				editForm: {
@@ -523,7 +521,13 @@
 				this.listLoading = true;
 				getXsznProcessByParam(data).then((res) => {
 					this.total = res.result.records;
-					this.list = res.result.data;
+					// this.list = res.result.data;
+					this.list = res.result.data.map(item=>{
+						if(item.pay_voucher){
+							item.pay_voucher=item.pay_voucher.split(',');
+						};
+						return item;
+					});
 					this.listLoading = false;
 				});
 			},
@@ -795,9 +799,12 @@
 			//导出
 			exportExcel(){
 				const data={
-					company_name:this.filters.company_name,
-					user_name:this.filters.user_name,
-					};
+					company_name: this.filters.company_name,
+					user_name: this.filters.user_name,
+					pay_time: this.filters.pay_time,
+					customer_type: this.filters.customer_type,
+					role_id: this.role_id
+				};
 				uploadRobotByParam(data).then(res=>{
 					var aDom = document.createElement('a');
 					var evt = document.createEvent('HTMLEvents');

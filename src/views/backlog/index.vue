@@ -129,6 +129,11 @@
 						<!-- <el-input disabled v-model="channelForm.level" auto-complete="off"></el-input> -->
 					</el-form-item>
 					<el-form-item label="市话长途" prop="distance">
+						<el-select disabled v-model="channelForm.distance">
+							<el-option label="市话" value="0"></el-option>
+							<el-option label="长途" value="1"></el-option>
+							<el-option label="市话长途" value="2"></el-option>
+						</el-select>
 						<el-input disabled v-model="channelForm.distance" auto-complete="off"></el-input>
 					</el-form-item>
 				</div>
@@ -327,8 +332,8 @@
 				<div class="flex">
 					<el-form-item label="业务归属" prop="projects_type">
 						<el-select disabled v-model="gatheringForm.projects_type">
-							<el-option label="小水智能" value="0"></el-option>
-							<el-option label="小水总机" value="1"></el-option>
+							<el-option label="小水总机" value="0"></el-option>
+							<el-option label="小水智能" value="1"></el-option>
 							<el-option label="语音PAAS" value="2"></el-option>
 						</el-select>
 					</el-form-item>
@@ -382,8 +387,8 @@
 					</el-form-item>
 					<el-form-item label="客户类型" prop="customer_type">
 						<el-select disabled v-model="gatheringForm.customer_type">
-							<el-option label="直客" value="1"></el-option>
-							<el-option label="渠道" value="0"></el-option>
+							<el-option label="直客" value="0"></el-option>
+							<el-option label="渠道" value="1"></el-option>
 						</el-select>
 					</el-form-item>
 				</div>
@@ -428,8 +433,8 @@
 					</el-form-item>
 					<el-form-item label="客户类型">
 						<el-select disabled v-model="robotForm.customer_type">
-							<el-option label="直客" value="1"></el-option>
-							<el-option label="渠道" value="0"></el-option>
+							<el-option label="直客" value="0"></el-option>
+							<el-option label="渠道" value="1"></el-option>
 						</el-select>
 					</el-form-item>
 				</div>
@@ -477,17 +482,20 @@
 					</el-form-item>
 				</div>
 				<div class="flex">
-					<el-form-item label="费用期间">
+					<!-- <el-form-item label="费用期间">
 						<el-select disabled v-model="robotForm.cost_interval">
 							<el-option label="月付" value="0"></el-option>
 							<el-option label="季付" value="1"></el-option>
 							<el-option label="年付" value="2"></el-option>
 							<el-option label="测试" value="3"></el-option>
-						</el-select>
+						</el-select> -->
 						<!-- <el-input v-model="robotForm.call_year_pay_money" auto-complete="off"></el-input> -->
 					</el-form-item>
 					<el-form-item label="机器人费">
 						<el-input disabled v-model="robotForm.robot_pay_money" auto-complete="off"></el-input>
+					</el-form-item>
+					<el-form-item label="备注">
+						<el-input disabled v-model="robotForm.remark" auto-complete="off"></el-input>
 					</el-form-item>
 				</div>
 				<div class="flex">
@@ -504,9 +512,7 @@
 				</div>
 				<div class="flex">
 				  
-					<el-form-item label="备注">
-						<el-input disabled v-model="robotForm.remark" auto-complete="off"></el-input>
-					</el-form-item>
+					
 				</div>
 				<el-form-item label="打款凭证">
 					<div class="editImg">
@@ -981,6 +987,7 @@
 				}else{
 					this.transpondForm.redirect_2=this.transpondForm.role_id;
 				};
+				this.transpondForm.suggest='';
 				const data=Object.assign({},this.transpondForm,{state:'1'});
 				updateProcessById(data).then(res=>{
 					this.$message({

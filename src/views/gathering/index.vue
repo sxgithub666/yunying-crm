@@ -87,8 +87,8 @@
 			</el-table-column>
 			<el-table-column prop="projects_type" label="业务归属" width="140" show-overflow-tooltip>
 			  <template slot-scope="scope">
-					<span v-if="scope.row.projects_type==0">小水智能</span>
-					<span v-if="scope.row.projects_type==1">小水总机</span>
+					<span v-if="scope.row.projects_type==0">小水总机</span>
+					<span v-if="scope.row.projects_type==1">小水智能</span>
 					<span v-if="scope.row.projects_type==2">语音PAAS</span>
 				</template>
 			</el-table-column>
@@ -155,7 +155,7 @@
 		</el-col>
 
 		<!--编辑界面-->
-		<el-dialog title="编辑" width="57%" :visible.sync="editFormVisible" :close-on-click-modal="false">
+		<el-dialog title="编辑" width="57%" @close="editDialogClose" :visible.sync="editFormVisible" :close-on-click-modal="false">
 			<el-form :model="editForm" label-width="120px" :rules="addFormRules" ref="editForm">
 				<div class="flex">
 					<el-form-item label="公司名称" prop="company_name">
@@ -199,10 +199,10 @@
 				</div>
 				<div class="flex">
 					<el-form-item label="销售区域" prop="area">
-						<area-cascader v-model="editForm.area" :level="0" type="text" :data="pca"></area-cascader> 
+						<area-cascader v-if="showArea" v-model="editForm.area" :level="0" type="text" :data="pca"></area-cascader> 
 					</el-form-item>
 					<el-form-item label="客户所在区域" prop="customer_area">
-						<area-cascader v-model="editForm.customer_area" :level="0" type="text" :data="pca"></area-cascader> 
+						<area-cascader v-if="showArea" v-model="editForm.customer_area" :level="0" type="text" :data="pca"></area-cascader> 
 						<!-- <el-input v-model="editForm.customer_area" auto-complete="off"></el-input> -->
 					</el-form-item>
 				</div>
@@ -210,8 +210,8 @@
 				<div class="flex">
 					<el-form-item label="业务归属" prop="projects_type">
 						<el-select v-model="editForm.projects_type">
-							<el-option label="小水智能" value="0"></el-option>
-							<el-option label="小水总机" value="1"></el-option>
+							<el-option label="小水总机" value="0"></el-option>
+							<el-option label="小水智能" value="1"></el-option>
 							<el-option label="语音PAAS" value="2"></el-option>
 						</el-select>
 					</el-form-item>
@@ -376,8 +376,8 @@
 				<div class="flex">
 					<el-form-item label="业务归属" prop="projects_type">
 						<el-select v-model="addForm.projects_type">
-							<el-option label="小水智能" value="0"></el-option>
-							<el-option label="小水总机" value="1"></el-option>
+							<el-option label="小水总机" value="0"></el-option>
+							<el-option label="小水智能" value="1"></el-option>
 							<el-option label="语音PAAS" value="2"></el-option>
 						</el-select>
 					</el-form-item>
@@ -480,6 +480,7 @@
 				listLoading: false,
 				editFormVisible: false,//编辑界面是否显示
 				editLoading: false,
+				showArea:false,
 				//编辑界面数据
 				editForm: {
 					company_name:'',
@@ -732,6 +733,7 @@
 			//显示编辑界面
 			handleEdit(index, row) {
 				this.editFormVisible = true;
+				this.showArea=true;
 				this.editForm = Object.assign({}, row);
 				if(typeof this.editForm.area==='string'){
 					this.editForm.area=this.editForm.area.split('/')
@@ -778,7 +780,7 @@
 					call_year_pay_money:'',
 				};
 				this.fileList=[];
-				this.getCityById();
+				// this.getCityById();
 			},
 			//编辑
 			editSubmit() {
@@ -832,7 +834,10 @@
 				const data={
 					company_name:this.filters.company_name,
 					user_name:this.filters.user_name,
-					};
+					pay_time: this.filters.pay_time,
+					customer_type: this.filters.customer_type,
+					role_id: this.role_id
+				};
 				uploadGatheringByParam(data).then(res=>{
 					var aDom = document.createElement('a');
 					var evt = document.createEvent('HTMLEvents');
@@ -864,6 +869,9 @@
 						
 					}
 				})
+			},
+			editDialogClose(){
+				this.showArea=false;
 			},
 			getSTime(val){
 				this.addForm.start_date=val;

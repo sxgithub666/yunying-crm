@@ -44,7 +44,7 @@
 					<area-cascader v-model="filters.address" :level="0" type="text" placeholder="地区" :data="pca"></area-cascader> 
 				</el-form-item>
 				<el-form-item style="width:15%;margin-right:0;">
-					<el-select size="small" v-model="filters.belong" placeholder="业务归属">
+					<el-select size="small" clearable v-model="filters.belong" placeholder="业务归属">
 						<el-option label="小水总机" value="0"></el-option>
 						<el-option label="小水智能" value="1"></el-option>
 						<el-option label="语音PASS" value="2"></el-option>
@@ -77,6 +77,11 @@
 				</template>
 			</el-table-column>
 			<el-table-column prop="distance" label="市话长途" width="100" show-overflow-tooltip>
+				<template slot-scope="scope">
+					<span v-if="scope.row.distance==0">市话</span>
+					<span v-if="scope.row.distance==1">长途</span>
+					<span v-if="scope.row.distance==2">市话长途</span>
+				</template>
 			</el-table-column>
 			<el-table-column prop="belong" label="业务归属" width="140" show-overflow-tooltip>
 				<template slot-scope="scope">
@@ -144,7 +149,7 @@
 		</el-col>
 
 		<!--编辑界面-->
-		<el-dialog title="编辑" :visible.sync="editFormVisible" :close-on-click-modal="false">
+		<el-dialog title="编辑" :visible.sync="editFormVisible" @close="editDialogClose" :close-on-click-modal="false">
 			<el-form :model="editForm" label-width="100px" :rules="addFormRules" ref="editForm">
 				<div class="flex">
 					<el-form-item label="通道名称" prop="name">
@@ -159,12 +164,17 @@
 						<el-input v-model="editForm.number" auto-complete="off"></el-input>
 					</el-form-item>
 					<el-form-item label="市话长途" prop="distance">
-						<el-input v-model="editForm.distance" auto-complete="off"></el-input>
+						<el-select v-model="editForm.distance">
+							<el-option label="市话" value="0"></el-option>
+							<el-option label="长途" value="1"></el-option>
+							<el-option label="市话长途" value="2"></el-option>
+						</el-select>
+						<!-- <el-input v-model="editForm.distance" auto-complete="off"></el-input> -->
 					</el-form-item>
 				</div>
 				<div class="flex">
 					<el-form-item label="地区" prop="address">
-						<area-cascader v-model="editForm.address" :level="0" type="text" :data="pca"></area-cascader> 
+						<area-cascader v-if="showArea" v-model="editForm.address" :level="0" type="text" :data="pca"></area-cascader> 
 						<!-- <el-input v-model="editForm.address" auto-complete="off"></el-input> -->
 					</el-form-item>
 					<el-form-item label="业务类型" prop="business">
@@ -263,9 +273,13 @@
 					</el-form-item>
 				</div>
 				<div class="flex">
-					
 					<el-form-item label="市话长途" prop="distance">
-						<el-input v-model="addForm.distance" auto-complete="off"></el-input>
+						<el-select v-model="addForm.distance">
+							<el-option label="市话" value="0"></el-option>
+							<el-option label="长途" value="1"></el-option>
+							<el-option label="市话长途" value="2"></el-option>
+						</el-select>
+						<!-- <el-input v-model="addForm.distance" auto-complete="off"></el-input> -->
 					</el-form-item>
 					<el-form-item label="号码" prop="number">
 						<el-input v-model="addForm.number" auto-complete="off"></el-input>
@@ -361,6 +375,7 @@
 </template>
 
 <script>
+  const Base64 = require('js-base64').Base64;
 	import { getChannelByParam, insertChannel, updateChannelById, deleteChannelById ,insertProcess ,updateReProcessById ,uploadChannelByParam} from '../../api/api';
 	import rules from '@/common/js/rule'
 	import { pca, pcaa } from 'area-data'
@@ -412,10 +427,11 @@
 					tax_point:'',
 				},
 				headers:{
-					authorLoginId:JSON.parse(sessionStorage.getItem('user')).login_id,
+					authorLoginId:Base64.encode(JSON.parse(sessionStorage.getItem('user')).login_id),
 					type:0
-					},
+				},
 				uploadUrl:'api/clouddo-crm/upload/exportExcel',
+				importData:{ },
 				fileList:[],
 				
 				addFormVisible: false,//新增界面是否显示
@@ -433,7 +449,7 @@
 					start_date: [{ required: true, message: '请输入开始时间', trigger: 'blur' }],
 					// end_date: [{ required: true, message: '请输入关停时间', trigger: 'blur' }],
 					charges: rules.numPot2,
-					communications_charges: rules.numPot2,
+					communications_charges: [{ required: true, message: '请输入通信资费', trigger: 'blur' }],
 					number_charges: rules.numPot2,
 					invoice: [{ required: true, message: '请输入是否开票', trigger: 'blur' }],
 					invoice_type: [{ required: true, message: '请输入发票类型', trigger: 'blur' }],
@@ -485,7 +501,8 @@
 					{label:'信用卡',value:'信用卡'},
 					{label:'知识产权',value:'知识产权'},
 					{label:'物流',value:'物流'},
-				]
+				],
+				showArea:false
 			}
 		},
 		methods: {
@@ -501,7 +518,7 @@
 					name: this.filters.name,
 					prefix: this.filters.prefix,
 					number: this.filters.number,
-					address: this.filters.address,
+					address: this.filters.address?this.filters.address.join('/'):'',
 					belong: this.filters.belong,
 					start_date: this.filters.start_date
 				};
@@ -565,6 +582,7 @@
 				if(typeof this.editForm.address==='string'){
 					this.editForm.address=this.editForm.address.split('/')
 				}
+				this.showArea=true;
 			},
 			//显示新增界面
 			handleAdd() {
@@ -642,11 +660,18 @@
 			uploadChange(file, fileList){
         this.fileList=fileList.slice(-1);
 			},
-			onSuccess(){
-				this.$message({
-					message: '导入成功！',
-					type: 'success'
-				});
+			onSuccess(response, file, fileList){
+				if(response.errCode=='200'){
+					this.$message({
+						message: response.errMsg,
+						type: 'success'
+					});
+				}else{
+					this.$message({
+						message: response.errMsg,
+						type: 'error'
+					});
+				}
 				this.getTableList();
 			},
 			//下载模板
@@ -655,7 +680,15 @@
 			},
 			//导出
 			exportExcel(){
-				const data={name:this.filters.name};
+				const data={
+					name:this.filters.name,
+					prefix: this.filters.prefix,
+					number: this.filters.number,
+					address: this.filters.address?this.filters.address.join('/'):'',
+					belong: this.filters.belong,
+					start_date: this.filters.start_date,
+					role_id: this.role_id
+				};
 				uploadChannelByParam(data).then(res=>{
 					var aDom = document.createElement('a');
 					var evt = document.createEvent('HTMLEvents');
@@ -666,7 +699,9 @@
 					aDom.click();
 				})
 			},
-			
+			editDialogClose(){
+				this.showArea=false;
+			},
 			getSTime(val){
 				this.addForm.start_date=val;
 			},

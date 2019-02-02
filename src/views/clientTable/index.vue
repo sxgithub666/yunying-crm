@@ -94,18 +94,22 @@
 			</el-table-column>
 			<el-table-column prop="number_charges" label="号码费" width="80" show-overflow-tooltip>
 			</el-table-column>
+			<el-table-column prop="call_card_pay_money" label="卡槽费" width="80" show-overflow-tooltip>
+			</el-table-column>
 			<el-table-column prop="charges" label="通信资费" width="80" show-overflow-tooltip>
 			</el-table-column>
 			<el-table-column prop="start_date" label="开通时间" width="160" show-overflow-tooltip>
 			</el-table-column>
 			<el-table-column prop="end_date" label="关停时间" width="160" show-overflow-tooltip>
 			</el-table-column>
+			<el-table-column prop="area" label="地区" width="140" show-overflow-tooltip>
+			</el-table-column>
 			<el-table-column prop="user_name" label="所属销售" width="80" show-overflow-tooltip>
 			</el-table-column>
-			<el-table-column label="操作" fixed="right" width="260">
+			<el-table-column label="操作" fixed="right" width="180">
 				<template slot-scope="scope">
-					<el-button v-if="scope.row.audit_status!=3" size="small" @click="auditSubmit(scope.row)">提交审核</el-button>
-					<el-button v-if="scope.row.audit_status==3" size="small" @click="resubmit(scope.row)">重新提交</el-button>
+					<!-- <el-button v-if="scope.row.audit_status!=3" size="small" @click="auditSubmit(scope.row)">提交审核</el-button>
+					<el-button v-if="scope.row.audit_status==3" size="small" @click="resubmit(scope.row)">重新提交</el-button> -->
 					<el-button size="small" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
 					<el-button v-if="role_id==='4'" type="danger" size="small" @click="handleDel(scope.$index, scope.row)">删除</el-button>
 				</template>
@@ -119,7 +123,7 @@
 		</el-col>
 
 		<!--编辑界面-->
-		<el-dialog title="编辑" :visible.sync="editFormVisible" :close-on-click-modal="false">
+		<el-dialog title="编辑" @close="editDialogClose" :visible.sync="editFormVisible" :close-on-click-modal="false">
 			<el-form :model="editForm" label-width="80px" :rules="editFormRules" ref="editForm">
 				<div class="flex">
 					<el-form-item label="前缀" prop="prefix">
@@ -154,7 +158,7 @@
 						<el-input v-model="editForm.call_card_pay_money" clearable auto-complete="off"></el-input>
 					</el-form-item>
 					<el-form-item label="地区" prop="area">
-						<area-cascader v-model="editForm.area" :level="0" type="text" :data="pcaa"></area-cascader> 
+						<area-cascader v-if="showArea" v-model="editForm.area" :level="0" type="text" :data="pcaa"></area-cascader> 
 					</el-form-item>
 				</div>
 				<div class="flex">
@@ -244,6 +248,7 @@
 </template>
 
 <script>
+	const Base64 = require('js-base64').Base64;
 	import { getCustomerListByParam, insertCustomer, updateCustomerById, deleteCustomerById, insertProcess ,uploadClientTableByParam} from '../../api/api';
 	import rules from '@/common/js/rule'
 	import { pca, pcaa } from 'area-data'
@@ -266,6 +271,7 @@
 				listLoading: false,
 				editFormVisible: false,//编辑界面是否显示
 				editLoading: false,
+				showArea: false,
 				editFormRules: {
 					prefix: [{ required: true, message: '请输入前缀', trigger: 'blur' }],
 					customer_name: [{ required: true, message: '请输入客户名称', trigger: 'blur' }],
@@ -294,7 +300,7 @@
 					number:'',
 				},
 				headers:{
-					authorLoginId:JSON.parse(sessionStorage.getItem('user')).login_id,
+					authorLoginId:Base64.encode(JSON.parse(sessionStorage.getItem('user')).login_id),
 					type:1
 					},
 				uploadUrl:'api/clouddo-crm/upload/exportExcel',
@@ -336,7 +342,7 @@
 					user_name:this.filters.user_name,
 					prefix: this.filters.prefix,
 					number: this.filters.number,
-					address: this.filters.address,
+					address: this.filters.address?this.filters.address.join('/'):'',
 					belong: this.filters.belong,
 					start_date: this.filters.start_date
 				};
@@ -397,6 +403,7 @@
 			//显示编辑界面
 			handleEdit(index, row) {
 				this.editFormVisible = true;
+				this.showArea = true;
 				this.editForm = Object.assign({}, row);
 				if(typeof this.editForm.area==='string'){
 					this.editForm.area=this.editForm.area.split('/')
@@ -475,11 +482,18 @@
 			uploadChange(file, fileList){
         this.fileList=fileList.slice(-1);
 			},
-			onSuccess(){
-				this.$message({
-					message: '导入成功！',
-					type: 'success'
-				});
+			onSuccess(response, file, fileList){
+				if(response.errCode=='200'){
+					this.$message({
+						message: response.errMsg,
+						type: 'success'
+					});
+				}else{
+					this.$message({
+						message: response.errMsg,
+						type: 'error'
+					});
+				}
 				this.getTableList();
 			},
 			//下载模板
@@ -490,8 +504,14 @@
 			exportExcel(){
 				const data={
 					customer_name:this.filters.customer_name,
-					user_name:this.filters.user_name
-					};
+					user_name:this.filters.user_name,
+					prefix: this.filters.prefix,
+					number: this.filters.number,
+					address: this.filters.address?this.filters.address.join('/'):'',
+					belong: this.filters.belong,
+					start_date: this.filters.start_date,
+					role_id: this.role_id,
+				};
 				uploadClientTableByParam(data).then(res=>{
 					var aDom = document.createElement('a');
 					var evt = document.createEvent('HTMLEvents');
@@ -501,6 +521,9 @@
 					aDom.dispatchEvent(evt);
 					aDom.click();
 				})
+			},
+			editDialogClose(){
+				this.showArea=false;
 			},
 			getSTime(val){
 				this.addForm.start_date=val;

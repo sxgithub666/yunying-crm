@@ -45,7 +45,7 @@
 			</el-table-column> -->
 			<el-table-column prop="pay_record" label="缴费记录" width="100">
 			</el-table-column>
-			<el-table-column prop="payment_desc" label="缴费记录备注" width="100">
+			<el-table-column prop="payment_desc" label="缴费备注" width="100">
 			</el-table-column>
 			<el-table-column prop="remark" label="备注" width="100">
 			</el-table-column>
@@ -145,7 +145,7 @@
 					<el-form-item label="缴费记录" prop="pay_record">
 						<el-input v-model="addForm.pay_record" clearable auto-complete="off"></el-input>
 					</el-form-item>
-					<el-form-item label="缴费记录备注" prop="payment_desc">
+					<el-form-item label="缴费备注" prop="payment_desc">
 						<el-input v-model="addForm.payment_desc" clearable auto-complete="off"></el-input>
 					</el-form-item>
 					<!-- <el-form-item label="调整金额" prop="amount_adjustment">

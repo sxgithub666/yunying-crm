@@ -1,7 +1,7 @@
 <template>
 	<el-row class="home-container">
 		<el-col :span="24" class="header">
-			<el-col :span="10" class="logo" :class="collapsed?'logo-collapse-width':'logo-width'">
+			<el-col :span="8" class="logo" :class="collapsed?'logo-collapse-width':'logo-width'">
 				<!-- {{collapsed?'':sysName}} -->
 				<div v-if="!collapsed">
 					<img src="../assets/logo.png" alt="">
@@ -15,7 +15,7 @@
 			<el-col :span="6">
 				<span class="title">运营部管理系统</span>
 			</el-col>
-			<el-col :span="4" class="userinfo">
+			<el-col :span="6" class="userinfo">
 				<el-badge :is-dot="hasBacklog" class="badge">
 					<i class="message el-icon-message" @click="goBacklog"></i>
 				</el-badge>

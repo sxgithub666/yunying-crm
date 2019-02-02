@@ -13,12 +13,12 @@
 					<el-date-picker style="width:98%" size="small" v-model="filters.pay_time" @change="getFiltersPayTime" value-format="yyyy-MM-dd" type="date" placeholder="选择收款日期">
 					</el-date-picker>
 				</el-form-item>
-				<el-form-item style="width:15%">
+				<!-- <el-form-item style="width:15%">
 					<el-select size="small" v-model="filters.customer_type" placeholder="客户类型" clearable>
 						<el-option label="直客" value="1"></el-option>
 						<el-option label="渠道" value="0"></el-option>
 					</el-select>
-				</el-form-item>
+				</el-form-item> -->
 				<el-form-item>
 					<el-button type="primary" size="small" v-on:click="getTableList">查询</el-button>
 				</el-form-item>
@@ -119,7 +119,7 @@
 		</el-col>
 
 		<!--编辑界面-->
-		<el-dialog title="编辑" :visible.sync="editFormVisible" :close-on-click-modal="false">
+		<el-dialog title="编辑" @close="editDialogClose" :visible.sync="editFormVisible" :close-on-click-modal="false">
 			<el-form :model="editForm" label-width="120px" :rules="editFormRules" ref="editForm">
 				<div class="flex">
 					<!-- <el-form-item label="销售区域" prop="area">
@@ -134,7 +134,8 @@
 				</div>
 				<div class="flex">
 					<el-form-item label="客户所在区域" prop="customer_region">
-						<el-input v-model="editForm.customer_region" clearable auto-complete="off"></el-input>
+						<area-cascader v-if="showArea" v-model="editForm.customer_region" :level="0" type="text" :data="pca"></area-cascader> 
+						<!-- <el-input v-model="editForm.customer_region" clearable auto-complete="off"></el-input> -->
 					</el-form-item>
 					<el-form-item label="收款金额" prop="pay_money">
 						<el-input v-model="editForm.pay_money" clearable auto-complete="off"></el-input>
@@ -244,7 +245,8 @@
 				</div>
 				<div class="flex">
 					<el-form-item label="客户所在区域" prop="customer_region">
-						<el-input v-model="addForm.customer_region" clearable auto-complete="off"></el-input>
+						<area-cascader v-model="addForm.customer_region" :level="0" type="text" :data="pca"></area-cascader> 
+						<!-- <el-input v-model="addForm.customer_region" clearable auto-complete="off"></el-input> -->
 					</el-form-item>
 					<el-form-item label="收款金额" prop="pay_money">
 						<el-input v-model="addForm.pay_money" clearable auto-complete="off"></el-input>
@@ -314,7 +316,8 @@
 
 <script>
 	import { getZjPaasProcessByParam, insertZjPaasProcess, updateZjPaasProcessById, deleteZjPaasProcessById ,updateReProcessById ,insertProcess ,uploadSwitchboardByParam} from '../../api/api';
-  import rules from '@/common/js/rule'
+	import rules from '@/common/js/rule'
+	import { pca, pcaa } from 'area-data'
 	export default {
 		data() {
 			return {
@@ -324,6 +327,8 @@
 					pay_time:'',
 					customer_type:''
 				},
+				pca: pca,
+				pcaa: pcaa,
 				role_id:'',
 				list: [],
 				total: 0,
@@ -331,6 +336,7 @@
 				listLoading: false,
 				editFormVisible: false,//编辑界面是否显示
 				editLoading: false,
+				showArea:false,
 				editFormRules: {
 					area: [{ required: true, message: '请输入销售区域', trigger: 'blur' }],
 					company_name: [{ required: true, message: '请输入公司名称', trigger: 'blur'}],
@@ -597,7 +603,11 @@
 			//显示编辑界面
 			handleEdit(index, row) {
 				this.editFormVisible = true;
+				this.showArea=true;
 				this.editForm = Object.assign({}, row);
+				if(typeof this.editForm.customer_region==='string'){
+					this.editForm.customer_region=this.editForm.customer_region.split('/')
+				}
 				if(row.pay_voucher){
 					this.editFileList=row.pay_voucher.map(item=>{
 						let obj={};
@@ -632,6 +642,7 @@
 						if(this.editForm.pay_voucher instanceof Array){
 							this.editForm.pay_voucher=this.editForm.pay_voucher.join(',');
 						};
+						this.editForm.customer_region=this.editForm.customer_region.join('/');
 						const data = Object.assign({}, this.editForm);
 						updateZjPaasProcessById(data).then((res) => {
 							this.editLoading = false;
@@ -668,10 +679,13 @@
 			//导出
 			exportExcel(){
 				const data={
-					company_name:this.filters.company_name,
-					user_name:this.filters.user_name,
+					company_name: this.filters.company_name,
+					user_name: this.filters.user_name,
+					pay_time: this.filters.pay_time,
+					customer_type: this.filters.customer_type,
+					role_id: this.role_id,
 					type:'0'
-					};
+				};
 				uploadSwitchboardByParam(data).then(res=>{
 					var aDom = document.createElement('a');
 					var evt = document.createEvent('HTMLEvents');
@@ -681,6 +695,9 @@
 					aDom.dispatchEvent(evt);
 					aDom.click();
 				})
+			},
+			editDialogClose(){
+				this.showArea=false;
 			},
 			getAddTime(val){
 				this.addForm.pay_time=val;
