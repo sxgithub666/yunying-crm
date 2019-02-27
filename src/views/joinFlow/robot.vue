@@ -118,7 +118,7 @@
 					</a>
 				</template>
 			</el-table-column>
-			<el-table-column prop="remark" label="备注" width="100" show-overflow-tooltip>
+			<el-table-column prop="remark" label="账户配置说明" width="120" show-overflow-tooltip>
 			</el-table-column>
 			<el-table-column label="操作" fixed="right" width="260">
 				<template slot-scope="scope">
@@ -149,7 +149,7 @@
 				</div>
 				<div class="flex">
 					<el-form-item label="收款时间" prop="pay_time">
-						<el-date-picker v-model="editForm.pay_time" @change="getEditTime" value-format="yyyy-MM-dd HH:mm:ss" type="datetime" placeholder="选择收款日期时间">
+						<el-date-picker v-model="editForm.pay_time" @change="getEditTime" value-format="yyyy-MM-dd" type="date" placeholder="选择收款日期">
 						</el-date-picker>
 					</el-form-item>
 					<el-form-item label="客户自备线路" style="width:44%" prop="call_customer_pay_money">
@@ -216,7 +216,18 @@
 							<el-option label="渠道" value="1"></el-option>
 						</el-select>
 					</el-form-item>
-					<el-form-item label="备注">
+					<el-form-item label="费用期间" prop="cost_interval">
+						<el-select v-model="editForm.cost_interval">
+							<el-option label="月付" value="0"></el-option>
+							<el-option label="季付" value="1"></el-option>
+							<el-option label="年付" value="2"></el-option>
+							<el-option label="测试月" value="3"></el-option>
+							<el-option label="测试季" value="4"></el-option>
+						</el-select>
+					</el-form-item>
+				</div>
+				<div class="flex">
+					<el-form-item label="账户配置说明" prop="remark">
 						<el-input v-model="editForm.remark" auto-complete="off"></el-input>
 					</el-form-item>
 				</div>
@@ -275,16 +286,16 @@
 		<el-dialog title="新增" width="55%" :visible.sync="addFormVisible" :close-on-click-modal="false">
 			<el-form :model="addForm" label-width="120px" :rules="editFormRules" ref="addForm">
 				<div class="flex">
-					<el-form-item label="线路单价" prop="line_price">
-						<el-input v-model="addForm.line_price" auto-complete="off"></el-input>
-					</el-form-item>
 					<el-form-item label="公司全称" prop="company_name">
 						<el-input v-model="addForm.company_name" auto-complete="off"></el-input>
+					</el-form-item>
+					<el-form-item label="线路单价" prop="line_price">
+						<el-input v-model="addForm.line_price" auto-complete="off"></el-input>
 					</el-form-item>
 				</div>
 				<div class="flex">
 					<el-form-item label="收款时间" prop="pay_time">
-						<el-date-picker v-model="addForm.pay_time" @change="getAddTime" value-format="yyyy-MM-dd HH:mm:ss" type="datetime" placeholder="选择收款日期时间">
+						<el-date-picker v-model="addForm.pay_time" @change="getAddTime" value-format="yyyy-MM-dd" type="date" placeholder="选择收款日期">
 						</el-date-picker>
 					</el-form-item>
 					<el-form-item label="客户自备线路" style="width:44%" prop="call_customer_pay_money">
@@ -352,7 +363,18 @@
 							<el-option label="渠道" value="1"></el-option>
 						</el-select>
 					</el-form-item>
-					<el-form-item label="备注">
+					<el-form-item label="费用期间" prop="cost_interval">
+						<el-select v-model="addForm.cost_interval">
+							<el-option label="月付" value="0"></el-option>
+							<el-option label="季付" value="1"></el-option>
+							<el-option label="年付" value="2"></el-option>
+							<el-option label="测试月" value="3"></el-option>
+							<el-option label="测试季" value="4"></el-option>
+						</el-select>
+					</el-form-item>
+				</div>
+				<div class="flex">
+					<el-form-item label="账户配置说明" prop="remark">
 						<el-input v-model="addForm.remark" auto-complete="off"></el-input>
 					</el-form-item>
 				</div>
@@ -431,7 +453,7 @@
 				editFormVisible: false,//编辑界面是否显示
 				editLoading: false,
 				editFormRules: {
-					line_price: [{ required: true, message: '请输入销售区域', trigger: 'blur' }],
+					line_price: [{ required: true, message: '请输入线路单价', trigger: 'blur' }],
 					company_name: [{ required: true, message: '请输入公司名称', trigger: 'blur'}],
 					customer_type: [{ required: true, message: '请输入客户类型', trigger: 'blur'}],
 					pay_time: [{ required: true, message: '请输入收款时间', trigger: 'blur'}],
@@ -446,7 +468,7 @@
 					call_year_pay_money:rules.numPot2,
 					refunds: [{ required: true, message: '请输入是否到款', trigger: 'blur'}],
 					sales_name: [{ required: true, message: '请输入销售经理', trigger: 'blur'}],
-					// verbal_trick: [{ required: true, message: '请上传话术', trigger: 'change blur'}],
+					remark: [{ required: true, message: '请输入账户配置说明', trigger: 'blur'}],
 					// need_data: [{ required: true, message: '请上传号码申请材料', trigger: 'change blur'}],
 				},
 				//编辑界面数据

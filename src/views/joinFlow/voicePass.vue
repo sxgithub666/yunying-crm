@@ -134,7 +134,7 @@
 				</div>
 				<div class="flex">
 					<el-form-item style="width:50%" label="收款时间" prop="pay_time">
-						<el-date-picker v-model="editForm.pay_time" @change="getEditTime" value-format="yyyy-MM-dd HH:mm:ss" type="datetime" placeholder="选择收款日期时间">
+						<el-date-picker v-model="editForm.pay_time" @change="getEditTime" value-format="yyyy-MM-dd" type="date" placeholder="选择收款日期">
 						</el-date-picker>
 					</el-form-item>
 					<el-form-item label="是否到款" prop="refunds">
@@ -230,7 +230,7 @@
 				</div>
 				<div class="flex">
 					<el-form-item label="收款时间" style="width:50%" prop="pay_time">
-						<el-date-picker v-model="addForm.pay_time" @change="getAddTime" value-format="yyyy-MM-dd HH:mm:ss" type="datetime" placeholder="选择收款日期时间">
+						<el-date-picker v-model="addForm.pay_time" @change="getAddTime" value-format="yyyy-MM-dd" type="date" placeholder="选择收款日期">
 						</el-date-picker>
 					</el-form-item>
 					<el-form-item label="是否到款" prop="refunds">

@@ -1,6 +1,29 @@
 <template>
 	<section>
 		<!--工具条-->
+		<el-col :span="24">
+			<el-form :inline="true" class="flexEnd">
+				<el-form-item style="margin-bottom:0;">
+					<el-button v-if="role_id==='4'" type="primary" size="small" @click="exportExcel">导出</el-button>
+				</el-form-item>
+				<el-form-item style="margin-bottom:0;">
+					<el-upload :headers="headers1"
+											:action="uploadUrl1"
+											:before-upload="beforeImportUpload"
+											:on-change="uploadChange"
+											:on-success="onImportSuccess"
+											:show-file-list="false"
+											multiple
+											:limit="2"
+											:file-list="fileList1">
+						<el-button v-if="role_id==='4'" type="primary" size="small">导入</el-button>
+					</el-upload>
+				</el-form-item>
+				<el-form-item style="margin-bottom:0;">
+					<div class="downloadTemplate" v-if="role_id==='4'" @click="downloadTemplate">下载导入模板</div>
+				</el-form-item>
+			</el-form>
+		</el-col>
 		<el-col :span="24" class="toolbar" style="padding-bottom: 0px;">
 			<el-form :inline="true" :model="filters">
 				<el-form-item style="width:15%">
@@ -25,9 +48,9 @@
 				<el-form-item>
 					<el-button type="primary" size="small" @click="handleAdd">新增</el-button>
 				</el-form-item>
-				<el-form-item>
+				<!-- <el-form-item>
 					<el-button v-if="role_id==='4'" type="primary" size="small" @click="exportExcel">导出</el-button>
-				</el-form-item>
+				</el-form-item> -->
 			</el-form>
 		</el-col>
 
@@ -109,7 +132,8 @@
 					<span v-if="scope.row.cost_interval==0">月付</span>
 					<span v-if="scope.row.cost_interval==1">季付</span>
 					<span v-if="scope.row.cost_interval==2">年付</span>
-					<span v-if="scope.row.cost_interval==3">测试</span>
+					<span v-if="scope.row.cost_interval==3">测试月</span>
+					<span v-if="scope.row.cost_interval==4">测试季</span>
 				</template>
 			</el-table-column>
 			<el-table-column prop="pay_voucher" label="打款凭证" width="200" show-overflow-tooltip>
@@ -248,7 +272,7 @@
 				</div>
 				<div class="flex">
 					<el-form-item label="收款时间" prop="pay_time">
-						<el-date-picker v-model="editForm.pay_time" @change="getEditPayTime" value-format="yyyy-MM-dd HH:mm:ss" type="datetime" placeholder="选择收款日期时间">
+						<el-date-picker v-model="editForm.pay_time" @change="getEditPayTime" value-format="yyyy-MM-dd" type="date" placeholder="选择收款日期">
 						</el-date-picker>
 					</el-form-item>
 					<el-form-item label="客户线索来源" prop="customer_clues">
@@ -270,7 +294,8 @@
 							<el-option label="月付" value="0"></el-option>
 							<el-option label="季付" value="1"></el-option>
 							<el-option label="年付" value="2"></el-option>
-							<el-option label="测试" value="3"></el-option>
+							<el-option label="测试月" value="3"></el-option>
+							<el-option label="测试季" value="4"></el-option>
 						</el-select>
 					</el-form-item>
 					<el-form-item label="客户类型" prop="customer_type">
@@ -400,7 +425,7 @@
 				
 				<div class="flex">
 					<el-form-item  label="收款时间" prop="pay_time">
-						<el-date-picker v-model="addForm.pay_time" @change="getAddPayTime" value-format="yyyy-MM-dd HH:mm:ss" type="datetime" placeholder="选择收款日期时间">
+						<el-date-picker v-model="addForm.pay_time" @change="getAddPayTime" value-format="yyyy-MM-dd" type="date" placeholder="选择收款日期">
 						</el-date-picker>
 					</el-form-item>
 					<el-form-item label="客户自备线路" prop="call_customer_pay_money">
@@ -417,7 +442,8 @@
 							<el-option label="月付" value="0"></el-option>
 							<el-option label="季付" value="1"></el-option>
 							<el-option label="年付" value="2"></el-option>
-							<el-option label="测试" value="3"></el-option>
+							<el-option label="测试月" value="3"></el-option>
+							<el-option label="测试季" value="4"></el-option>
 						</el-select>
 					</el-form-item>
 					<el-form-item label="客户类型" prop="customer_type">
@@ -514,6 +540,14 @@
 				headers:{authorLoginId:JSON.parse(sessionStorage.getItem('user')).login_id},
 				uploadUrl:'api/clouddo-crm/upload/uploadFile',
 				fileList:[],
+
+				headers1:{
+					authorLoginId:Base64.encode(JSON.parse(sessionStorage.getItem('user')).login_id),
+					type:2
+				},
+				uploadUrl1:'api/clouddo-crm/upload/exportExcel',
+				fileList1:[],
+
 				editFileList:[],
 				dialogImageUrl:'',
 				previewDialogVisible:false,
@@ -828,6 +862,40 @@
 						});
 					};
 				});
+			},
+			beforeImportUpload(file){
+				let fileType = file.name.substring(file.name.lastIndexOf(".")+1).toUpperCase();
+				const isXLS = fileType === 'XLS';
+				const isXLSX = fileType === 'XLSX';
+
+				if (!isXLS && !isXLSX) {
+					this.$message({
+						message: '上传图片必须是XLS/XLSX/ 格式!',
+						type: 'warning'
+					});
+				}
+				return isXLS || isXLSX ;
+			},
+			uploadChange(file, fileList){
+        this.fileList1=fileList.slice(-1);
+			},
+			onImportSuccess(response, file, fileList){
+				if(response.errCode=='200'){
+					this.$message({
+						message: response.errMsg,
+						type: 'success'
+					});
+				}else{
+					this.$message({
+						message: response.errMsg,
+						type: 'error'
+					});
+				}
+				this.getTableList();
+			},
+			//下载模板
+			downloadTemplate(){
+				window.open('../../../static/gatheringTemplate.xlsx')
 			},
 			//导出
 			exportExcel(){

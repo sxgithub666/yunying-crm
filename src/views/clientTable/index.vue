@@ -163,11 +163,11 @@
 				</div>
 				<div class="flex">
 					<el-form-item label="开始时间" prop="start_date">
-						<el-date-picker v-model="editForm.start_date" @change="getEditTime" value-format="yyyy-MM-dd HH:mm:ss" type="datetime" placeholder="选择开始日期时间">
+						<el-date-picker v-model="editForm.start_date" @change="getEditTime" value-format="yyyy-MM-dd" type="date" placeholder="选择开始日期">
 						</el-date-picker>
 					</el-form-item>
 					<el-form-item label="关停时间" prop="end_date">
-						<el-date-picker v-model="editForm.end_date"  @change="getEditETime" value-format="yyyy-MM-dd HH:mm:ss" type="datetime" placeholder="选择结束日期时间">
+						<el-date-picker v-model="editForm.end_date"  @change="getEditETime" value-format="yyyy-MM-dd" type="date" placeholder="选择结束日期">
 						</el-date-picker>
 					</el-form-item>
 				</div>
@@ -225,11 +225,11 @@
 				</div>
 				<div class="flex">
 					<el-form-item label="开始时间" prop="start_date">
-						<el-date-picker v-model="addForm.start_date" @change="getSTime" value-format="yyyy-MM-dd HH:mm:ss" type="datetime" placeholder="选择开始日期时间">
+						<el-date-picker v-model="addForm.start_date" @change="getSTime" value-format="yyyy-MM-dd" type="date" placeholder="选择开始日期">
 						</el-date-picker>
 					</el-form-item>
 					<el-form-item label="关停时间" prop="end_date">
-						<el-date-picker v-model="addForm.end_date"  @change="getETime" value-format="yyyy-MM-dd HH:mm:ss" type="datetime" placeholder="选择结束日期时间">
+						<el-date-picker v-model="addForm.end_date"  @change="getETime" value-format="yyyy-MM-dd" type="date" placeholder="选择结束日期">
 						</el-date-picker>
 					</el-form-item>
 				</div>
@@ -302,7 +302,7 @@
 				headers:{
 					authorLoginId:Base64.encode(JSON.parse(sessionStorage.getItem('user')).login_id),
 					type:1
-					},
+				},
 				uploadUrl:'api/clouddo-crm/upload/exportExcel',
 				fileList:[],
 

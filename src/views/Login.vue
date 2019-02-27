@@ -22,7 +22,7 @@
         </el-form-item>
         <!-- <el-checkbox v-model="checked" checked class="remember">记住密码</el-checkbox> -->
         <el-form-item style="width:100%;">
-          <el-button type="primary" style="width:100%;" @click.native.prevent="handleSubmit" :loading="logining">登录</el-button>
+          <el-button type="primary" style="width:100%;" @click.native.prevent="handleSubmit">登录</el-button>
           <!--<el-button @click.native.prevent="handleReset">重置</el-button>-->
         </el-form-item>
       </el-form>

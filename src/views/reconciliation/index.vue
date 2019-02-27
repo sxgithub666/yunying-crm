@@ -1,6 +1,29 @@
 <template>
 	<section>
 		<!--工具条-->
+		<!-- <el-col :span="24">
+			<el-form :inline="true" class="flexEnd">
+				<el-form-item style="margin-bottom:0;">
+					<el-button v-if="role_id==='4'" type="primary" size="small" @click="exportExcel">导出</el-button>
+				</el-form-item>
+				<el-form-item style="margin-bottom:0;">
+					<el-upload :headers="headers"
+											:action="uploadUrl"
+											:before-upload="beforeUpload"
+											:on-change="uploadChange"
+											:on-success="onSuccess"
+											:show-file-list="false"
+											multiple
+											:limit="2"
+											:file-list="fileList">
+						<el-button v-if="role_id==='4'" type="primary" size="small">导入</el-button>
+					</el-upload>
+				</el-form-item>
+				<el-form-item style="margin-bottom:0;">
+					<div class="downloadTemplate" v-if="role_id==='4'" @click="downloadTemplate">下载导入模板</div>
+				</el-form-item>
+			</el-form>
+		</el-col> -->
 		<el-col :span="24" class="toolbar" style="padding-bottom: 0px;">
 			<el-form :inline="true" :model="filters">
 				<el-form-item>
@@ -71,7 +94,7 @@
 				</el-form-item>
 				<div class="flex">
 					<el-form-item label="对账时间" prop="reconciliation_time">
-						<el-date-picker v-model="editForm.reconciliation_time" :picker-options="pickerOptions" @change="getEditTime" value-format="yyyy-MM-dd HH:mm:ss" type="datetime" placeholder="选择收款日期时间">
+						<el-date-picker v-model="editForm.reconciliation_time" :picker-options="pickerOptions" @change="getEditTime" value-format="yyyy-MM-dd" type="date" placeholder="选择收款日期">
 						</el-date-picker>
 					</el-form-item>
 					<el-form-item label="收入" prop="income">
@@ -123,7 +146,7 @@
 				</el-form-item>
 				<div class="flex">
 					<el-form-item label="对账时间" prop="reconciliation_time">
-						<el-date-picker v-model="addForm.reconciliation_time" :picker-options="pickerOptions" @change="getAddTime" value-format="yyyy-MM-dd HH:mm:ss" type="datetime" placeholder="选择收款日期时间">
+						<el-date-picker v-model="addForm.reconciliation_time" :picker-options="pickerOptions" @change="getAddTime" value-format="yyyy-MM-dd" type="date" placeholder="选择收款日期">
 						</el-date-picker>
 					</el-form-item>
 					<el-form-item label="收入" prop="income">
@@ -238,6 +261,12 @@
 					vos_type:'',
 					
 				},
+				headers:{
+					authorLoginId:Base64.encode(JSON.parse(sessionStorage.getItem('user')).login_id),
+					type:1
+				},
+				uploadUrl:'api/clouddo-crm/upload/exportExcel',
+				fileList:[],
 
 				addFormVisible: false,//新增界面是否显示
 				addLoading: false,
@@ -356,6 +385,40 @@
 					};
 				});
 			},
+			beforeUpload(file){
+				let fileType = file.name.substring(file.name.lastIndexOf(".")+1).toUpperCase();
+				const isXLS = fileType === 'XLS';
+				const isXLSX = fileType === 'XLSX';
+
+				if (!isXLS && !isXLSX) {
+					this.$message({
+						message: '上传图片必须是XLS/XLSX/ 格式!',
+						type: 'warning'
+					});
+				}
+				return isXLS || isXLSX ;
+			},
+			uploadChange(file, fileList){
+        this.fileList=fileList.slice(-1);
+			},
+			onSuccess(response, file, fileList){
+				if(response.errCode=='200'){
+					this.$message({
+						message: response.errMsg,
+						type: 'success'
+					});
+				}else{
+					this.$message({
+						message: response.errMsg,
+						type: 'error'
+					});
+				}
+				this.getTableList();
+			},
+			//下载模板
+			downloadTemplate(){
+				window.open('../../../static/clientTemplate.xlsx')
+			},
 			//导出
 			exportExcel(){
 				const data={
@@ -395,5 +458,11 @@
 	display: flex;
 	flex-direction: row;
 	justify-content: space-between;
+}
+.flexEnd{
+	display: flex;
+	flex-direction: row;
+	justify-content: flex-end;
+	
 }
 </style>

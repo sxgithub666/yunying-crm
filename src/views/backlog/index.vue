@@ -64,6 +64,16 @@
 					<span v-if="scope.row.redirect_3=='5'">客服</span>
 				</template>
 			</el-table-column>
+			<el-table-column prop="redirect_4" label="四级审核人" sortable width="120">
+				<template slot-scope="scope">
+					<span v-if="scope.row.redirect_4=='0'">销售</span>
+					<span v-if="scope.row.redirect_4=='1'">产品</span>
+					<span v-if="scope.row.redirect_4=='2'">财务</span>
+					<span v-if="scope.row.redirect_4=='3'">运营</span>
+					<span v-if="scope.row.redirect_4=='4'">超级管理员</span>
+					<span v-if="scope.row.redirect_4=='5'">客服</span>
+				</template>
+			</el-table-column>
 			<el-table-column prop="user_name" label="提交人" sortable width="100">
 			</el-table-column>
 			<el-table-column prop="operator_name" label="操作人" sortable width="100">
@@ -168,11 +178,11 @@
 				</div>
 				<div class="flex">
 					<el-form-item label="开始时间" prop="start_date">
-						<el-date-picker disabled v-model="channelForm.start_date" value-format="yyyy-MM-dd HH:mm:ss" type="datetime" placeholder="选择开始日期时间">
+						<el-date-picker disabled v-model="channelForm.start_date" value-format="yyyy-MM-dd" type="date" placeholder="选择开始日期">
 						</el-date-picker>
 					</el-form-item>
 					<el-form-item label="关停时间" prop="end_date">
-						<el-date-picker disabled v-model="channelForm.end_date" value-format="yyyy-MM-dd HH:mm:ss" type="datetime" placeholder="选择结束日期时间">
+						<el-date-picker disabled v-model="channelForm.end_date" value-format="yyyy-MM-dd" type="date" placeholder="选择结束日期">
 						</el-date-picker>
 					</el-form-item>
 				</div>
@@ -249,11 +259,11 @@
 				</div>
 				<div class="flex">
 					<el-form-item label="开始时间">
-						<el-date-picker disabled v-model="clientForm.start_date" value-format="yyyy-MM-dd HH:mm:ss" type="datetime" placeholder="选择开始日期时间">
+						<el-date-picker disabled v-model="clientForm.start_date" value-format="yyyy-MM-dd" type="datet" placeholder="选择开始日期">
 						</el-date-picker>
 					</el-form-item>
 					<el-form-item label="关停时间">
-						<el-date-picker disabled v-model="clientForm.end_date" value-format="yyyy-MM-dd HH:mm:ss" type="datetime" placeholder="选择结束日期时间">
+						<el-date-picker disabled v-model="clientForm.end_date" value-format="yyyy-MM-dd" type="date" placeholder="选择结束日期">
 						</el-date-picker>
 					</el-form-item>
 				</div>
@@ -364,7 +374,7 @@
 
 				<div class="flex">
 					<el-form-item label="收款时间" prop="pay_time">
-						<el-date-picker disabled v-model="gatheringForm.pay_time" value-format="yyyy-MM-dd HH:mm:ss" type="datetime" placeholder="选择收款日期时间">
+						<el-date-picker disabled v-model="gatheringForm.pay_time" value-format="yyyy-MM-dd" type="date" placeholder="选择收款日期">
 						</el-date-picker>
 					</el-form-item>
 					<el-form-item label="客户线索来源" prop="customer_clues">
@@ -381,7 +391,8 @@
 							<el-option label="月付" value="0"></el-option>
 							<el-option label="季付" value="1"></el-option>
 							<el-option label="年付" value="2"></el-option>
-							<el-option label="测试" value="3"></el-option>
+							<el-option label="测试月" value="3"></el-option>
+							<el-option label="测试季" value="4"></el-option>
 						</el-select>
 						<!-- <el-input v-model="gatheringForm.call_year_pay_money" auto-complete="off"></el-input> -->
 					</el-form-item>
@@ -428,7 +439,7 @@
 				</div>
 				<div class="flex">
 					<el-form-item label="收款时间">
-						<el-date-picker disabled v-model="robotForm.pay_time" value-format="yyyy-MM-dd HH:mm:ss" type="datetime" placeholder="选择收款日期时间">
+						<el-date-picker disabled v-model="robotForm.pay_time" value-format="yyyy-MM-dd" type="date" placeholder="选择收款日期">
 						</el-date-picker>
 					</el-form-item>
 					<el-form-item label="客户类型">
@@ -494,7 +505,18 @@
 					<el-form-item label="机器人费">
 						<el-input disabled v-model="robotForm.robot_pay_money" auto-complete="off"></el-input>
 					</el-form-item>
-					<el-form-item label="备注">
+					<el-form-item label="费用期间" prop="cost_interval">
+						<el-select disabled v-model="robotForm.cost_interval">
+							<el-option label="月付" value="0"></el-option>
+							<el-option label="季付" value="1"></el-option>
+							<el-option label="年付" value="2"></el-option>
+							<el-option label="测试月" value="3"></el-option>
+							<el-option label="测试季" value="4"></el-option>
+						</el-select>
+					</el-form-item>
+				</div>
+				<div class="flex">
+					<el-form-item label="账户配置说明">
 						<el-input disabled v-model="robotForm.remark" auto-complete="off"></el-input>
 					</el-form-item>
 				</div>
@@ -598,7 +620,7 @@
 				</div>
 				<div class="flex">
 					<el-form-item label="收款时间">
-						<el-date-picker disabled v-model="voicePassForm.pay_time" value-format="yyyy-MM-dd HH:mm:ss" type="datetime" placeholder="选择收款日期时间">
+						<el-date-picker disabled v-model="voicePassForm.pay_time" value-format="yyyy-MM-dd" type="date" placeholder="选择收款日期">
 						</el-date-picker>
 					</el-form-item>
 					<el-form-item label="收款金额">
@@ -982,7 +1004,9 @@
       },
       //转发提交
       transpondSubmit(){
-        if(this.transpondForm.redirect_2){
+        if(this.transpondForm.redirect_3){
+					this.transpondForm.redirect_4=this.transpondForm.role_id;
+				}else if(this.transpondForm.redirect_2 && !this.transpondForm.redirect_3){
 					this.transpondForm.redirect_3=this.transpondForm.role_id;
 				}else{
 					this.transpondForm.redirect_2=this.transpondForm.role_id;
