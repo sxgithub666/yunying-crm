@@ -1,7 +1,7 @@
 <template>
 	<section>
 		<!--工具条-->
-		<el-col :span="24">
+		<!-- <el-col :span="24">
 			<el-form :inline="true" class="flexEnd">
 				<el-form-item style="margin-bottom:0;">
 					<el-button v-if="role_id==='4'" type="primary" size="small" @click="exportExcel">导出</el-button>
@@ -21,33 +21,24 @@
 				</el-form-item>
 				<el-form-item style="margin-bottom:0;">
 					<div class="downloadTemplate" v-if="role_id==='4'" @click="downloadTemplate">下载导入模板</div>
-					<!-- <el-button v-if="role_id==='4'" type="text" size="mini">下载导入模板</el-button> -->
 				</el-form-item>
 			</el-form>
-		</el-col>
+		</el-col> -->
 		<el-col :span="24" class="toolbar mytoolbar" style="padding-bottom:0px;margin-top:0px;">
 			<el-form :inline="true" :model="filters">
 				<el-form-item style="width:13%;margin-right:0;">
-					<el-input size="small" clearable v-model="filters.customer_name" placeholder="客户名称"></el-input>
+					<el-input size="small" clearable v-model="filters.company_industry" placeholder="公司行业"></el-input>
 				</el-form-item>
 				<el-form-item style="width:13%;margin-right:0;">
-					<el-input size="small" clearable v-model="filters.prefix" placeholder="前缀"></el-input>
+					<el-input size="small" clearable v-model="filters.company_name" placeholder="公司全称"></el-input>
 				</el-form-item>
 				<el-form-item style="width:13%;margin-right:0;">
-					<el-input size="small" clearable v-model="filters.number" placeholder="号码"></el-input>
+					<el-input size="small" clearable v-model="filters.customer_phone" placeholder="客户联系电话"></el-input>
 				</el-form-item>
 				<el-form-item style="width:15%;margin-right:0;">
-					<el-date-picker style="width:95%" size="small" v-model="filters.start_date" @change="getFiltersSTime" value-format="yyyy-MM-dd" type="date" placeholder="开始日期">
-					</el-date-picker>
-				</el-form-item>
-				<el-form-item style="width:15%;margin-right:0;">
-					<area-cascader v-model="filters.address" :level="0" type="text" placeholder="地区" :data="pcaa"></area-cascader> 
-				</el-form-item>
-				<el-form-item style="width:15%;margin-right:0;">
-					<el-select size="small" v-model="filters.belong" placeholder="业务归属">
-						<el-option label="小水总机" value="0"></el-option>
-						<el-option label="小水智能" value="1"></el-option>
-						<el-option label="语音PASS" value="2"></el-option>
+					<el-select size="small" v-model="filters.customer_type" clearable placeholder="客户类型">
+						<el-option label="渠道" value="0"></el-option>
+						<el-option label="直客" value="1"></el-option>
 					</el-select> 
 				</el-form-item>
 				<!-- <el-form-item>
@@ -69,42 +60,30 @@
 			</el-table-column> -->
 			<el-table-column type="index" width="60">
 			</el-table-column>
-			<el-table-column prop="prefix" label="前缀" width="100" show-overflow-tooltip>
+			<el-table-column prop="company_name" label="公司全称" width="100" show-overflow-tooltip>
 			</el-table-column>
-			<el-table-column prop="customer_name" label="客户名称" width="100" show-overflow-tooltip>
+			<el-table-column prop="company_industry" label="公司行业" width="100" show-overflow-tooltip>
 			</el-table-column>
-			<el-table-column prop="belong" label="业务归属" width="80" show-overflow-tooltip>
+			<el-table-column prop="customer_type" label="客户类型" width="80" show-overflow-tooltip>
 				<template slot-scope="scope">
-					<span v-if="scope.row.belong==0">小水总机</span>
-					<span v-if="scope.row.belong==1">小水智能</span>
-					<span v-if="scope.row.belong==2">语音PASS</span>
+					<span v-if="scope.row.customer_type==0">渠道</span>
+					<span v-if="scope.row.customer_type==1">直客</span>
 				</template>
 			</el-table-column>
-			<el-table-column prop="industry" label="行业" width="80" show-overflow-tooltip
-			</el-table-column>
-			<el-table-column prop="audit_status" label="状态" width="100" show-overflow-tooltip>
+			<el-table-column prop="customer_clues" label="客户线索来源" show-overflow-tooltip>
 				<template slot-scope="scope">
-					<el-button type="info" size="small" plain v-if="scope.row.audit_status==0">未审批</el-button>
-					<el-button type="primary" size="small" plain v-if="scope.row.audit_status==1">转发中</el-button>
-					<el-button type="success" size="small" plain v-if="scope.row.audit_status==2">审批通过</el-button>
-					<el-button type="danger" size="small" plain v-if="scope.row.audit_status==3">审批拒绝</el-button>
+					<span v-if="scope.row.customer_clues==0">SEM</span>
+					<span v-if="scope.row.customer_clues==1">公司</span>
+					<span v-if="scope.row.customer_clues==2">商务</span>
 				</template>
 			</el-table-column>
-			<el-table-column prop="number" label="号码" width="120" show-overflow-tooltip>
+			<el-table-column prop="customer_area" label="客户所在区域" show-overflow-tooltip>
 			</el-table-column>
-			<el-table-column prop="number_charges" label="号码费" width="80" show-overflow-tooltip>
+			<el-table-column prop="customer_phone" label="客户联系电话" show-overflow-tooltip>
 			</el-table-column>
-			<el-table-column prop="call_card_pay_money" label="卡槽费" width="80" show-overflow-tooltip>
+			<el-table-column prop="customer_name" label="客户联系人" show-overflow-tooltip>
 			</el-table-column>
-			<el-table-column prop="charges" label="通信资费" width="80" show-overflow-tooltip>
-			</el-table-column>
-			<el-table-column prop="start_date" label="开通时间" width="160" show-overflow-tooltip>
-			</el-table-column>
-			<el-table-column prop="end_date" label="关停时间" width="160" show-overflow-tooltip>
-			</el-table-column>
-			<el-table-column prop="area" label="地区" width="140" show-overflow-tooltip>
-			</el-table-column>
-			<el-table-column prop="user_name" label="所属销售" width="80" show-overflow-tooltip>
+			<el-table-column prop="customer_address" label="客户联系地址" show-overflow-tooltip>
 			</el-table-column>
 			<el-table-column label="操作" fixed="right" width="180">
 				<template slot-scope="scope">
@@ -124,56 +103,44 @@
 
 		<!--编辑界面-->
 		<el-dialog title="编辑" @close="editDialogClose" :visible.sync="editFormVisible" :close-on-click-modal="false">
-			<el-form :model="editForm" label-width="80px" :rules="editFormRules" ref="editForm">
+			<el-form :model="editForm" label-width="120px" :rules="editFormRules" ref="editForm">
 				<div class="flex">
-					<el-form-item label="前缀" prop="prefix">
-						<el-input v-model="editForm.prefix" clearable auto-complete="off"></el-input>
+					<el-form-item label="公司全称" prop="company_name">
+						<el-input v-model="editForm.company_name" clearable auto-complete="off"></el-input>
 					</el-form-item>
-					<el-form-item label="客户名称" prop="customer_name">
+					<el-form-item label="公司行业" prop="company_industry">
+						<el-input v-model="editForm.company_industry" clearable auto-complete="off"></el-input>
+					</el-form-item>
+				</div>
+				<div class="flex">
+					<el-form-item label="客户类型" prop="customer_type">
+						<el-select v-model="editForm.customer_type">
+							<el-option label="渠道" value="0"></el-option>
+							<el-option label="直客" value="1"></el-option>
+						</el-select>
+					</el-form-item>
+					<el-form-item label="客户线索来源" prop="customer_clues">
+						<el-select v-model="editForm.customer_clues">
+							<el-option label="SEM" value="0"></el-option>
+							<el-option label="公司" value="1"></el-option>
+							<el-option label="商务" value="2"></el-option>
+						</el-select>
+					</el-form-item>
+				</div>
+				<div class="flex">
+          <el-form-item label="客户所在区域" prop="customer_area">
+						<area-cascader v-model="editForm.customer_area" :level="0" type="text" :data="pcaa"></area-cascader>
+					</el-form-item>
+					<el-form-item label="客户联系人" prop="customer_name">
 						<el-input v-model="editForm.customer_name" clearable auto-complete="off"></el-input>
 					</el-form-item>
 				</div>
 				<div class="flex">
-					<el-form-item label="业务归属" prop="belong">
-						<el-select v-model="editForm.belong">
-							<el-option label="小水总机" value="0"></el-option>
-							<el-option label="小水智能" value="1"></el-option>
-							<el-option label="语音PASS" value="2"></el-option>
-						</el-select>
+          <el-form-item label="客户联系地址" prop="customer_address">
+						<el-input v-model="editForm.customer_address" clearable auto-complete="off"></el-input> 
 					</el-form-item>
-					<el-form-item label="行业" prop="industry">
-						<el-input v-model="editForm.industry" clearable auto-complete="off"></el-input>
-					</el-form-item>
-				</div>
-				<div class="flex">
-					<el-form-item label="号码费" prop="number_charges">
-						<el-input v-model="editForm.number_charges" clearable auto-complete="off"></el-input>
-					</el-form-item>
-					<el-form-item label="通信资费" prop="charges">
-						<el-input v-model="editForm.charges" clearable auto-complete="off"></el-input>
-					</el-form-item>
-				</div>
-				<div class="flex">
-					<el-form-item label="卡槽费" prop="call_card_pay_money">
-						<el-input v-model="editForm.call_card_pay_money" clearable auto-complete="off"></el-input>
-					</el-form-item>
-					<el-form-item label="地区" prop="area">
-						<area-cascader v-if="showArea" v-model="editForm.area" :level="0" type="text" :data="pcaa"></area-cascader> 
-					</el-form-item>
-				</div>
-				<div class="flex">
-					<el-form-item label="开始时间" prop="start_date">
-						<el-date-picker v-model="editForm.start_date" @change="getEditTime" value-format="yyyy-MM-dd" type="date" placeholder="选择开始日期">
-						</el-date-picker>
-					</el-form-item>
-					<el-form-item label="关停时间" prop="end_date">
-						<el-date-picker v-model="editForm.end_date"  @change="getEditETime" value-format="yyyy-MM-dd" type="date" placeholder="选择结束日期">
-						</el-date-picker>
-					</el-form-item>
-				</div>
-				<div class="flex">
-					<el-form-item label="号码" prop="number">
-						<el-input v-model="editForm.number" clearable auto-complete="off"></el-input>
+					<el-form-item label="客户联系电话" prop="customer_phone">
+						<el-input v-model="editForm.customer_phone" clearable auto-complete="off"></el-input>
 					</el-form-item>
 				</div>
 			</el-form>
@@ -185,57 +152,45 @@
 
 		<!--新增界面-->
 		<el-dialog title="新增" :visible.sync="addFormVisible" :close-on-click-modal="false">
-			<el-form :model="addForm" label-width="80px" :rules="editFormRules" ref="addForm">
+			<el-form :model="addForm" label-width="120px" :rules="editFormRules" ref="addForm">
 				<div class="flex">
-					<el-form-item label="前缀" prop="prefix">
-						<el-input v-model="addForm.prefix" clearable auto-complete="off"></el-input>
+					<el-form-item label="公司全称" prop="company_name">
+						<el-input v-model="addForm.company_name" clearable auto-complete="off"></el-input>
 					</el-form-item>
-					<el-form-item label="客户名称" prop="customer_name">
+					<el-form-item label="公司行业" prop="company_industry">
+						<el-input v-model="addForm.company_industry" clearable auto-complete="off"></el-input>
+					</el-form-item>
+				</div>
+				<div class="flex">
+					<el-form-item label="客户类型" prop="customer_type">
+						<el-select v-model="addForm.customer_type">
+							<el-option label="渠道" value="0"></el-option>
+							<el-option label="直客" value="1"></el-option>
+						</el-select>
+					</el-form-item>
+					<el-form-item label="客户线索来源" prop="customer_clues">
+						<el-select v-model="addForm.customer_clues">
+							<el-option label="SEM" value="0"></el-option>
+							<el-option label="公司" value="1"></el-option>
+							<el-option label="商务" value="2"></el-option>
+						</el-select>
+					</el-form-item>
+				</div>
+				<div class="flex">
+          <el-form-item label="客户所在区域" prop="customer_area">
+            <area-cascader v-model="addForm.customer_area" :level="0" type="text" :data="pcaa"></area-cascader>
+					</el-form-item>
+					</el-form-item>
+					<el-form-item label="客户联系人" prop="customer_name">
 						<el-input v-model="addForm.customer_name" clearable auto-complete="off"></el-input>
 					</el-form-item>
 				</div>
 				<div class="flex">
-					<el-form-item label="业务归属" prop="belong">
-						<el-select v-model="addForm.belong">
-							<el-option label="小水总机" value="0"></el-option>
-							<el-option label="小水智能" value="1"></el-option>
-							<el-option label="语音PASS" value="2"></el-option>
-						</el-select>
+          <el-form-item label="客户联系电话" prop="customer_phone">
+						<el-input v-model="addForm.customer_phone" clearable auto-complete="off"></el-input>
 					</el-form-item>
-					<el-form-item label="行业" prop="industry">
-						<el-input v-model="addForm.industry" clearable auto-complete="off"></el-input>
-					</el-form-item>
-				</div>
-				<div class="flex">
-					<el-form-item label="号码费" prop="number_charges">
-						<el-input v-model="addForm.number_charges" clearable auto-complete="off"></el-input>
-					</el-form-item>
-					</el-form-item>
-					<el-form-item label="通信资费" prop="charges">
-						<el-input v-model="addForm.charges" clearable auto-complete="off"></el-input>
-					</el-form-item>
-				</div>
-				<div class="flex">
-					<el-form-item label="卡槽费" prop="call_card_pay_money">
-						<el-input v-model="addForm.call_card_pay_money" clearable auto-complete="off"></el-input>
-					</el-form-item>
-					<el-form-item label="地区" prop="area">
-						<area-cascader v-model="addForm.area" :level="0" type="text" :data="pcaa"></area-cascader> 
-					</el-form-item>
-				</div>
-				<div class="flex">
-					<el-form-item label="开始时间" prop="start_date">
-						<el-date-picker v-model="addForm.start_date" @change="getSTime" value-format="yyyy-MM-dd" type="date" placeholder="选择开始日期">
-						</el-date-picker>
-					</el-form-item>
-					<el-form-item label="关停时间" prop="end_date">
-						<el-date-picker v-model="addForm.end_date"  @change="getETime" value-format="yyyy-MM-dd" type="date" placeholder="选择结束日期">
-						</el-date-picker>
-					</el-form-item>
-				</div>
-				<div class="flex">
-					<el-form-item label="号码" prop="number">
-						<el-input v-model="addForm.number" clearable auto-complete="off"></el-input>
+					<el-form-item label="客户联系地址" prop="customer_address">
+						<el-input v-model="addForm.customer_address" clearable auto-complete="off"></el-input>
 					</el-form-item>
 				</div>
 			</el-form>
@@ -249,19 +204,20 @@
 
 <script>
 	const Base64 = require('js-base64').Base64;
-	import { getCustomerListByParam, insertCustomer, updateCustomerById, deleteCustomerById, insertProcess ,uploadClientTableByParam} from '../../api/api';
+	import { getSalesCustomerByParam, insertSalesCustomer, updateSalesCustomerById, deleteSalesCustomerById, insertProcess ,uploadClientTableByParam} from '../../api/api';
 	import rules from '@/common/js/rule'
 	import { pca, pcaa } from 'area-data'
 	export default {
 		data() {
 			return {
 				filters: {
-					customer_name: '',
+					company_industry: '',
 					user_name:'',
-					prefix: '',
-					number: '',
+					company_name: '',
+					customer_phone: '',
 					address: '',
-					belong: '',
+					customer_type: '',
+					customer_clues: '',
 					start_date:''
 				},
 				role_id:'',
@@ -273,31 +229,25 @@
 				editLoading: false,
 				showArea: false,
 				editFormRules: {
-					prefix: [{ required: true, message: '请输入前缀', trigger: 'blur' }],
-					customer_name: [{ required: true, message: '请输入客户名称', trigger: 'blur' }],
-					belong: [{ required: true, message: '请输入业务归属', trigger: 'blur' }],
-					industry: [{ required: true, message: '请输入行业', trigger: 'blur' }],
-					number_charges: rules.numPot2,
-					charges: rules.numPot2,
-					start_date: [{ required: true, message: '请输入开通时间', trigger: 'blur' }],
-					// end_date: [{ required: true, message: '请输入关停时间', trigger: 'blur' }],
-					call_card_pay_money: rules.numPot2,
-					area: [{ required: true, message: '请选择地区', trigger: 'blur' }],
-					number: rules.InterNum,
+					company_name: [{ required: true, message: '请输入公司全称', trigger: 'blur' }],
+					company_industry: [{ required: true, message: '请输入公司行业', trigger: 'blur' }],
+					customer_type: [{ required: true, message: '请输入客户类型', trigger: 'blur' }],
+					customer_clues: [{ required: true, message: '请输入客户线索来源', trigger: 'blur' }],
+					customer_area: [{ required: true, message: '请输入客户所在区域', trigger: 'blur' }],
+					customer_name: [{ required: true, message: '请输入客户联系人', trigger: 'blur' }],
+					customer_address: [{ required: true, message: '请输入客户联系地址', trigger: 'blur' }],
+					customer_phone: [{ required: true, message: '请输入客户联系电话', trigger: 'blur' }],
 				},
 				//编辑界面数据
 				editForm: {
-					prefix:'',
+					company_name:'',
+					company_industry:'',
+					customer_type:'',
+					customer_clues:'',
+					customer_area:'',
 					customer_name:'',
-					belong:'',
-					industry:'',
-					number_charges:'',
-					charges:'',
-					start_date:'',
-					end_date:'',
-					call_card_pay_money:'',
-					area:'',
-					number:'',
+					customer_address:'',
+					customer_phone:'',
 				},
 				headers:{
 					authorLoginId:Base64.encode(JSON.parse(sessionStorage.getItem('user')).login_id),
@@ -310,17 +260,14 @@
 				addLoading: false,
 				//新增界面数据
 				addForm: {
-					prefix:'',
+					company_name:'',
+					company_industry:'',
+					customer_type:'',
+					customer_clues:'',
+					customer_area:'',
 					customer_name:'',
-					belong:'',
-					industry:'',
-					number_charges:'',
-					charges:'',
-					start_date:'',
-					end_date:'',
-					call_card_pay_money:'',
-					area:'',
-					number:'',
+					customer_address:'',
+					customer_phone:'',
 				},
 				pca: pca,
 				pcaa: pcaa
@@ -338,16 +285,14 @@
 					role_id:this.role_id,
 					page: this.page,
 					rows:10,
-					customer_name: this.filters.customer_name,
-					user_name:this.filters.user_name,
-					prefix: this.filters.prefix,
-					number: this.filters.number,
-					address: this.filters.address?this.filters.address.join('/'):'',
-					belong: this.filters.belong,
-					start_date: this.filters.start_date
+					company_industry: this.filters.company_industry,
+					company_name: this.filters.company_name,
+					customer_phone: this.filters.customer_phone,
+					customer_type: this.filters.customer_type,
+					customer_clues: this.filters.customer_clues,
 				};
 				this.listLoading = true;
-				getCustomerListByParam(data).then((res) => {
+				getSalesCustomerByParam(data).then((res) => {
 					this.total = res.result.records;
 					this.list = res.result.data;
 					this.listLoading = false;
@@ -388,7 +333,7 @@
 				}).then(() => {
 					this.listLoading = true;
 					const data = { id: row.id };
-					deleteCustomerById(data).then((res) => {
+					deleteSalesCustomerById(data).then((res) => {
 						this.listLoading = false;
 						this.$message({
 							message: res.errMsg,
@@ -405,25 +350,22 @@
 				this.editFormVisible = true;
 				this.showArea = true;
 				this.editForm = Object.assign({}, row);
-				if(typeof this.editForm.area==='string'){
-					this.editForm.area=this.editForm.area.split('/')
+				if(typeof this.editForm.customer_area==='string'){
+					this.editForm.customer_area=this.editForm.customer_area.split('/')
 				}
 			},
 			//显示新增界面
 			handleAdd() {
 				this.addFormVisible = true;
 				this.addForm = {
-					prefix:'',
+					company_name:'',
+					company_industry:'',
+					customer_type:'',
+					customer_clues:'',
+					customer_area:'',
 					customer_name:'',
-					belong:'',
-					industry:'',
-					number_charges:'',
-					charges:'',
-					start_date:'',
-					end_date:'',
-					call_card_pay_money:'',
-					area:'',
-					number:'',
+					customer_address:'',
+					customer_phone:'',
 				};
 			},
 			//编辑
@@ -431,9 +373,9 @@
 				this.$refs.editForm.validate((valid) => {
 					if (valid) {
 						this.editLoading = true;
-						this.editForm.area=this.editForm.area.join('/');
+						this.editForm.customer_area=this.editForm.customer_area.join('/');
 						const data = Object.assign({}, this.editForm);
-						updateCustomerById(data).then((res) => {
+						updateSalesCustomerById(data).then((res) => {
 							this.editLoading = false;
 							this.$message({
 								message: res.errMsg,
@@ -451,9 +393,9 @@
 				this.$refs.addForm.validate((valid) => {
 					if (valid) {
 						this.addLoading = true;
-						this.addForm.area=this.addForm.area.join('/');
+						this.addForm.customer_area=this.addForm.customer_area.join('/');
 						const data = Object.assign({}, this.addForm);
-						insertCustomer(data).then((res) => {
+						insertSalesCustomer(data).then((res) => {
 							this.addLoading = false;
 							this.$message({
 								message: res.errMsg,
@@ -503,12 +445,13 @@
 			//导出
 			exportExcel(){
 				const data={
-					customer_name:this.filters.customer_name,
+					company_industry:this.filters.company_industry,
 					user_name:this.filters.user_name,
-					prefix: this.filters.prefix,
-					number: this.filters.number,
+					company_name: this.filters.company_name,
+					customer_phone: this.filters.customer_phone,
 					address: this.filters.address?this.filters.address.join('/'):'',
-					belong: this.filters.belong,
+					customer_type: this.filters.customer_type,
+					customer_clues: this.filters.customer_clues,
 					start_date: this.filters.start_date,
 					role_id: this.role_id,
 				};

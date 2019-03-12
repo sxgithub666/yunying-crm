@@ -4,7 +4,7 @@
 		<el-col :span="24" class="toolbar" style="padding-bottom: 0px;">
 			<el-form :inline="true" :model="filters">
 				<el-form-item style="width:15%">
-					<el-input size="small" clearable v-model="filters.company_name" placeholder="公司名称"></el-input>
+					<el-input size="small" clearable v-model="filters.company_name" placeholder="公司全称"></el-input>
 				</el-form-item>
 				<el-form-item style="width:15%">
 					<el-input size="small" clearable v-model="filters.user_name" placeholder="添加人"></el-input>
@@ -39,7 +39,7 @@
 			</el-table-column>
 			<!-- <el-table-column prop="area" label="销售区域" width="100" show-overflow-tooltip>
 			</el-table-column> -->
-			<el-table-column prop="company_name" label="公司名称" width="100" show-overflow-tooltip>
+			<el-table-column prop="company_name" label="公司全称" width="100" show-overflow-tooltip>
 			</el-table-column>
 			<!-- <el-table-column prop="type" label="行业类型" width="80" show-overflow-tooltip>
 				<template slot-scope="scope">
@@ -119,49 +119,39 @@
 		</el-col>
 
 		<!--编辑界面-->
-		<el-dialog title="编辑" @close="editDialogClose" :visible.sync="editFormVisible" :close-on-click-modal="false">
+		<el-dialog title="编辑" @close="editDialogClose" width="53%" :visible.sync="editFormVisible" :close-on-click-modal="false">
 			<el-form :model="editForm" label-width="120px" :rules="editFormRules" ref="editForm">
 				<div class="flex">
-					<!-- <el-form-item label="销售区域" prop="area">
-						<el-input v-model="editForm.area" clearable auto-complete="off"></el-input>
-					</el-form-item> -->
-					<el-form-item label="公司名称" prop="company_name">
-						<el-input v-model="editForm.company_name" clearable auto-complete="off"></el-input>
+					<el-form-item label="公司全称" prop="company_name">
+						<el-input disabled v-model="editForm.company_name" clearable auto-complete="off"></el-input>
 					</el-form-item>
-					<el-form-item label="号码需求" prop="need_phonenumber">
-						<el-input v-model="editForm.need_phonenumber" clearable auto-complete="off"></el-input>
+					<el-form-item label="付款方式" prop="pay_type">
+						<el-select disabled v-model="editForm.pay_type">
+							<el-option label="对公" value="0"></el-option>
+							<el-option label="对私" value="1"></el-option>
+						</el-select>
+					</el-form-item>
+				</div>
+				<div class="flex">
+					<el-form-item label="线路单价" prop="line_price">
+						<el-input disabled v-model="editForm.line_price" auto-complete="off"></el-input>
+					</el-form-item>
+					<el-form-item label="收款金额" prop="pay_money">
+						<el-input disabled v-model="editForm.pay_money" clearable auto-complete="off"></el-input>
 					</el-form-item>
 				</div>
 				<div class="flex">
 					<el-form-item label="客户所在区域" prop="customer_region">
-						<area-cascader v-if="showArea" v-model="editForm.customer_region" :level="0" type="text" :data="pca"></area-cascader> 
-						<!-- <el-input v-model="editForm.customer_region" clearable auto-complete="off"></el-input> -->
+						<area-cascader v-if="showArea" disabled v-model="editForm.customer_region" :level="0" type="text" :data="pcaa"></area-cascader> 
 					</el-form-item>
-					<el-form-item label="收款金额" prop="pay_money">
-						<el-input v-model="editForm.pay_money" clearable auto-complete="off"></el-input>
-					</el-form-item>
-				</div>
-				<div class="flex">
-					<!-- <el-form-item label="销售经理" prop="sales_name">
-						<el-input v-model="editForm.sales_name" auto-complete="off"></el-input>
-					</el-form-item> -->
-				</div>
-				<div class="flex">
 					<el-form-item label="收款时间" prop="pay_time">
-						<el-date-picker v-model="editForm.pay_time" @change="getEditTime" value-format="yyyy-MM-dd" type="date" placeholder="选择收款日期">
+						<el-date-picker disabled v-model="editForm.pay_time" @change="getEditTime" value-format="yyyy-MM-dd" type="date" placeholder="选择收款日期">
 						</el-date-picker>
 					</el-form-item>
-					<el-form-item label="行业类型" prop="business_type">
-						<el-input v-model="editForm.business_type" clearable auto-complete="off"></el-input>
-					</el-form-item>
 				</div>
 				<div class="flex">
-					<el-form-item label="付款方式" prop="pay_type">
-						<el-select v-model="editForm.pay_type">
-							<el-option label="对公" value="0"></el-option>
-							<el-option label="对私" value="1"></el-option>
-						</el-select>
-						<!-- <el-input v-model="editForm.pay_type" clearable auto-complete="off"></el-input> -->
+					<el-form-item label="号码需求" prop="need_phonenumber">
+						<el-input v-model="editForm.need_phonenumber" clearable auto-complete="off"></el-input>
 					</el-form-item>
 					<el-form-item label="是否返款" prop="refunds">
 						<el-select v-model="editForm.refunds">
@@ -171,8 +161,8 @@
 					</el-form-item>
 				</div>
 				<div class="flex">
-					<el-form-item label="线路单价" prop="line_price">
-						<el-input v-model="editForm.line_price" auto-complete="off"></el-input>
+					<el-form-item label="行业类型" prop="business_type">
+						<el-input v-model="editForm.business_type" clearable auto-complete="off"></el-input>
 					</el-form-item>
 					<el-form-item label="备注">
 						<el-input v-model="editForm.remark" clearable auto-complete="off"></el-input>
@@ -215,49 +205,57 @@
 		</el-dialog>
 
 		<!--新增界面-->
-		<el-dialog title="新增" :visible.sync="addFormVisible" :close-on-click-modal="false">
+		<el-dialog title="新增" width="53%" :visible.sync="addFormVisible" :close-on-click-modal="false">
 			<el-form :model="addForm" label-width="120px" :rules="editFormRules" ref="addForm">
 				<div class="flex">
-					<!-- <el-form-item label="销售区域" prop="area">
-						<el-input v-model="addForm.area" clearable auto-complete="off"></el-input>
-					</el-form-item> -->
-					<el-form-item label="公司名称" prop="company_name">
-						<el-input v-model="addForm.company_name" clearable auto-complete="off"></el-input>
-					</el-form-item>
-					<el-form-item label="号码需求" prop="need_phonenumber">
-						<el-input v-model="addForm.need_phonenumber" clearable auto-complete="off"></el-input>
+					<el-form-item label="订单号码" prop="id">
+						<el-select v-model="addForm.id" 
+											 @change="orderNumChange" 
+											 filterable 
+											 clearable
+											 @clear="orderClear"
+											 placeholder="请选择订单号">
+							<el-option v-for="(item,index) in gatheringInfos" 
+												 :label="item.id.substring(0,8)" 
+												 :value="item.id"
+												 :key="index">
+							</el-option>
+						</el-select>
 					</el-form-item>
 				</div>
 				<div class="flex">
-					<el-form-item label="收款时间" prop="pay_time">
-						<el-date-picker v-model="addForm.pay_time" @change="getAddTime" value-format="yyyy-MM-dd" type="date" placeholder="选择收款日期">
-						</el-date-picker>
+					<el-form-item label="公司全称" prop="company_name">
+						<el-input :disabled="disabled" v-model="addForm.company_name" clearable auto-complete="off"></el-input>
 					</el-form-item>
-					<el-form-item label="行业类型" prop="business_type">
-						<el-input v-model="addForm.business_type" clearable auto-complete="off"></el-input>
+					<el-form-item label="付款方式" prop="pay_type">
+						<el-select :disabled="disabled" v-model="addForm.pay_type">
+							<el-option label="对公" value="0"></el-option>
+							<el-option label="对私" value="1"></el-option>
+						</el-select>
+					</el-form-item>
+				</div>
+				<div class="flex">
+					<el-form-item label="线路单价" prop="line_price">
+						<el-input :disabled="disabled" v-model="addForm.line_price" clearable auto-complete="off"></el-input>
+					</el-form-item>
+					
+					<el-form-item label="收款金额" prop="pay_money">
+						<el-input :disabled="disabled" v-model="addForm.pay_money" clearable auto-complete="off"></el-input>
+					</el-form-item>
+				</div>
+				<div class="flex">
+					<el-form-item label="客户所在区域" prop="customer_region">
+						<area-cascader v-if="showArea" :disabled="disabled" v-model="addForm.customer_region" :level="0" type="text" :data="pcaa"></area-cascader> 
+					</el-form-item>
+					<el-form-item label="收款时间" prop="pay_time">
+						<el-date-picker :disabled="disabled" v-model="addForm.pay_time" @change="getAddTime" value-format="yyyy-MM-dd" type="date" placeholder="选择收款日期">
+						</el-date-picker>
 					</el-form-item>
 				</div>
 				<div class="flex">
 					
-					<!-- <el-form-item label="销售经理" prop="sales_name">
-						<el-input v-model="addForm.sales_name" auto-complete="off"></el-input>
-					</el-form-item> -->
-				</div>
-				<div class="flex">
-					<el-form-item label="客户所在区域" prop="customer_region">
-						<area-cascader v-model="addForm.customer_region" :level="0" type="text" :data="pca"></area-cascader> 
-						<!-- <el-input v-model="addForm.customer_region" clearable auto-complete="off"></el-input> -->
-					</el-form-item>
-					<el-form-item label="收款金额" prop="pay_money">
-						<el-input v-model="addForm.pay_money" clearable auto-complete="off"></el-input>
-					</el-form-item>
-				</div>
-				<div class="flex">
-					<el-form-item label="付款方式" prop="pay_type">
-						<el-select v-model="addForm.pay_type">
-							<el-option label="对公" value="0"></el-option>
-							<el-option label="对私" value="1"></el-option>
-						</el-select>
+					<el-form-item label="号码需求" prop="need_phonenumber">
+						<el-input v-model="addForm.need_phonenumber" clearable auto-complete="off"></el-input>
 					</el-form-item>
 					<el-form-item label="是否返款" prop="refunds">
 						<el-select v-model="addForm.refunds">
@@ -267,9 +265,10 @@
 					</el-form-item>
 				</div>
 				<div class="flex">
-					<el-form-item label="线路单价" prop="line_price">
-						<el-input v-model="addForm.line_price" auto-complete="off"></el-input>
+					<el-form-item label="行业类型" prop="business_type">
+						<el-input v-model="addForm.business_type" clearable auto-complete="off"></el-input>
 					</el-form-item>
+					
 					<el-form-item label="备注">
 						<el-input v-model="addForm.remark" clearable auto-complete="off"></el-input>
 					</el-form-item>
@@ -315,7 +314,7 @@
 </template>
 
 <script>
-	import { getZjPaasProcessByParam, insertZjPaasProcess, updateZjPaasProcessById, deleteZjPaasProcessById ,updateReProcessById ,insertProcess ,uploadSwitchboardByParam} from '../../api/api';
+	import { getZjPaasProcessByParam, insertZjPaasProcess, updateZjPaasProcessById, deleteZjPaasProcessById ,updateReProcessById ,insertProcess ,uploadSwitchboardByParam ,getCompanyCollectionByParam} from '../../api/api';
 	import rules from '@/common/js/rule'
 	import { pca, pcaa } from 'area-data'
 	export default {
@@ -349,7 +348,7 @@
 					pay_type: [{ required: true, message: '请输入付款方式', trigger: 'blur'}],
 					customer_region: [{ required: true, message: '请输入客户所在区域', trigger: 'blur'}],
 					refunds: [{ required: true, message: '请输入是否返款', trigger: 'blur'}],
-					need_data: [{ required: true, message: '请输入申请号码材料', trigger: 'change'}],
+					// need_data: [{ required: true, message: '请输入申请号码材料', trigger: 'change'}],
 					line_price: rules.numPot2,
 					sales_name:[{ required: true, message: '请输入销售经理', trigger: 'blur'}],
 				},
@@ -403,7 +402,9 @@
 					line_price:'',
 					sales_name:'',
 				},
-				numMaterialfileList:[]
+				gatheringInfos:[],
+				numMaterialfileList:[],
+				disabled:false
 
 			}
 		},
@@ -435,6 +436,17 @@
 					});
 					this.listLoading = false;
 				});
+			},
+			//新增获取客户信息
+			getGatheringInfo(){
+				const data={
+					role_id:this.role_id,
+					page:1,
+					rows:1000
+				};
+				getCompanyCollectionByParam(data).then(res=>{
+					this.gatheringInfos=res.result.data;
+				})
 			},
 			beforeUpload(file){
 				let fileType = file.name.substring(file.name.lastIndexOf(".")+1).toUpperCase();
@@ -619,6 +631,7 @@
 			//显示新增界面
 			handleAdd() {
 				this.addFormVisible = true;
+				this.showArea=true;
 				this.addForm = {
 					type:'0',
 					area:'',
@@ -633,6 +646,24 @@
 					sales_name:'',
 				};
 				this.fileList=[];
+				this.getGatheringInfo();
+			},
+			orderNumChange(){
+				this.disabled=true;
+				this.gatheringInfos.forEach(item=>{
+					if(item.id==this.addForm.id){
+						this.$set(this.addForm,'company_name',item.company_name);
+						this.$set(this.addForm,'pay_time',item.pay_time);
+						this.$set(this.addForm,'pay_money',item.all_received_money);
+						this.$set(this.addForm,'pay_type',item.pay_type);
+						this.$set(this.addForm,'line_price',item.line_price);
+						this.$set(this.addForm,'customer_region',item.customer_area?item.customer_area.split('/'):[]);
+					}
+				})
+			},
+			orderClear(){
+				this.disabled=false;
+				this.addForm={};
 			},
 			//编辑
 			editSubmit() {
@@ -663,6 +694,8 @@
 					if (valid) {
 						this.addLoading = true;
 						const data = Object.assign({}, this.addForm);
+						data.customer_region=data.customer_region.join('/');
+						
 						insertZjPaasProcess(data).then((res) => {
 							this.addLoading = false;
 							this.$message({
@@ -671,6 +704,7 @@
 							});
 							this.$refs['addForm'].resetFields();
 							this.addFormVisible = false;
+							this.showArea=false;
 							this.getTableList();
 						});
 					};

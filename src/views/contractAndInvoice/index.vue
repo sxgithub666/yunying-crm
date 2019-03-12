@@ -3,21 +3,21 @@
 		<!--工具条-->
 		<el-col :span="24" class="toolbar" style="padding-bottom: 0px;">
 			<el-form :inline="true" :model="filters">
-				<el-form-item>
+				<!-- <el-form-item>
 					<el-input size="small" clearable v-model="filters.company_name" placeholder="公司名称"></el-input>
 				</el-form-item>
 				<el-form-item>
 					<el-input size="small" clearable v-model="filters.user_name" placeholder="添加人"></el-input>
-				</el-form-item>
-				<el-form-item>
+				</el-form-item> -->
+				<!-- <el-form-item>
 					<el-button type="primary" size="small" v-on:click="getTableList">查询</el-button>
-				</el-form-item>
+				</el-form-item> -->
 				<el-form-item>
 					<el-button type="primary" size="small" @click="handleAdd">新增</el-button>
 				</el-form-item>
-				<el-form-item>
+				<!-- <el-form-item>
 					<el-button v-if="role_id==='4'" type="primary" size="small" @click="exportExcel">导出</el-button>
-				</el-form-item>
+				</el-form-item> -->
 			</el-form>
 		</el-col>
 
@@ -27,35 +27,35 @@
 			</el-table-column> -->
 			<el-table-column type="index" width="60">
 			</el-table-column>
-			<el-table-column prop="company_name" label="公司名称">
+			<el-table-column prop="invoice_title" label="发票抬头">
 			</el-table-column>
-			<el-table-column prop="invoice" label="是否开票">
+			<el-table-column prop="taxpayers_code" label="纳税人识别码">
+			</el-table-column>
+			<el-table-column prop="invoice_address" label="开票地址">
+			</el-table-column>
+			<el-table-column prop="invoice_phone" label="开票电话">
+			</el-table-column>
+			<el-table-column prop="bank" label="开户行">
+			</el-table-column>
+			<el-table-column prop="bank_account" label="银行账号">
+			</el-table-column>
+			<el-table-column prop="invoice_type" label="发票类型">
         <template slot-scope="scope">
-					<span v-if="scope.row.invoice==0">未开票</span>
-					<span v-if="scope.row.invoice==1">已开票</span>
+					<span v-if="scope.row.invoice_type==0">增值税专用发票</span>
+					<span v-if="scope.row.invoice_type==1">增值税普通发票</span>
 				</template>
 			</el-table-column>
-			<el-table-column prop="audit_status" label="状态" width="100" show-overflow-tooltip>
+			<!-- <el-table-column prop="audit_status" label="状态" width="100" show-overflow-tooltip>
 				<template slot-scope="scope">
 					<el-button type="info" size="small" plain v-if="scope.row.audit_status==0">未审批</el-button>
 					<el-button type="primary" size="small" plain v-if="scope.row.audit_status==1">转发中</el-button>
 					<el-button type="success" size="small" plain v-if="scope.row.audit_status==2">审批通过</el-button>
 					<el-button type="danger" size="small" plain v-if="scope.row.audit_status==3">审批拒绝</el-button>
 				</template>
-			</el-table-column>
-			<el-table-column prop="scan_file" label="双方盖章扫描件" width="210">
-				<template slot-scope="scope">
-					<div class="tableImg" v-if="scope.row.scan_file">
-						<img v-for="(item,index)  in scope.row.scan_file" preview="6" class="smallImg" :src="item" :key="index" alt="" style="width: 40px;height: 40px;margin-right:5px;">
-					  <!-- <img class="bigImg" :src="scope.row.url" alt="">   -->
-					</div>
-				</template>
-			</el-table-column>
-			<el-table-column prop="user_name" label="添加人">
-			</el-table-column>
+			</el-table-column> -->
 			<el-table-column prop="remark" label="备注">
 			</el-table-column>
-			<el-table-column label="操作" fixed="right" width="260">
+			<el-table-column label="操作" fixed="right" width="220">
 				<template slot-scope="scope">
 					<el-button v-if="scope.row.audit_status!=3" size="small" @click="auditSubmit(scope.row)">提交审核</el-button>
 					<el-button v-if="scope.row.audit_status==3" size="small" @click="resubmit(scope.row)">重新提交</el-button>
@@ -73,32 +73,42 @@
 
 		<!--编辑界面-->
 		<el-dialog title="编辑" :visible.sync="editFormVisible" :close-on-click-modal="false">
-			<el-form :model="editForm" label-width="130px" :rules="editFormRules" ref="editForm">
-				<el-form-item label="公司名称" prop="company_name">
-					<el-input v-model="editForm.company_name" clearable auto-complete="off"></el-input>
-				</el-form-item>
-				<el-form-item label="是否开票" prop="invoice">
-          <el-select v-model="editForm.invoice">
-						<el-option label="已开票" value="1"></el-option>
-						<el-option label="未开票" value="0"></el-option>
-					</el-select>
-				</el-form-item>
-				<el-form-item label="双方盖章扫描件">
-					<el-upload ref="editUpload"
-					           :headers="headers"
-					           :action="uploadUrl"
-										 :file-list="editFileList"
-										 list-type="picture-card"
-										 :before-upload="beforeUpload"
-										 :on-success="onEditSuccess"
-										 :on-preview="handlePictureCardPreview"
-										 :on-remove="handleEditRemove">
-						<i class="el-icon-plus"></i>
-					</el-upload>
-				</el-form-item>
-				<el-form-item label="备注">
-					<el-input v-model="editForm.remark" clearable auto-complete="off"></el-input>
-				</el-form-item>
+			<el-form :model="editForm" label-width="110px" :rules="editFormRules" ref="editForm">
+				<div class="flex">
+					<el-form-item label="发票抬头" prop="invoice_title">
+						<el-input v-model="editForm.invoice_title" clearable auto-complete="off"></el-input>
+					</el-form-item>
+					<el-form-item label="纳税人识别码" prop="taxpayers_code">
+						<el-input v-model="editForm.taxpayers_code" clearable auto-complete="off"></el-input>
+					</el-form-item>
+				</div>
+				<div class="flex">
+					<el-form-item label="开票地址" prop="invoice_address">
+						<el-input v-model="editForm.invoice_address" clearable auto-complete="off"></el-input>
+					</el-form-item>
+					<el-form-item label="开票电话" prop="invoice_phone">
+						<el-input v-model="editForm.invoice_phone" clearable auto-complete="off"></el-input>
+					</el-form-item>
+				</div>
+				<div class="flex">
+					<el-form-item label="开户行" prop="bank">
+						<el-input v-model="editForm.bank" clearable auto-complete="off"></el-input>
+					</el-form-item>
+					<el-form-item label="银行账号" prop="bank_account">
+						<el-input v-model="editForm.bank_account" clearable auto-complete="off"></el-input>
+					</el-form-item>
+				</div>
+				<div class="flex">
+					<el-form-item label="发票类型" prop="invoice_type">
+						<el-select v-model="editForm.invoice_type">
+							<el-option label="增值税普通发票" value="1"></el-option>
+							<el-option label="增值税专用发票" value="0"></el-option>
+						</el-select>
+					</el-form-item>
+					<el-form-item label="备注">
+						<el-input v-model="editForm.remark" clearable auto-complete="off"></el-input>
+					</el-form-item>
+				</div>
 			</el-form>
 			<div slot="footer" class="dialog-footer">
 				<el-button @click.native="editFormVisible = false">取消</el-button>
@@ -108,34 +118,41 @@
 
 		<!--新增界面-->
 		<el-dialog title="新增" :visible.sync="addFormVisible" :close-on-click-modal="false">
-			<el-form :model="addForm" label-width="130px" :rules="editFormRules" ref="addForm">
-				<el-form-item label="公司名称" prop="company_name">
-					<el-input v-model="addForm.company_name" clearable auto-complete="off"></el-input>
-				</el-form-item>
-				<el-form-item label="是否开票" prop="invoice">
-          <el-select v-model="addForm.invoice">
-						<el-option label="已开票" value="1"></el-option>
-						<el-option label="未开票" value="0"></el-option>
-					</el-select>
-				</el-form-item>
-				<el-form-item label="双方盖章扫描件">
-					<el-upload ref="addUpload"
-					           :headers="headers"
-					           :action="uploadUrl"
-										 :file-list="fileList"
-										 list-type="picture-card"
-										 :before-upload="beforeUpload"
-										 :on-success="onSuccess"
-										 :on-preview="handlePictureCardPreview"
-										 :on-remove="handleRemove">
-						<i class="el-icon-plus"></i>
-					</el-upload>
-					
-					<!-- <el-input v-model="addForm.scan_file" auto-complete="off"></el-input> -->
-				</el-form-item>
-				<el-form-item label="备注">
-					<el-input v-model="addForm.remark" clearable auto-complete="off"></el-input>
-				</el-form-item>
+			<el-form :model="addForm" label-width="110px" :rules="editFormRules" ref="addForm">
+				<div class="flex">
+					<el-form-item label="发票抬头" prop="invoice_title">
+						<el-input v-model="addForm.invoice_title" clearable auto-complete="off"></el-input>
+					</el-form-item>
+					<el-form-item label="纳税人识别码" prop="taxpayers_code">
+						<el-input v-model="addForm.taxpayers_code" clearable auto-complete="off"></el-input>
+					</el-form-item>
+				</div>
+				<div class="flex">
+					<el-form-item label="开票地址" prop="invoice_address">
+						<el-input v-model="addForm.invoice_address" clearable auto-complete="off"></el-input>
+					</el-form-item>
+					<el-form-item label="开票电话" prop="invoice_phone">
+						<el-input v-model="addForm.invoice_phone" clearable auto-complete="off"></el-input>
+					</el-form-item>
+				</div>
+				<div class="flex">
+					<el-form-item label="开户行" prop="bank">
+						<el-input v-model="addForm.bank" clearable auto-complete="off"></el-input>
+					</el-form-item>
+					<el-form-item label="银行账号" prop="bank_account">
+						<el-input v-model="addForm.bank_account" clearable auto-complete="off"></el-input>
+					</el-form-item>
+				</div>
+				<div class="flex">
+					<el-form-item label="发票类型" prop="invoice_type">
+						<el-select v-model="addForm.invoice_type">
+							<el-option label="增值税普通发票" value="1"></el-option>
+							<el-option label="增值税专用发票" value="0"></el-option>
+						</el-select>
+					</el-form-item>
+					<el-form-item label="备注">
+						<el-input v-model="addForm.remark" clearable auto-complete="off"></el-input>
+					</el-form-item>
 				</div>
 			</el-form>
 			<div slot="footer" class="dialog-footer">
@@ -167,34 +184,37 @@
 				editFormVisible: false,//编辑界面是否显示
 				editLoading: false,
 				editFormRules: {
-					company_name: [{ required: true, message: '请输入姓名', trigger: 'blur' }],
-					invoice: [{ required: true, message: '请输入是否开票', trigger: 'blur' }],
+					invoice_title: [{ required: true, message: '请输入发票抬头', trigger: 'blur' }],
+					taxpayers_code: [{ required: true, message: '请输入纳税人识别码', trigger: 'blur' }],
+					invoice_address: [{ required: true, message: '请输入开票地址', trigger: 'blur' }],
+					invoice_phone: [{ required: true, message: '请输入开票电话', trigger: 'blur' }],
+					bank: [{ required: true, message: '请输入开户行', trigger: 'blur' }],
+					bank_account: [{ required: true, message: '请输入银行账号', trigger: 'blur' }],
+					invoice_type: [{ required: true, message: '请输入发票类型', trigger: 'blur' }],
 				},
 				//编辑界面数据
 				editForm: {
-					company_name:'',
-					invoice:'',
-					scan_file:'',
+					invoice_title:'',
+					taxpayers_code:'',
+					invoice_address:'',
+					invoice_phone:'',
+					bank:'',
+					bank_account:'',
+					invoice_type:'',
 					remark:'',
-					del_pic:''
 				},
 
 				addFormVisible: false,//新增界面是否显示
 				addLoading: false,
-				addFormRules: {
-					company_name: [
-						{ required: true, message: '请输入姓名', trigger: 'blur' }
-					],
-					company_name: [
-						{ required: true, message: '请输入前缀', trigger: 'blur' }
-					],
-
-				},
 				//新增界面数据
 				addForm: {
-					company_name:'',
-					invoice:'',
-					scan_file:'',
+					invoice_title:'',
+					taxpayers_code:'',
+					invoice_address:'',
+					invoice_phone:'',
+					bank:'',
+					bank_account:'',
+					invoice_type:'',
 					remark:'',
 				},
 				dialogImageUrl: '',
@@ -224,12 +244,7 @@
 				this.listLoading = true;
 				getContractProcessByParam(data).then((res) => {
 					this.total = res.result.records;
-					this.list=res.result.data.map(item=>{
-						if(item.scan_file){
-							item.scan_file=item.scan_file.split(',');
-						};
-						return item;
-					})
+					this.list=res.result.data;
 					this.listLoading = false;
 				});
 			},
@@ -413,8 +428,6 @@
 					if (valid) {
 						this.addLoading = true;
 						const data = Object.assign({}, this.addForm);
-						console.log(this.fileList);
-						this.$refs.addUpload.submit();
 						insertContractProcess(data).then((res) => {
 							this.addLoading = false;
 							this.$message({
@@ -463,6 +476,7 @@
 .flex{
 	display: flex;
 	flex-direction: row;
+	justify-content: space-between;
 }
 .tableImg{
 	position: relative;

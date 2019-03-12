@@ -89,7 +89,7 @@ export const deleteMenuById = params => {
   return POST('/menu/deleteMenuById', params)
 };
 
-//通道信息
+//通道号码对照表
 export const getChannelByParam = params => {
   return POST('/channel/getChannelByParam', params)
 };
@@ -108,6 +108,9 @@ export const getChannelById = params => {
 export const uploadChannelByParam = params => {
   return POST('/channel/uploadChannelByParam', params)
 };
+//通道信息
+
+
 //导入
 export const exportExcel = params => {
   return POST('/upload/exportExcel', params)
@@ -133,7 +136,7 @@ export const uploadGatheringByParam = params => {
   return POST('/collection/uploadCollectionByParam', params)
 };
 
-//客户信息
+//客户号码对照表
 export const getCustomerListByParam = params => {
   return POST('/customer/getCustomerListByParam', params)
 };
@@ -151,6 +154,51 @@ export const getCustomerById = params => {
 };
 export const uploadClientTableByParam = params => {
   return POST('/customer/uploadCustomerByParam', params)
+};
+//客户信息
+export const getSalesCustomerByParam = params => {
+  return POST('/salesCustomer/getSalesCustomerByParam', params)
+};
+export const insertSalesCustomer = params => {
+  return POST('/salesCustomer/insertSalesCustomer', params)
+};
+export const updateSalesCustomerById = params => {
+  return POST('/salesCustomer/updateSalesCustomerById', params)
+};
+export const deleteSalesCustomerById = params => {
+  return POST('/salesCustomer/deleteSalesCustomerById', params)
+};
+//线索信息
+export const getClueByParam = params => {
+  return POST('/clue/getClueByParam', params)
+};
+export const insertclue = params => {
+  return POST('/clue/insertclue', params)
+};
+export const updateClueById = params => {
+  return POST('/clue/updateClueById', params)
+};
+export const deleteClueById = params => {
+  return POST('/clue/deleteClueById', params)
+};
+export const insertDistributionClue = params => {
+  return POST('/clue/insertDistributionClue', params)
+};
+export const getClueById = params => {
+  return POST('/clue/getClueById', params)
+};
+//线索信息跟踪
+export const getSalesClueByParam = params => {
+  return POST('/salesClue/getSalesClueByParam', params)
+};
+export const insertSalesClue = params => {
+  return POST('/salesClue/insertSalesClue', params)
+};
+export const updateSalesClueById = params => {
+  return POST('/salesClue/updateSalesClueById', params)
+};
+export const deleteSalesClueById = params => {
+  return POST('/salesClue/deleteSalesClueById', params)
 };
 
 //角色管理

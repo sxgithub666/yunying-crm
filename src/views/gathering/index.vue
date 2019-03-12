@@ -27,7 +27,7 @@
 		<el-col :span="24" class="toolbar" style="padding-bottom: 0px;">
 			<el-form :inline="true" :model="filters">
 				<el-form-item style="width:15%">
-					<el-input size="small" clearable v-model="filters.company_name" placeholder="公司名称"></el-input>
+					<el-input size="small" clearable v-model="filters.company_name" placeholder="公司全称"></el-input>
 				</el-form-item>
 				<el-form-item style="width:15%">
 					<el-input size="small" clearable v-model="filters.user_name" placeholder="添加人"></el-input>
@@ -58,9 +58,12 @@
 		<el-table :data="list" border highlight-current-row v-loading="listLoading" style="width: 100%;">
 			<!-- <el-table-column type="selection" width="55">
 			</el-table-column> -->
-			<el-table-column type="index" width="60">
+			<el-table-column type="id" label="订单号" width="100">
+				<template slot-scope="scope">
+					<span>{{scope.row.id.substring(0,8)}}</span>
+				</template>
 			</el-table-column>
-			<el-table-column prop="company_name" label="公司名称" width="220" show-overflow-tooltip>
+			<el-table-column prop="company_name" label="公司全称" width="220" show-overflow-tooltip>
 			</el-table-column>
 			<el-table-column prop="area" label="销售区域" width="160" show-overflow-tooltip>
 			</el-table-column>
@@ -88,10 +91,10 @@
 				<template slot-scope="scope">
 					<span v-if="scope.row.customer_clues==0">SEM</span>
 					<span v-if="scope.row.customer_clues==1">公司</span>
-					<span v-if="scope.row.customer_clues==2">商务本身</span>
+					<span v-if="scope.row.customer_clues==2">商务</span>
 				</template>
 			</el-table-column>
-			<!-- <el-table-column prop="business_itself" label="商务本身" width="100">
+			<!-- <el-table-column prop="business_itself" label="商务" width="100">
 			</el-table-column> -->
 			<el-table-column prop="number_pay_money" label="号码费" width="100" show-overflow-tooltip>
 			</el-table-column>
@@ -132,8 +135,8 @@
 					<span v-if="scope.row.cost_interval==0">月付</span>
 					<span v-if="scope.row.cost_interval==1">季付</span>
 					<span v-if="scope.row.cost_interval==2">年付</span>
-					<span v-if="scope.row.cost_interval==3">测试月</span>
-					<span v-if="scope.row.cost_interval==4">测试季</span>
+					<span v-if="scope.row.cost_interval==3">测试月付</span>
+					<span v-if="scope.row.cost_interval==4">测试季付</span>
 				</template>
 			</el-table-column>
 			<el-table-column prop="pay_voucher" label="打款凭证" width="200" show-overflow-tooltip>
@@ -146,7 +149,7 @@
 			</el-table-column>
 			<el-table-column prop="robot_pay_money" label="机器人费" width="100" show-overflow-tooltip>
 			</el-table-column>
-			<el-table-column prop="user_name" label="销售经理" width="70" show-overflow-tooltip>
+			<el-table-column prop="user_name" label="销售经理" width="80" show-overflow-tooltip>
 			</el-table-column>
 			<el-table-column prop="pay_type" label="付款方式" width="80" show-overflow-tooltip>
 				<template slot-scope="scope">
@@ -182,16 +185,31 @@
 		<el-dialog title="编辑" width="57%" @close="editDialogClose" :visible.sync="editFormVisible" :close-on-click-modal="false">
 			<el-form :model="editForm" label-width="120px" :rules="addFormRules" ref="editForm">
 				<div class="flex">
-					<el-form-item label="公司名称" prop="company_name">
-						<el-input v-model="editForm.company_name" auto-complete="off"></el-input>
+					<el-form-item label="公司全称" prop="company_name">
+						<el-input disabled v-model="editForm.company_name" auto-complete="off"></el-input>
 					</el-form-item>
-					<el-form-item label="号码费" prop="number_pay_money">
-						<el-input v-model="editForm.number_pay_money" auto-complete="off"></el-input>
+					<el-form-item label="公司行业" prop="company_industry">
+						<el-input disabled v-model="editForm.company_industry" auto-complete="off"></el-input>
 					</el-form-item>
 				</div>
 				<div class="flex">
-					<el-form-item label="公司行业" prop="company_industry">
-						<el-input v-model="editForm.company_industry" auto-complete="off"></el-input>
+					<el-form-item label="客户类型" prop="customer_type">
+						<el-select disabled v-model="editForm.customer_type">
+							<el-option label="直客" value="1"></el-option>
+							<el-option label="渠道" value="0"></el-option>
+						</el-select>
+					</el-form-item>
+					<el-form-item label="客户线索来源" prop="customer_clues">
+						<el-select disabled v-model="editForm.customer_clues">
+							<el-option label="SEM" value="0"></el-option>
+							<el-option label="公司" value="1"></el-option>
+							<el-option label="商务" value="2"></el-option>
+						</el-select>
+					</el-form-item>
+				</div>
+				<div class="flex">
+					<el-form-item label="号码费" prop="number_pay_money">
+						<el-input v-model="editForm.number_pay_money" auto-complete="off"></el-input>
 					</el-form-item>
 					<el-form-item label="机器人数量" prop="robot_number">
 						<el-input v-model="editForm.robot_number" auto-complete="off"></el-input>
@@ -223,10 +241,10 @@
 				</div>
 				<div class="flex">
 					<el-form-item label="销售区域" prop="area">
-						<area-cascader v-if="showArea" v-model="editForm.area" :level="0" type="text" :data="pca"></area-cascader> 
+						<area-cascader v-if="showArea" v-model="editForm.area" :level="0" type="text" :data="pcaa"></area-cascader> 
 					</el-form-item>
 					<el-form-item label="客户所在区域" prop="customer_area">
-						<area-cascader v-if="showArea" v-model="editForm.customer_area" :level="0" type="text" :data="pca"></area-cascader> 
+						<area-cascader disabled v-if="showArea" v-model="editForm.customer_area" :level="0" type="text" :data="pcaa"></area-cascader> 
 						<!-- <el-input v-model="editForm.customer_area" auto-complete="off"></el-input> -->
 					</el-form-item>
 				</div>
@@ -275,33 +293,13 @@
 						<el-date-picker v-model="editForm.pay_time" @change="getEditPayTime" value-format="yyyy-MM-dd" type="date" placeholder="选择收款日期">
 						</el-date-picker>
 					</el-form-item>
-					<el-form-item label="客户线索来源" prop="customer_clues">
-						<el-select v-model="editForm.customer_clues">
-							<el-option label="SEM" value="0"></el-option>
-							<el-option label="公司" value="1"></el-option>
-							<el-option label="商务本身" value="2"></el-option>
-						</el-select>
-					</el-form-item>
-				</div>
-				<div class="flex">
-					<!-- <el-form-item label="销售经理" prop="sales_name">
-						<el-input v-model="editForm.sales_name" auto-complete="off"></el-input>
-					</el-form-item> -->
-				</div>
-				<div class="flex">
 					<el-form-item label="费用期间" prop="cost_interval">
 						<el-select v-model="editForm.cost_interval">
 							<el-option label="月付" value="0"></el-option>
 							<el-option label="季付" value="1"></el-option>
 							<el-option label="年付" value="2"></el-option>
-							<el-option label="测试月" value="3"></el-option>
-							<el-option label="测试季" value="4"></el-option>
-						</el-select>
-					</el-form-item>
-					<el-form-item label="客户类型" prop="customer_type">
-						<el-select v-model="editForm.customer_type">
-							<el-option label="直客" value="1"></el-option>
-							<el-option label="渠道" value="0"></el-option>
+							<el-option label="测试月付" value="3"></el-option>
+							<el-option label="测试季付" value="4"></el-option>
 						</el-select>
 					</el-form-item>
 				</div>
@@ -330,22 +328,43 @@
 		<el-dialog title="新增" width="57%" :visible.sync="addFormVisible" :close-on-click-modal="false">
 			<el-form :model="addForm" label-width="120px" :rules="addFormRules" ref="addForm">
 				<div class="flex">
-					<el-form-item label="公司名称" prop="company_name">
-						<el-input v-model="addForm.company_name" auto-complete="off"></el-input>
+					<el-form-item label="公司全称" prop="company_name">
+						<el-select v-model="addForm.company_name"
+						           @change="companyNameChange"
+											 filterable>
+							<el-option v-for="(item,index) in clientInfos"
+												 :key="index"
+												 :label="item.company_name"
+												 :value="item.company_name">
+							</el-option>
+						</el-select>
 					</el-form-item>
 					<el-form-item label="号码费" prop="number_pay_money">
 						<el-input v-model="addForm.number_pay_money" auto-complete="off"></el-input>
 					</el-form-item>
-					<!-- <el-form-item label="销售经理" prop="sales_name">
-						<el-input v-model="addForm.sales_name" auto-complete="off"></el-input>
-					</el-form-item> -->
 				</div>
 				<div class="flex">
 					<el-form-item label="公司行业" prop="company_industry">
-						<el-input v-model="addForm.company_industry" auto-complete="off"></el-input>
+						<el-input disabled v-model="addForm.company_industry" auto-complete="off"></el-input>
 					</el-form-item>
-					<el-form-item label="机器人数量" prop="robot_number">
-						<el-input v-model="addForm.robot_number" auto-complete="off"></el-input>
+					<el-form-item label="客户线索来源" prop="customer_clues">
+						<el-select disabled v-model="addForm.customer_clues">
+							<el-option label="SEM" value="0"></el-option>
+							<el-option label="公司" value="1"></el-option>
+							<el-option label="商务" value="2"></el-option>
+						</el-select>
+					</el-form-item>
+				</div>
+				<div class="flex">
+					<el-form-item label="客户类型" prop="customer_type">
+						<el-select disabled v-model="addForm.customer_type">
+							<el-option label="直客" value="0"></el-option>
+							<el-option label="渠道" value="1"></el-option>
+						</el-select>
+					</el-form-item>
+					<el-form-item label="客户所在区域" prop="customer_area">
+						<area-cascader disabled v-model="addForm.customer_area" :level="0" type="text" :data="pcaa"></area-cascader> 
+						<!-- <el-input v-model="addForm.customer_area" auto-complete="off"></el-input> -->
 					</el-form-item>
 				</div>
 				<div class="flex">
@@ -375,11 +394,16 @@
 				</div>
 				<div class="flex">
 					<el-form-item label="销售区域" prop="area">
-						<area-cascader v-model="addForm.area" :level="0" type="text" :data="pca"></area-cascader> 
+						<area-cascader v-model="addForm.area" :level="0" type="text" :data="pcaa"></area-cascader> 
 					</el-form-item>
-					<el-form-item label="客户所在区域" prop="customer_area">
-						<area-cascader v-model="addForm.customer_area" :level="0" type="text" :data="pca"></area-cascader> 
-						<!-- <el-input v-model="addForm.customer_area" auto-complete="off"></el-input> -->
+					<el-form-item label="费用期间" prop="cost_interval">
+						<el-select v-model="addForm.cost_interval">
+							<el-option label="月付" value="0"></el-option>
+							<el-option label="季付" value="1"></el-option>
+							<el-option label="年付" value="2"></el-option>
+							<el-option label="测试月付" value="3"></el-option>
+							<el-option label="测试季付" value="4"></el-option>
+						</el-select>
 					</el-form-item>
 				</div>
 				<div class="flex">
@@ -390,12 +414,8 @@
 						</el-select>
 						<!-- <el-input v-model="addForm.pay_type" auto-complete="off"></el-input> -->
 					</el-form-item>
-					<el-form-item label="客户线索来源" prop="customer_clues">
-						<el-select v-model="addForm.customer_clues">
-							<el-option label="SEM" value="0"></el-option>
-							<el-option label="公司" value="1"></el-option>
-							<el-option label="商务本身" value="2"></el-option>
-						</el-select>
+					<el-form-item label="机器人数量" prop="robot_number">
+						<el-input v-model="addForm.robot_number" auto-complete="off"></el-input>
 					</el-form-item>
 				</div>
 				<div class="flex">
@@ -419,7 +439,6 @@
 							<el-option label="退款" value="退款"></el-option>
 							<el-option label="返款" value="返款"></el-option>
 						</el-select>
-						<!-- <el-input v-model="editForm.robot_pay_money" auto-complete="off"></el-input> -->
 					</el-form-item>
 				</div>
 				
@@ -433,36 +452,9 @@
 							<el-option label="是" value="1"></el-option>
 							<el-option label="否" value="0"></el-option>
 						</el-select>
-						<!-- <el-input v-model="addForm.call_customer_pay_money" auto-complete="off"></el-input> -->
 					</el-form-item>
-				</div>
-				<div class="flex">
-					<el-form-item label="费用期间" prop="cost_interval">
-						<el-select v-model="addForm.cost_interval">
-							<el-option label="月付" value="0"></el-option>
-							<el-option label="季付" value="1"></el-option>
-							<el-option label="年付" value="2"></el-option>
-							<el-option label="测试月" value="3"></el-option>
-							<el-option label="测试季" value="4"></el-option>
-						</el-select>
-					</el-form-item>
-					<el-form-item label="客户类型" prop="customer_type">
-						<el-select v-model="addForm.customer_type">
-							<el-option label="直客" value="0"></el-option>
-							<el-option label="渠道" value="1"></el-option>
-						</el-select>
-					</el-form-item>
-				</div>
-				<div class="flex">
-					<!-- <el-form-item style="width:45%" label="是否返款" prop="refunds">
-						<el-select v-model="addForm.refunds">
-							<el-option label="已返款" value="1"></el-option>
-							<el-option label="未返款" value="0"></el-option>
-						</el-select>
-					</el-form-item> -->
 				</div>
 				<el-form-item label="打款凭证" prop="pay_voucher">
-					<!-- <el-input v-model="addForm.pay_voucher" auto-complete="off"></el-input> -->
 					<el-upload ref="addUpload"
 					           :headers="headers"
 					           :action="uploadUrl"
@@ -488,7 +480,7 @@
 </template>
 
 <script>
-	import { getCompanyCollectionByParam, insertCompanyCollection, updateCompanyCollectionById, deleteCompanyCollectionById, insertProcess ,updateReProcessById ,uploadGatheringByParam ,getCityById} from '../../api/api';
+	import { getCompanyCollectionByParam, insertCompanyCollection, updateCompanyCollectionById, deleteCompanyCollectionById, insertProcess ,updateReProcessById ,uploadGatheringByParam ,getCityById ,getSalesCustomerByParam} from '../../api/api';
 	import rules from '@/common/js/rule'
 	import { pca, pcaa } from 'area-data'
 	export default {
@@ -611,6 +603,7 @@
 					line_price:'',
 					call_year_pay_money:'',
 				},
+				clientInfos:[],
 				delFiles:[],
 				role_id:'',
 				options1:[],
@@ -646,6 +639,28 @@
 					})
 					this.listLoading = false;
 				});
+			},
+			//新增根据公司名称获取客户信息
+			getClientInfo(){
+				const data={
+					role_id:this.role_id,
+					page:1,
+					rows:1000
+				};
+				getSalesCustomerByParam(data).then(res=>{
+					this.clientInfos=res.result.data;
+				})
+			},
+			//新增公司名名下拉change
+			companyNameChange(){
+				this.clientInfos.forEach(item=>{
+					if(item.company_name==this.addForm.company_name){
+						this.addForm.company_industry=item.company_industry;
+						this.addForm.customer_area=item.customer_area.split('/');
+						this.addForm.customer_clues=item.customer_clues;
+						this.addForm.customer_type=item.customer_type;
+					}
+				})
 			},
 			beforeUpload(file){
 				let fileType = file.name.substring(file.name.lastIndexOf(".")+1).toUpperCase();
@@ -814,6 +829,7 @@
 					call_year_pay_money:'',
 				};
 				this.fileList=[];
+				this.getClientInfo();
 				// this.getCityById();
 			},
 			//编辑
@@ -827,6 +843,7 @@
 						};
 						this.editForm.area=this.editForm.area.join('/');
 						this.editForm.customer_area=this.editForm.customer_area.join('/');
+						this.editForm.cost_type=this.editForm.cost_type.join(',');
 						const data = Object.assign({}, this.editForm);
 						updateCompanyCollectionById(data).then((res) => {
 							this.editLoading = false;

@@ -136,7 +136,6 @@
 							<el-option label="强显" value="1"></el-option>
 							<el-option label="手机号" value="2"></el-option>
 						</el-select>
-						<!-- <el-input disabled v-model="channelForm.level" auto-complete="off"></el-input> -->
 					</el-form-item>
 					<el-form-item label="市话长途" prop="distance">
 						<el-select disabled v-model="channelForm.distance">
@@ -154,7 +153,6 @@
 							<el-option label="小水智能" value="1"></el-option>
 							<el-option label="语音PASS" value="2"></el-option>
 						</el-select>
-						<!-- <el-input disabled v-model="channelForm.belong" auto-complete="off"></el-input> -->
 					</el-form-item>
 					<el-form-item label="号码" prop="number">
 						<el-input disabled v-model="channelForm.number" auto-complete="off"></el-input>
@@ -186,31 +184,9 @@
 						</el-date-picker>
 					</el-form-item>
 				</div>
-				<!-- <div class="flex">
-					<el-form-item label="通信费" prop="charges">
-						<el-input disabled v-model="channelForm.charges" auto-complete="off"></el-input>
-					</el-form-item>
-				</div> -->
 				<el-form-item label="通道属性" prop="attribute">
 						<el-input disabled type="textarea" :rows="2" v-model="channelForm.attribute" auto-complete="off"></el-input>
 					</el-form-item>
-				<!-- <div class="flex">
-					<el-form-item label="是否开票" prop="invoice">
-						<el-select disabled v-model="channelForm.invoice">
-							<el-option label="已开票" value="1"></el-option>
-							<el-option label="未开票" value="0"></el-option>
-						</el-select>
-					</el-form-item>
-					<el-form-item label="发票类型" prop="invoice_type">
-						<el-select disabled v-model="channelForm.invoice_type">
-							<el-option label="普票" value="1"></el-option>
-							<el-option label="专票" value="0"></el-option>
-						</el-select>
-					</el-form-item>
-				</div> -->
-				<!-- <el-form-item label="税点" prop="tax_point">
-					<el-input disabled v-model="channelForm.tax_point" auto-complete="off"></el-input>
-				</el-form-item> -->
 			</el-form>
 			<div v-if="role_id!=='0'" slot="footer" class="dialog-footer">
 				<el-button type="primary" @click.native="check('2')">审核通过</el-button>
@@ -235,7 +211,6 @@
 							<el-option label="小水智能" value="1"></el-option>
 							<el-option label="语音PASS" value="2"></el-option>
 						</el-select>
-						<!-- <el-input disabled v-model="clientForm.belong" auto-complete="off"></el-input> -->
 					</el-form-item>
 					<el-form-item label="行业">
 						<el-input disabled v-model="clientForm.industry" auto-complete="off"></el-input>
@@ -381,7 +356,7 @@
 						<el-select disabled v-model="gatheringForm.customer_clues">
 							<el-option label="SEM" value="0"></el-option>
 							<el-option label="公司" value="1"></el-option>
-							<el-option label="商务本身" value="2"></el-option>
+							<el-option label="商务" value="2"></el-option>
 						</el-select>
 					</el-form-item>
 				</div>
@@ -391,8 +366,8 @@
 							<el-option label="月付" value="0"></el-option>
 							<el-option label="季付" value="1"></el-option>
 							<el-option label="年付" value="2"></el-option>
-							<el-option label="测试月" value="3"></el-option>
-							<el-option label="测试季" value="4"></el-option>
+							<el-option label="测试月付" value="3"></el-option>
+							<el-option label="测试季付" value="4"></el-option>
 						</el-select>
 						<!-- <el-input v-model="gatheringForm.call_year_pay_money" auto-complete="off"></el-input> -->
 					</el-form-item>
@@ -510,8 +485,8 @@
 							<el-option label="月付" value="0"></el-option>
 							<el-option label="季付" value="1"></el-option>
 							<el-option label="年付" value="2"></el-option>
-							<el-option label="测试月" value="3"></el-option>
-							<el-option label="测试季" value="4"></el-option>
+							<el-option label="测试月付" value="3"></el-option>
+							<el-option label="测试季付" value="4"></el-option>
 						</el-select>
 					</el-form-item>
 				</div>
@@ -549,68 +524,10 @@
 				<el-button type="danger" @click.native="check('3')">审核拒绝</el-button>
 			</div>
 		</el-dialog>
-		<!--查看小水总机信息-->
-		<!-- <el-dialog title="小水总机信息" :visible.sync="switchboardVisible" :close-on-click-modal="false">
-			<el-form :model="switchboardForm" label-width="80px">
-				<el-form-item label="销售区域" prop="area">
-					<el-input v-model="switchboardForm.area" auto-complete="off"></el-input>
-				</el-form-item>
-				<el-form-item label="公司名称" prop="company_name">
-					<el-input v-model="switchboardForm.company_name" auto-complete="off"></el-input>
-				</el-form-item>
-				<el-form-item label="收款时间">
-					<el-date-picker v-model="switchboardForm.pay_time" value-format="yyyy-MM-dd HH:mm:ss" type="datetime" placeholder="选择收款日期时间">
-					</el-date-picker>
-				</el-form-item>
-				<el-form-item label="收款金额">
-					<el-input v-model="switchboardForm.pay_money" auto-complete="off"></el-input>
-				</el-form-item>
-				<el-form-item label="公司行业">
-					<el-input v-model="switchboardForm.company_industry" auto-complete="off"></el-input>
-				</el-form-item>
-				<el-form-item label="号码需求">
-					<el-input v-model="switchboardForm.need_phonenumber" auto-complete="off"></el-input>
-				</el-form-item>
-				<el-form-item label="业务类型">
-					<el-input v-model="switchboardForm.business_type" auto-complete="off"></el-input>
-				</el-form-item>
-				<el-form-item label="付款方式">
-					<el-select v-model="switchboardForm.pay_type">
-						<el-option label="对公" value="0"></el-option>
-						<el-option label="对私" value="1"></el-option>
-					</el-select>
-				</el-form-item>
-				<el-form-item label="客户所在区域">
-					<el-input v-model="switchboardForm.customer_region" auto-complete="off"></el-input>
-				</el-form-item>
-				<el-form-item label="是否返款">
-					<el-select v-model="switchboardForm.refunds">
-						<el-option label="已返款" value="1"></el-option>
-						<el-option label="未返款" value="0"></el-option>
-					</el-select>
-				</el-form-item>
-				<el-form-item label="打款凭证">
-					<el-input v-model="switchboardForm.pay_voucher" auto-complete="off"></el-input>
-				</el-form-item>
-				<el-form-item label="申请号码所需材料">
-					<el-input v-model="switchboardForm.need_data" auto-complete="off"></el-input>
-				</el-form-item>
-				<el-form-item label="备注">
-					<el-input v-model="switchboardForm.remark" auto-complete="off"></el-input>
-				</el-form-item>
-			</el-form>
-			<div v-if="role_id!=='0'" slot="footer" class="dialog-footer">
-				<el-button type="primary" @click.native="check('2')">审核通过</el-button>
-				<el-button type="danger" @click.native="check('3')">审核拒绝</el-button>
-			</div>
-		</el-dialog> -->
 		<!--查看语音Pass信息-->
 		<el-dialog title="总机Pass信息" :visible.sync="voicePassVisible" :close-on-click-modal="false">
 			<el-form :model="voicePassForm" label-width="100px">
 				<div class="flex">
-					<!-- <el-form-item label="销售区域" prop="area">
-						<el-input disabled v-model="voicePassForm.area" auto-complete="off"></el-input>
-					</el-form-item> -->
 					<el-form-item label="公司名称" prop="company_name">
 						<el-input disabled v-model="voicePassForm.company_name" auto-complete="off"></el-input>
 					</el-form-item>
@@ -628,12 +545,6 @@
 					</el-form-item>
 				</div>
 				<div class="flex">
-					
-					<!-- <el-form-item label="销售经理" prop="sales_name">
-						<el-input disabled v-model="voicePassForm.sales_name" auto-complete="off"></el-input>
-					</el-form-item> -->
-				</div>
-				<div class="flex">
 					<el-form-item label="行业类型">
 						<el-input disabled v-model="voicePassForm.business_type" auto-complete="off"></el-input>
 					</el-form-item>
@@ -642,7 +553,6 @@
 							<el-option label="对公" value="0"></el-option>
 							<el-option label="对私" value="1"></el-option>
 						</el-select>
-						<!-- <el-input disabled v-model="voicePassForm.pay_type" auto-complete="off"></el-input> -->
 					</el-form-item>
 				</div>
 				<div class="flex">
@@ -685,26 +595,41 @@
 		<!--查看合同发票-->
 		<el-dialog title="合同发票" :visible.sync="contractAndInvoiceVisible" :append-to-body="true" :close-on-click-modal="false">
 			<el-form :model="contractAndInvoiceForm" label-width="130px">
-				<el-form-item label="公司名称" prop="company_name">
-					<el-input v-model="contractAndInvoiceForm.company_name" auto-complete="off"></el-input>
-				</el-form-item>
-				<el-form-item label="是否开票">
-          <el-select v-model="contractAndInvoiceForm.invoice">
-						<el-option label="已开票" value="1"></el-option>
-						<el-option label="未开票" value="0"></el-option>
-					</el-select>
-				</el-form-item>
-				<el-form-item label="双方盖章扫描件">
-					<div class="editImg">
-						<div class="item" v-for="(item,index) in editFileList" :key="index">
-							<img class="smallImg" :preview="index" :src="item" alt="">
-							<!-- <img class="bigImg" :src="item" alt=""> -->
-						</div>
-					</div>
-				</el-form-item>
-				<el-form-item label="备注">
-					<el-input v-model="contractAndInvoiceForm.remark" auto-complete="off"></el-input>
-				</el-form-item>
+				<div class="flex">
+					<el-form-item label="发票抬头" prop="invoice_title">
+						<el-input disabled v-model="contractAndInvoiceForm.invoice_title" clearable auto-complete="off"></el-input>
+					</el-form-item>
+					<el-form-item label="纳税人识别码" prop="taxpayers_code">
+						<el-input disabled v-model="contractAndInvoiceForm.taxpayers_code" clearable auto-complete="off"></el-input>
+					</el-form-item>
+				</div>
+				<div class="flex">
+					<el-form-item label="开票地址" prop="invoice_address">
+						<el-input disabled v-model="contractAndInvoiceForm.invoice_address" clearable auto-complete="off"></el-input>
+					</el-form-item>
+					<el-form-item label="开票电话" prop="invoice_phone">
+						<el-input disabled v-model="contractAndInvoiceForm.invoice_phone" clearable auto-complete="off"></el-input>
+					</el-form-item>
+				</div>
+				<div class="flex">
+					<el-form-item label="开户行" prop="bank">
+						<el-input disabled v-model="contractAndInvoiceForm.bank" clearable auto-complete="off"></el-input>
+					</el-form-item>
+					<el-form-item label="银行账号" prop="bank_account">
+						<el-input disabled v-model="contractAndInvoiceForm.bank_account" clearable auto-complete="off"></el-input>
+					</el-form-item>
+				</div>
+				<div class="flex">
+					<el-form-item label="发票类型" prop="invoice_type">
+						<el-select disabled v-model="contractAndInvoiceForm.invoice_type">
+							<el-option label="增值税普通发票" value="1"></el-option>
+							<el-option label="增值税专用发票" value="0"></el-option>
+						</el-select>
+					</el-form-item>
+					<el-form-item label="备注">
+						<el-input disabled v-model="contractAndInvoiceForm.remark" clearable auto-complete="off"></el-input>
+					</el-form-item>
+				</div>
 			</el-form>
 			<div v-if="role_id!=='0'" slot="footer" class="dialog-footer">
 				<el-button type="primary" @click.native="check('2')">审核通过</el-button>
@@ -899,9 +824,6 @@
 			showContractAndInvoice(){
 				getContractProcessById({id:this.showDilagForm.type_id}).then(res=>{
 					this.contractAndInvoiceForm=res.result[0];
-					if(this.contractAndInvoiceForm.scan_file){
-						this.editFileList=this.contractAndInvoiceForm.scan_file.split(',')
-					}
 					this.contractAndInvoiceVisible=true;
 				})
 			},

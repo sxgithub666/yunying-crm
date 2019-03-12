@@ -141,89 +141,75 @@
 			<el-form :model="editForm" label-width="120px" :rules="editFormRules" ref="editForm">
 				<div class="flex">
 					<el-form-item label="公司全称" prop="company_name">
-						<el-input v-model="editForm.company_name" auto-complete="off"></el-input>
+						<el-input disabled v-model="editForm.company_name" auto-complete="off"></el-input>
 					</el-form-item>
 					<el-form-item label="线路单价" prop="line_price">
-						<el-input v-model="editForm.line_price" auto-complete="off"></el-input>
+						<el-input disabled v-model="editForm.line_price" auto-complete="off"></el-input>
 					</el-form-item>
 				</div>
 				<div class="flex">
 					<el-form-item label="收款时间" prop="pay_time">
-						<el-date-picker v-model="editForm.pay_time" @change="getEditTime" value-format="yyyy-MM-dd" type="date" placeholder="选择收款日期">
+						<el-date-picker disabled v-model="editForm.pay_time" @change="getEditTime" value-format="yyyy-MM-dd" type="date" placeholder="选择收款日期">
 						</el-date-picker>
 					</el-form-item>
 					<el-form-item label="客户自备线路" style="width:44%" prop="call_customer_pay_money">
-						<el-select v-model="editForm.call_customer_pay_money">
+						<el-select disabled v-model="editForm.call_customer_pay_money">
 							<el-option label="是" value="1"></el-option>
 							<el-option label="否" value="0"></el-option>
 						</el-select>
-						<!-- <el-input v-model="editForm.call_customer_pay_money" auto-complete="off"></el-input> -->
 					</el-form-item>
 				</div>
 				<div class="flex">
-					<el-form-item label="行业类型" prop="business_type">
-						<el-input v-model="editForm.business_type" auto-complete="off"></el-input>
-					</el-form-item>
 					<el-form-item label="机器人数量" prop="robot_number">
-						<el-input v-model="editForm.robot_number" auto-complete="off"></el-input>
+						<el-input disabled v-model="editForm.robot_number" auto-complete="off"></el-input>
+					</el-form-item>
+					<el-form-item label="通信费" prop="call_year_pay_money">
+						<el-input disabled v-model="editForm.call_year_pay_money" auto-complete="off"></el-input>
 					</el-form-item>
 				</div>
 				<div class="flex">
+					<el-form-item label="号码费" prop="number_pay_money">
+						<el-input disabled v-model="editForm.number_pay_money" auto-complete="off"></el-input>
+					</el-form-item>
+					<el-form-item label="费用期间" prop="cost_interval">
+						<el-select disabled v-model="editForm.cost_interval">
+							<el-option label="月付" value="0"></el-option>
+							<el-option label="季付" value="1"></el-option>
+							<el-option label="年付" value="2"></el-option>
+							<el-option label="测试月付" value="3"></el-option>
+							<el-option label="测试季付" value="4"></el-option>
+						</el-select>
+					</el-form-item>
+				</div>
+				<div class="flex">
+					<el-form-item label="机器人费" prop="robot_pay_money">
+						<el-input disabled v-model="editForm.robot_pay_money" auto-complete="off"></el-input>
+					</el-form-item>
+					<el-form-item label="卡槽费" prop="call_card_pay_money">
+						<el-input disabled v-model="editForm.call_card_pay_money" auto-complete="off"></el-input>
+					</el-form-item>
+				</div>
+				<div class="flex">
+					<el-form-item label="客户类型" prop="customer_type">
+						<el-select disabled v-model="editForm.customer_type">
+							<el-option label="直客" value="0"></el-option>
+							<el-option label="渠道" value="1"></el-option>
+						</el-select>
+					</el-form-item>
 					<el-form-item label="是否到款" prop="refunds">
 						<el-select v-model="editForm.refunds">
 							<el-option label="未到款" value="0"></el-option>
 							<el-option label="已到款" value="1"></el-option>
 						</el-select>
 					</el-form-item>
-					<el-form-item label="通信费" prop="call_year_pay_money">
-						<el-input v-model="editForm.call_year_pay_money" auto-complete="off"></el-input>
-					</el-form-item>
-					<!-- <el-form-item label="销售经理" prop="sales_name">
-						<el-input v-model="editForm.sales_name" auto-complete="off"></el-input>
-					</el-form-item> -->
+					
 				</div>
 				<div class="flex">
 					<el-form-item label="线路并发数" prop="line_concurrency">
 						<el-input v-model="editForm.line_concurrency" auto-complete="off"></el-input>
 					</el-form-item>
-					<el-form-item label="号码费" prop="number_pay_money">
-						<el-input v-model="editForm.number_pay_money" auto-complete="off"></el-input>
-					</el-form-item>
-				</div>
-				<div class="flex">
-					<el-form-item label="机器人费" prop="robot_pay_money">
-						<el-input v-model="editForm.robot_pay_money" auto-complete="off"></el-input>
-					</el-form-item>
-					<el-form-item label="卡槽费" prop="call_card_pay_money">
-						<el-input v-model="editForm.call_card_pay_money" auto-complete="off"></el-input>
-					</el-form-item>
-				</div>
-				<div class="flex">
-					<!-- <el-form-item label="费用期间" prop="cost_interval">
-						<el-select v-model="editForm.cost_interval">
-							<el-option label="月付" value="0"></el-option>
-							<el-option label="季付" value="1"></el-option>
-							<el-option label="年付" value="2"></el-option>
-							<el-option label="测试" value="3"></el-option>
-						</el-select>
-					</el-form-item> -->
-					
-				</div>
-				<div class="flex">
-					<el-form-item label="客户类型" prop="customer_type">
-						<el-select v-model="editForm.customer_type">
-							<el-option label="直客" value="0"></el-option>
-							<el-option label="渠道" value="1"></el-option>
-						</el-select>
-					</el-form-item>
-					<el-form-item label="费用期间" prop="cost_interval">
-						<el-select v-model="editForm.cost_interval">
-							<el-option label="月付" value="0"></el-option>
-							<el-option label="季付" value="1"></el-option>
-							<el-option label="年付" value="2"></el-option>
-							<el-option label="测试月" value="3"></el-option>
-							<el-option label="测试季" value="4"></el-option>
-						</el-select>
+					<el-form-item label="行业类型" prop="business_type">
+						<el-input v-model="editForm.business_type" auto-complete="off"></el-input>
 					</el-form-item>
 				</div>
 				<div class="flex">
@@ -283,97 +269,99 @@
 		</el-dialog>
 
 		<!--新增界面-->
-		<el-dialog title="新增" width="55%" :visible.sync="addFormVisible" :close-on-click-modal="false">
-			<el-form :model="addForm" label-width="120px" :rules="editFormRules" ref="addForm">
+		<el-dialog title="新增" width="53%" :visible.sync="addFormVisible" :close-on-click-modal="false">
+			<el-form :model="addForm" label-width="110px" :rules="editFormRules" ref="addForm">
+				<div class="flex">
+					<el-form-item label="订单号码" prop="id">
+						<el-select v-model="addForm.id" 
+											@change="orderNumChange" 
+											filterable
+											clearable
+											@clear="orderClear" 
+											placeholder="请选择订单号">
+							<el-option v-for="(item,index) in gatheringInfos" 
+												 :label="item.id.substring(0,8)" 
+												 :value="item.id"
+												 :key="index">
+							</el-option>
+						</el-select>
+					</el-form-item>
+				</div>
 				<div class="flex">
 					<el-form-item label="公司全称" prop="company_name">
-						<el-input v-model="addForm.company_name" auto-complete="off"></el-input>
+						<el-input :disabled="disabled" v-model="addForm.company_name" auto-complete="off"></el-input>
 					</el-form-item>
 					<el-form-item label="线路单价" prop="line_price">
-						<el-input v-model="addForm.line_price" auto-complete="off"></el-input>
+						<el-input :disabled="disabled" v-model="addForm.line_price" auto-complete="off"></el-input>
 					</el-form-item>
 				</div>
 				<div class="flex">
 					<el-form-item label="收款时间" prop="pay_time">
-						<el-date-picker v-model="addForm.pay_time" @change="getAddTime" value-format="yyyy-MM-dd" type="date" placeholder="选择收款日期">
+						<el-date-picker :disabled="disabled" v-model="addForm.pay_time" @change="getAddTime" value-format="yyyy-MM-dd" type="date" placeholder="选择收款日期">
 						</el-date-picker>
 					</el-form-item>
 					<el-form-item label="客户自备线路" style="width:44%" prop="call_customer_pay_money">
-						<el-select v-model="addForm.call_customer_pay_money">
+						<el-select :disabled="disabled" v-model="addForm.call_customer_pay_money">
 							<el-option label="是" value="1"></el-option>
 							<el-option label="否" value="0"></el-option>
 						</el-select>
-						<!-- <el-input v-model="addForm.call_customer_pay_money" auto-complete="off"></el-input> -->
 					</el-form-item>
 				</div>
 				<div class="flex">
-					<el-form-item label="行业类型" prop="business_type">
-						<el-input v-model="addForm.business_type" auto-complete="off"></el-input>
-					</el-form-item>
-					</el-form-item>
 					<el-form-item label="机器人数量" prop="robot_number">
-						<el-input v-model="addForm.robot_number" auto-complete="off"></el-input>
+						<el-input :disabled="disabled" v-model="addForm.robot_number" auto-complete="off"></el-input>
+					</el-form-item>
+					<el-form-item label="通信费" prop="call_year_pay_money">
+						<el-input :disabled="disabled" v-model="addForm.call_year_pay_money" auto-complete="off"></el-input>
 					</el-form-item>
 				</div>
 				<div class="flex">
+					<el-form-item label="号码费" prop="number_pay_money">
+						<el-input :disabled="disabled" v-model="addForm.number_pay_money" auto-complete="off"></el-input>
+					</el-form-item>
+					<el-form-item label="费用期间" prop="cost_interval">
+						<el-select :disabled="disabled" v-model="addForm.cost_interval">
+							<el-option label="月付" value="0"></el-option>
+							<el-option label="季付" value="1"></el-option>
+							<el-option label="年付" value="2"></el-option>
+							<el-option label="测试月付" value="3"></el-option>
+							<el-option label="测试季付" value="4"></el-option>
+						</el-select>
+					</el-form-item>
+				</div>
+				<div class="flex">
+					<el-form-item label="机器人费" prop="robot_pay_money">
+						<el-input :disabled="disabled" v-model="addForm.robot_pay_money" auto-complete="off"></el-input>
+					</el-form-item>
+					<el-form-item label="卡槽费" prop="call_card_pay_money">
+						<el-input :disabled="disabled" v-model="addForm.call_card_pay_money" auto-complete="off"></el-input>
+					</el-form-item>
+				</div>
+				<div class="flex">
+					<el-form-item label="客户类型" prop="customer_type">
+						<el-select :disabled="disabled" v-model="addForm.customer_type">
+							<el-option label="直客" value="0"></el-option>
+							<el-option label="渠道" value="1"></el-option>
+						</el-select>
+					</el-form-item>
 					<el-form-item label="是否到款" prop="refunds">
 						<el-select v-model="addForm.refunds">
 							<el-option label="未到款" value="0"></el-option>
 							<el-option label="已到款" value="1"></el-option>
 						</el-select>
 					</el-form-item>
-					<el-form-item label="通信费" prop="call_year_pay_money">
-						<el-input v-model="addForm.call_year_pay_money" auto-complete="off"></el-input>
-					</el-form-item>
-					<!-- <el-form-item label="销售经理" prop="sales_name">
-						<el-input v-model="addForm.sales_name" auto-complete="off"></el-input>
-					</el-form-item> -->
+					
 				</div>
 				<div class="flex">
 					<el-form-item label="线路并发数" prop="line_concurrency">
 						<el-input v-model="addForm.line_concurrency" auto-complete="off"></el-input>
 					</el-form-item>
-					<el-form-item label="号码费" prop="number_pay_money">
-						<el-input v-model="addForm.number_pay_money" auto-complete="off"></el-input>
+					<el-form-item label="行业类型" prop="business_type">
+						<el-input v-model="addForm.business_type" auto-complete="off"></el-input>
 					</el-form-item>
 				</div>
 				<div class="flex">
-					<el-form-item label="机器人费" prop="robot_pay_money">
-						<el-input v-model="addForm.robot_pay_money" auto-complete="off"></el-input>
-					</el-form-item>
-					<el-form-item label="卡槽费" prop="call_card_pay_money">
-						<el-input v-model="addForm.call_card_pay_money" auto-complete="off"></el-input>
-					</el-form-item>
-				</div>
-				<div class="flex">
-					<!-- <el-form-item label="费用期间" prop="cost_interval">
-						<el-select v-model="addForm.cost_interval">
-							<el-option label="月付" value="0"></el-option>
-							<el-option label="季付" value="1"></el-option>
-							<el-option label="年付" value="2"></el-option>
-							<el-option label="测试" value="3"></el-option>
-						</el-select>
-					</el-form-item> -->
 					
-				</div>
-				<div class="flex">
-					<el-form-item label="客户类型" prop="customer_type">
-						<el-select v-model="addForm.customer_type">
-							<el-option label="直客" value="0"></el-option>
-							<el-option label="渠道" value="1"></el-option>
-						</el-select>
-					</el-form-item>
-					<el-form-item label="费用期间" prop="cost_interval">
-						<el-select v-model="addForm.cost_interval">
-							<el-option label="月付" value="0"></el-option>
-							<el-option label="季付" value="1"></el-option>
-							<el-option label="年付" value="2"></el-option>
-							<el-option label="测试月" value="3"></el-option>
-							<el-option label="测试季" value="4"></el-option>
-						</el-select>
-					</el-form-item>
-				</div>
-				<div class="flex">
 					<el-form-item label="账户配置说明" prop="remark">
 						<el-input v-model="addForm.remark" auto-complete="off"></el-input>
 					</el-form-item>
@@ -434,8 +422,15 @@
 </template>
 
 <script>
-	import { getXsznProcessByParam, insertXsznProcess, updateXsznProcessById, deleteXsznProcessById ,updateReProcessById ,insertProcess ,uploadRobotByParam} from '../../api/api';
-  import rules from '@/common/js/rule'
+	import { getXsznProcessByParam, 
+					 insertXsznProcess, 
+					 updateXsznProcessById, 
+					 deleteXsznProcessById,
+					 updateReProcessById,
+					 insertProcess,
+					 uploadRobotByParam,
+					 getCompanyCollectionByParam } from '../../api/api';
+  import rules from '@/common/js/rule';
 	export default {
 		data() {
 			return {
@@ -520,8 +515,9 @@
 					sales_name:'',
 					refunds:'',
 					remark:'',
-				}
-
+				},
+				gatheringInfos:[],
+				disabled:false
 			}
 		},
 		methods: {
@@ -779,6 +775,41 @@
 					refunds:'',
 					call_year_pay_money:'',
 				};
+				this.getGatheringInfo();
+			},
+			//新增获取客户信息
+			getGatheringInfo(){
+				const data={
+					role_id:this.role_id,
+					page:1,
+					rows:1000
+				};
+				getCompanyCollectionByParam(data).then(res=>{
+					this.gatheringInfos=res.result.data;
+				})
+			},
+			orderNumChange(){
+				this.disabled=true;
+				this.gatheringInfos.forEach(item=>{
+					if(item.id==this.addForm.id){
+						this.$set(this.addForm,'company_name',item.company_name);
+						this.$set(this.addForm,'pay_time',item.pay_time);
+						this.$set(this.addForm,'line_price',item.line_price);
+						this.$set(this.addForm,'call_customer_pay_money',item.call_customer_pay_money);
+						this.$set(this.addForm,'robot_number',item.robot_number);
+						this.$set(this.addForm,'call_year_pay_money',item.call_year_pay_money);
+						this.$set(this.addForm,'number_pay_money',item.number_pay_money);
+						this.$set(this.addForm,'robot_pay_money',item.robot_pay_money);
+						this.$set(this.addForm,'call_card_pay_money',item.call_card_pay_money);
+						this.$set(this.addForm,'customer_type',item.customer_type);
+						this.$set(this.addForm,'cost_interval',item.cost_interval);
+						
+					}
+				})
+			},
+			orderClear(){
+				this.disabled=false;
+				this.addForm={};
 			},
 			//编辑
 			editSubmit() {

@@ -41,7 +41,7 @@
 					</el-date-picker>
 				</el-form-item>
 				<el-form-item style="width:15%;margin-right:0;">
-					<area-cascader v-model="filters.address" :level="0" type="text" placeholder="地区" :data="pca"></area-cascader> 
+					<area-cascader v-model="filters.address" :level="0" type="text" placeholder="地区" :data="pcaa"></area-cascader> 
 				</el-form-item>
 				<el-form-item style="width:15%;margin-right:0;">
 					<el-select size="small" clearable v-model="filters.belong" placeholder="业务归属">
@@ -174,7 +174,7 @@
 				</div>
 				<div class="flex">
 					<el-form-item label="地区" prop="address">
-						<area-cascader v-if="showArea" v-model="editForm.address" :level="0" type="text" :data="pca"></area-cascader> 
+						<area-cascader v-if="showArea" v-model="editForm.address" :level="0" type="text" :data="pcaa"></area-cascader> 
 						<!-- <el-input v-model="editForm.address" auto-complete="off"></el-input> -->
 					</el-form-item>
 					<el-form-item label="业务类型" prop="business">
@@ -295,7 +295,7 @@
 				</div>
 				<div class="flex">
 					<el-form-item label="地区" prop="address">
-						<area-cascader v-model="addForm.address" :level="0" type="text" :data="pca"></area-cascader> 
+						<area-cascader v-model="addForm.address" :level="0" type="text" :data="pcaa"></area-cascader> 
 						<!-- <el-input v-model="addForm.address" auto-complete="off"></el-input> -->
 					</el-form-item>
 					<el-form-item label="业务类型" prop="business">

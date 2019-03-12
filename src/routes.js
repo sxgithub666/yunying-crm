@@ -2,17 +2,19 @@ import Login from './views/Login.vue'
 import NotFound from './views/404.vue'
 import Home from './views/Home.vue'
 import ChannelTable from './views/channelTable' //通道信息号码表
+import ChannelInfo from './views/channelInfo' //通道信息
 import ClientTable from './views/clientTable'   //客户信息号码表
+import ClientInfo from './views/clientInfo'   //客户信息
 import Robot from './views/joinFlow/robot.vue'  //小水智能
 import Switchboard from './views/joinFlow/switchboard.vue' //小水总机
 import VoicePass from './views/joinFlow/voicePass.vue' //语音pass
-import Invoice from './views/invoice'     //发票
-import Contract from './views/contract'   //合同
 import Gathering from './views/gathering' //收款
+import CluesInfo from './views/cluesInfo' //线索信息
+import CluesTailAfter from './views/cluesTailAfter' //线索跟进
+
 import UserManage from './views/userManage' //用户管理
 import MenuManage from './views/menuManage' //菜单管理
 import RoleManage from './views/roleManage' //角色管理
-import PersonalCenter from './views/personalCenter' //个人中心
 import Reconciliation from './views/reconciliation' //对账信息
 import ContractAndInvoice from './views/contractAndInvoice' //合同和发票
 import SystemParam from './views/systemParam' //系统参数
@@ -99,10 +101,50 @@ let routes = [
         path: '/',
         component: Home,
         name: '',
+        iconCls: 'iconfont icon-fapiao1',
+        leaf: true,//只有一个节点
+        children: [
+            { path: '/contractAndInvoice', component: ContractAndInvoice, name: '发票信息' }
+        ]
+    },
+    {
+        path: '/',
+        component: Home,
+        name: '',
         iconCls: 'iconfont icon-yonghuguanli',
         leaf: true,//只有一个节点
         children: [
-            { path: '/contractAndInvoice', component: ContractAndInvoice, name: '合同发票' }
+            { path: '/channelInfo', component: ChannelInfo, name: '通道信息' }
+        ]
+    },
+    {
+        path: '/',
+        component: Home,
+        name: '',
+        iconCls: 'iconfont icon-yonghuguanli',
+        leaf: true,//只有一个节点
+        children: [
+            { path: '/clientInfo', component: ClientInfo, name: '客户信息' }
+        ]
+    },
+    {
+        path: '/',
+        component: Home,
+        name: '',
+        iconCls: 'iconfont icon-yonghuguanli',
+        leaf: true,//只有一个节点
+        children: [
+            { path: '/cluesInfo', component: CluesInfo, name: '线索信息' }
+        ]
+    },
+    {
+        path: '/',
+        component: Home,
+        name: '',
+        iconCls: 'iconfont icon-yonghuguanli',
+        leaf: true,//只有一个节点
+        children: [
+            { path: '/cluesTailAfter', component: CluesTailAfter, name: '线索跟进' }
         ]
     },
     {
@@ -113,16 +155,6 @@ let routes = [
         leaf: true,//只有一个节点
         children: [
             { path: '/backlog', component: Backlog, name: '待办事项' }
-        ]
-    },
-    {
-        path: '/',
-        component: Home,
-        name: '',
-        iconCls: 'iconfont icon-tubiaozhizuomoban',
-        leaf: true,//只有一个节点
-        children: [
-            { path: '/personalCenter', component: PersonalCenter, name: '个人中心' }
         ]
     },
     {
