@@ -11,7 +11,8 @@
     <zk-table ref="table"  
               sum-text="sum"
               index-text="序号" 
-              :data="data" 
+              :data="data"
+              v-loading="listLoading" 
               :columns="columns"
               :stripe="true" 
               :border="true" 
@@ -168,6 +169,7 @@
         addOneFormVisible:false,
         editFormVisible: false,
         addFormVisible: false,
+        listLoading: false,
         addLoading: false,
         editLoading: false,
         addOneForm:{
@@ -208,8 +210,10 @@
       //获取菜单列表
       getMenuList(){
         const data={};
+        this.listLoading=true;
         getMenuList(data).then(res=>{
           if(res.result && res.result.data.length>0){
+            this.listLoading=false
             this.data=res.result.data.sort(this.createCompare('order_num'));
           }
         })

@@ -1,29 +1,32 @@
 <template>
 	<section>
-		<!-- <el-col :span="24" class="toolbar mytoolbar" style="padding-bottom:0px;margin-top:0px;">
+		<el-col :span="24" class="toolbar mytoolbar" style="padding-bottom:0px;">
 			<el-form :inline="true" :model="filters">
-				<el-form-item>
-					<el-input size="small" clearable v-model="filters.feed1" placeholder="第一次反馈"></el-input>
+				<el-form-item v-if="role_id=='4'||role_id=='6'">
+					<el-select size="small" v-model="filters.user_name" clearable filterable placeholder="销售经理">
+						<el-option v-for="item in salesList" :label="item.user_name" :value="item.user_name" :key="item.id"></el-option>
+					</el-select>
 				</el-form-item>
 				<el-form-item>
-					<el-input size="small" clearable v-model="filters.feed3" placeholder="第三次反馈"></el-input>
+					<el-select size="small" v-model="filters.state" clearable filterable placeholder="状态">
+						<el-option label="无效" value="1"></el-option>
+						<el-option label="跟进" value="2"></el-option>
+						<el-option label="成交" value="3"></el-option>
+					</el-select>
+					<!-- <el-input size="small" clearable v-model="filters.state" placeholder="状态"></el-input> -->
 				</el-form-item>
 				<el-form-item>
 					<el-button type="primary" size="small" v-on:click="getTableList">查询</el-button>
 				</el-form-item>
-				<el-form-item>
-					<el-button type="primary" size="small" @click="handleAdd">新增</el-button>
-				</el-form-item>
 			</el-form>
-		</el-col> -->
-    <el-col style="margin-bottom:20px;"></el-col>
+		</el-col>
 		<!--列表-->
 		<el-table :data="list" border highlight-current-row v-loading="listLoading" style="width: 100%;">
 			<el-table-column type="index" width="60">
 			</el-table-column>
 			<el-table-column prop="state" label="状态" width="100">
 				<template slot-scope="scope">
-          <el-button type="danger" size="small" plain v-if="scope.row.state==1">失败</el-button>
+          <el-button type="danger" size="small" plain v-if="scope.row.state==1">无效</el-button>
 					<el-button type="primary" size="small" plain v-if="scope.row.state==2">跟进</el-button>
 					<el-button type="success" size="small" plain v-if="scope.row.state==3">成交</el-button>
 				</template>
@@ -35,6 +38,10 @@
 			<el-table-column prop="feed3" label="第三次反馈" show-overflow-tooltip>
 			</el-table-column>
 			<el-table-column prop="result" label="线索结果" show-overflow-tooltip>
+			</el-table-column>
+			<el-table-column prop="createtime" label="分配时间" show-overflow-tooltip>
+			</el-table-column>
+			<el-table-column prop="user_name" label="销售经理" show-overflow-tooltip>
 			</el-table-column>
 			<el-table-column prop="remark" label="备注" show-overflow-tooltip>
 			</el-table-column>
@@ -70,9 +77,9 @@
 					</el-form-item>
           <el-form-item label="状态" prop="state">
 						<el-select v-model="editForm.state">
-							<el-option label="未处理" value="1"></el-option>
-							<el-option label="已分配" value="2"></el-option>
-							<el-option label="重新分配" value="3"></el-option>
+							<el-option label="无效" value="1"></el-option>
+							<el-option label="跟进" value="2"></el-option>
+							<el-option label="成交" value="3"></el-option>
 						</el-select>
 					</el-form-item>
 				</div>
@@ -95,8 +102,8 @@
 		<el-dialog title="详情" @close="editDialogClose" :visible.sync="detailFormVisible" :close-on-click-modal="false">
 			<el-form :model="detailForm" label-width="120px" ref="editForm">
 				<div class="flex">
-					<el-form-item label="客户名称" prop="content">
-						<el-input disabled v-model="detailForm.content" clearable auto-complete="off"></el-input>
+					<el-form-item label="客户名称" prop="customer_name">
+						<el-input disabled v-model="detailForm.customer_name" clearable auto-complete="off"></el-input>
 					</el-form-item>
 					<el-form-item label="联系方式" prop="contract">
 						<el-input disabled v-model="detailForm.contract" clearable auto-complete="off"></el-input>
@@ -121,10 +128,11 @@
 				</div>
 				<div class="flex">
           <el-form-item label="销售区域" prop="area">
-						<area-cascader v-if="showArea" disabled v-model="detailForm.area" :level="0" type="text" :data="pcaa"></area-cascader>
+						<!-- <area-cascader v-if="showArea" disabled v-model="detailForm.area" :level="0" type="text" :data="pcaa"></area-cascader> -->
+						<el-input disabled v-model="detailForm.area" clearable auto-complete="off"></el-input>
 					</el-form-item>
-					<el-form-item label="对话内容" prop="content">
-						<el-input disabled v-model="detailForm.content" clearable auto-complete="off"></el-input>
+					<el-form-item label="关键词" prop="content_key">
+						<el-input disabled v-model="detailForm.content_key" clearable auto-complete="off"></el-input>
 					</el-form-item>
 				</div>
 				<div class="flex">
@@ -141,19 +149,13 @@
 							<el-option label="自拓" value="9"></el-option>>
 						</el-select>
 					</el-form-item>
-					<el-form-item label="关键词" prop="content_key">
-						<el-input disabled v-model="detailForm.content_key" clearable auto-complete="off"></el-input>
+					<el-form-item label="销售经理" prop="user_name">
+						<el-input disabled v-model="detailForm.user_name" clearable auto-complete="off"></el-input>
 					</el-form-item>
 				</div>
-        <div class="flex">
-          <el-form-item label="状态" prop="state">
-						<el-select disabled v-model="detailForm.state">
-							<el-option label="未处理" value="1"></el-option>
-							<el-option label="已分配" value="2"></el-option>
-							<el-option label="重新分配" value="3"></el-option>
-						</el-select>
-					</el-form-item>
-        </div>
+				<el-form-item label="对话内容" prop="content">
+					<el-input type="textarea" :rows="3" disabled v-model="detailForm.content" auto-complete="off"></el-input>
+				</el-form-item>
 			</el-form>
 		</el-dialog>
 	</section>
@@ -165,16 +167,17 @@
            insertSalesClue, 
            updateSalesClueById, 
            deleteSalesClueById,
-           getClueById } from '../../api/api';
+					 getClueById,
+					 getUserInfoByParam } from '../../api/api';
   import rules from '@/common/js/rule';
   import { pca, pcaa } from 'area-data';
 	export default {
 		data() {
 			return {
-				// filters: {
-				// 	feed1: '',
-				// 	feed3: '',
-				// },
+				filters: {
+					user_name: '',
+					state: '',
+				},
 				role_id:'',
 				list: [],
 				total: 0,
@@ -182,7 +185,6 @@
 				listLoading: false,
         editFormVisible: false,//编辑界面是否显示
         detailFormVisible:false,
-				editLoading: false,
 				//编辑界面数据
 				editForm: {
 					result:'',
@@ -192,7 +194,8 @@
           state:'',
           remark:''
         },
-        detailForm:{},
+				detailForm:{},
+				salesList:[],
         showArea:false,
         pca: pca,
 				pcaa: pcaa,
@@ -207,6 +210,8 @@
 			getTableList() {
 				const data = {
 					role_id:this.role_id,
+					user_name:this.filters.user_name,
+					state:this.filters.state,
 					page: this.page,
 					rows:10,
 				};
@@ -216,6 +221,17 @@
 					this.list = res.result.data;
 					this.listLoading = false;
 				});
+			},
+			//获取所有销售人员
+      getSalesList(){
+        const data={
+          page:1,
+          rows:1000,
+          role_id:0
+        };
+        getUserInfoByParam(data).then(res=>{
+          this.salesList=res.result.data;
+        })
       },
 			//删除
 			handleDel(index, row) {
@@ -263,11 +279,8 @@
 			editSubmit() {
 				this.$refs.editForm.validate((valid) => {
 					if (valid) {
-						this.editLoading = true;
-						this.editForm.feed2=this.editForm.feed2.join('/');
 						const data = Object.assign({}, this.editForm);
 						updateSalesClueById(data).then((res) => {
-							this.editLoading = false;
 							this.$message({
 								message: res.errMsg,
 								type: 'success'
@@ -303,8 +316,10 @@
       handleDetail(index,row){
         const data={ id : row.clue_id };
         getClueById(data).then(res=>{
-          this.detailForm=res.result[0];
-          this.detailForm.area=res.result[0].area?res.result[0].area.split('/'):[];
+					if(res.result && res.result.length>0){
+						this.detailForm=res.result[0];
+					};
+          // this.detailForm.area=res.result[0].area?res.result[0].area.split('/'):[];
           this.detailFormVisible=true;
           this.showArea=true;
         })
@@ -316,6 +331,7 @@
 		mounted() {
 			this.role_id=JSON.parse(sessionStorage.getItem('user')).role_id; 
       this.getTableList();
+      this.getSalesList();
 		}
 	}
 

@@ -173,7 +173,7 @@ export const getClueByParam = params => {
   return POST('/clue/getClueByParam', params)
 };
 export const insertclue = params => {
-  return POST('/clue/insertclue', params)
+  return POST('/clue/insertClue', params)
 };
 export const updateClueById = params => {
   return POST('/clue/updateClueById', params)
@@ -186,6 +186,9 @@ export const insertDistributionClue = params => {
 };
 export const getClueById = params => {
   return POST('/clue/getClueById', params)
+};
+export const uploadClueByParam = params => {
+  return POST('/clue/uploadClueByParam', params)
 };
 //线索信息跟踪
 export const getSalesClueByParam = params => {

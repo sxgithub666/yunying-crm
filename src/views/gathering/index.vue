@@ -24,7 +24,7 @@
 				</el-form-item>
 			</el-form>
 		</el-col>
-		<el-col :span="24" class="toolbar" style="padding-bottom: 0px;">
+		<el-col :span="24" class="toolbar" style="padding-bottom: 0px;margin-top:0;">
 			<el-form :inline="true" :model="filters">
 				<el-form-item style="width:15%">
 					<el-input size="small" clearable v-model="filters.company_name" placeholder="公司全称"></el-input>

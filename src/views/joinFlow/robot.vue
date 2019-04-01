@@ -344,24 +344,22 @@
 							<el-option label="渠道" value="1"></el-option>
 						</el-select>
 					</el-form-item>
+					<el-form-item label="行业类型" prop="business_type">
+						<el-input :disabled="disabled" v-model="addForm.business_type" auto-complete="off"></el-input>
+					</el-form-item>
+				</div>
+				<div class="flex">
+					<el-form-item label="线路并发数" prop="line_concurrency">
+						<el-input v-model="addForm.line_concurrency" auto-complete="off"></el-input>
+					</el-form-item>
 					<el-form-item label="是否到款" prop="refunds">
 						<el-select v-model="addForm.refunds">
 							<el-option label="未到款" value="0"></el-option>
 							<el-option label="已到款" value="1"></el-option>
 						</el-select>
 					</el-form-item>
-					
 				</div>
 				<div class="flex">
-					<el-form-item label="线路并发数" prop="line_concurrency">
-						<el-input v-model="addForm.line_concurrency" auto-complete="off"></el-input>
-					</el-form-item>
-					<el-form-item label="行业类型" prop="business_type">
-						<el-input v-model="addForm.business_type" auto-complete="off"></el-input>
-					</el-form-item>
-				</div>
-				<div class="flex">
-					
 					<el-form-item label="账户配置说明" prop="remark">
 						<el-input v-model="addForm.remark" auto-complete="off"></el-input>
 					</el-form-item>
@@ -803,6 +801,7 @@
 						this.$set(this.addForm,'call_card_pay_money',item.call_card_pay_money);
 						this.$set(this.addForm,'customer_type',item.customer_type);
 						this.$set(this.addForm,'cost_interval',item.cost_interval);
+						this.$set(this.addForm,'business_type',item.company_industry);
 						
 					}
 				})

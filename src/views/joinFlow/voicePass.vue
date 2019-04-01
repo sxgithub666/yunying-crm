@@ -252,8 +252,8 @@
 					</el-form-item>
 				</div>
 				<div class="flex">
-					<el-form-item label="号码需求" prop="need_phonenumber">
-						<el-input v-model="addForm.need_phonenumber" clearable auto-complete="off"></el-input>
+					<el-form-item label="行业类型" prop="business_type">
+						<el-input :disabled="disabled" v-model="addForm.business_type" clearable auto-complete="off"></el-input>
 					</el-form-item>
 					<el-form-item label="是否到款" prop="refunds">
 						<el-select v-model="addForm.refunds">
@@ -263,8 +263,8 @@
 					</el-form-item>
 				</div>
 				<div class="flex">
-					<el-form-item label="行业类型" prop="business_type">
-						<el-input v-model="addForm.business_type" clearable auto-complete="off"></el-input>
+					<el-form-item label="号码需求" prop="need_phonenumber">
+						<el-input v-model="addForm.need_phonenumber" clearable auto-complete="off"></el-input>
 					</el-form-item>
 					<el-form-item style="width:50%" label="备注" prop="remark">
 						<el-input v-model="addForm.remark" clearable auto-complete="off"></el-input>
@@ -654,6 +654,7 @@
 						this.$set(this.addForm,'pay_money',item.all_received_money);
 						this.$set(this.addForm,'pay_type',item.pay_type);
 						this.$set(this.addForm,'line_price',item.line_price);
+						this.$set(this.addForm,'business_type',item.company_industry);
 						this.$set(this.addForm,'customer_region',item.customer_area?item.customer_area.split('/'):[]);
 					}
 				})

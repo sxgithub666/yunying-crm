@@ -55,7 +55,7 @@
 			</el-table-column> -->
 			<el-table-column prop="remark" label="备注">
 			</el-table-column>
-			<el-table-column label="操作" fixed="right" width="220">
+			<el-table-column label="操作" fixed="right" width="260">
 				<template slot-scope="scope">
 					<el-button v-if="scope.row.audit_status!=3" size="small" @click="auditSubmit(scope.row)">提交审核</el-button>
 					<el-button v-if="scope.row.audit_status==3" size="small" @click="resubmit(scope.row)">重新提交</el-button>

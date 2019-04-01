@@ -51,6 +51,7 @@ var webpackConfig = merge(baseWebpackConfig, {
     // see https://github.com/ampedandwired/html-webpack-plugin
     new HtmlWebpackPlugin({
       filename: config.build.index,
+      favicon:path.resolve(__dirname, '../favicon.ico'),
       template: 'index.html',
       inject: true,
       minify: {

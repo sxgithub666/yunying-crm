@@ -79,10 +79,10 @@
 			</el-table-column>
 			<el-table-column prop="customer_region" label="客户所在区域" width="110" show-overflow-tooltip>
 			</el-table-column>
-			<el-table-column prop="refunds" label="是否返款" width="80" show-overflow-tooltip>
+			<el-table-column prop="refunds" label="是否到款" width="80" show-overflow-tooltip>
 				<template slot-scope="scope">
-					<span v-if="scope.row.refunds==0">未返款</span>
-					<span v-if="scope.row.refunds==1">已返款</span>
+					<span v-if="scope.row.refunds==0">未到款</span>
+					<span v-if="scope.row.refunds==1">已到款</span>
 				</template>
 			</el-table-column>
 			<el-table-column prop="pay_voucher" label="打款凭证" width="200" show-overflow-tooltip>
@@ -153,10 +153,10 @@
 					<el-form-item label="号码需求" prop="need_phonenumber">
 						<el-input v-model="editForm.need_phonenumber" clearable auto-complete="off"></el-input>
 					</el-form-item>
-					<el-form-item label="是否返款" prop="refunds">
+					<el-form-item label="是否到款" prop="refunds">
 						<el-select v-model="editForm.refunds">
-							<el-option label="已返款" value="1"></el-option>
-							<el-option label="未返款" value="0"></el-option>
+							<el-option label="已到款" value="1"></el-option>
+							<el-option label="未到款" value="0"></el-option>
 						</el-select>
 					</el-form-item>
 				</div>
@@ -253,22 +253,20 @@
 					</el-form-item>
 				</div>
 				<div class="flex">
-					
+					<el-form-item label="行业类型" prop="business_type">
+						<el-input :disabled="disabled" v-model="addForm.business_type" clearable auto-complete="off"></el-input>
+					</el-form-item>
 					<el-form-item label="号码需求" prop="need_phonenumber">
 						<el-input v-model="addForm.need_phonenumber" clearable auto-complete="off"></el-input>
 					</el-form-item>
-					<el-form-item label="是否返款" prop="refunds">
-						<el-select v-model="addForm.refunds">
-							<el-option label="已返款" value="1"></el-option>
-							<el-option label="未返款" value="0"></el-option>
-						</el-select>
-					</el-form-item>
 				</div>
 				<div class="flex">
-					<el-form-item label="行业类型" prop="business_type">
-						<el-input v-model="addForm.business_type" clearable auto-complete="off"></el-input>
+					<el-form-item label="是否到款" prop="refunds">
+						<el-select v-model="addForm.refunds">
+							<el-option label="已到款" value="1"></el-option>
+							<el-option label="未到款" value="0"></el-option>
+						</el-select>
 					</el-form-item>
-					
 					<el-form-item label="备注">
 						<el-input v-model="addForm.remark" clearable auto-complete="off"></el-input>
 					</el-form-item>
@@ -347,7 +345,7 @@
 					business_type: [{ required: true, message: '请输入业务类型', trigger: 'blur'}],
 					pay_type: [{ required: true, message: '请输入付款方式', trigger: 'blur'}],
 					customer_region: [{ required: true, message: '请输入客户所在区域', trigger: 'blur'}],
-					refunds: [{ required: true, message: '请输入是否返款', trigger: 'blur'}],
+					refunds: [{ required: true, message: '请输入是否到款', trigger: 'blur'}],
 					// need_data: [{ required: true, message: '请输入申请号码材料', trigger: 'change'}],
 					line_price: rules.numPot2,
 					sales_name:[{ required: true, message: '请输入销售经理', trigger: 'blur'}],
@@ -657,6 +655,7 @@
 						this.$set(this.addForm,'pay_money',item.all_received_money);
 						this.$set(this.addForm,'pay_type',item.pay_type);
 						this.$set(this.addForm,'line_price',item.line_price);
+						this.$set(this.addForm,'business_type',item.company_industry);
 						this.$set(this.addForm,'customer_region',item.customer_area?item.customer_area.split('/'):[]);
 					}
 				})

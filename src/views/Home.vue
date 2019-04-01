@@ -16,7 +16,7 @@
 				<span class="title">运营部管理系统</span>
 			</el-col>
 			<el-col :span="6" class="userinfo">
-				<el-badge :is-dot="hasBacklog" class="badge">
+				<el-badge v-if="this.role_id!='6'" :is-dot="hasBacklog" class="badge">
 					<i class="message el-icon-message" @click="goBacklog"></i>
 				</el-badge>
 				<el-dropdown trigger="hover">
@@ -97,6 +97,7 @@ import { getProcessByParam ,updateUserPassword} from '../api/api';
 		data() {
 			return {
 				collapsed:false,
+				role_id:'',
 				sysUserName: '',
 				sysUserAvatar: '',
 				form: {
@@ -214,6 +215,7 @@ import { getProcessByParam ,updateUserPassword} from '../api/api';
 		},
 		mounted() {
 			this.menu =JSON.parse(sessionStorage.getItem('menu'));
+			this.role_id=JSON.parse(sessionStorage.getItem('user')).role_id;
 			let user = sessionStorage.getItem('user');
 			if (user) {
 				user = JSON.parse(user);
@@ -325,7 +327,7 @@ import { getProcessByParam ,updateUserPassword} from '../api/api';
 				// top: 0px;
 				// bottom: 0px;
 				.el-menu{
-					height: 100%;
+					// height: 100%;
 				}
 				.collapsed{
 					width:60px;
