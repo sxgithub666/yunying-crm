@@ -256,9 +256,6 @@
 			handleEdit(index, row) {
 				this.editFormVisible = true;
 				this.editForm = Object.assign({}, row);
-				if(typeof this.editForm.feed2==='string'){
-					this.editForm.feed2=this.editForm.feed2.split('/')
-				}
 			},
 			//显示新增界面
 			handleAdd() {
@@ -297,7 +294,6 @@
 				this.$refs.addForm.validate((valid) => {
 					if (valid) {
 						this.addLoading = true;
-						this.addForm.feed2=this.addForm.feed2.join('/');
 						const data = Object.assign({}, this.addForm);
 						insertSalesClue(data).then((res) => {
 							this.addLoading = false;
@@ -341,7 +337,7 @@
 .flex{
 	display: flex;
 	flex-direction: row;
-	justify-feed2: space-between;
+	justify-content: space-between;
 }
 .downloadTemplate{
 	font-size: 12px;
@@ -351,15 +347,15 @@
 .flexEnd{
 	display: flex;
 	flex-direction: row;
-	justify-feed2: flex-end;
+	justify-content: flex-end;
 	
 }
-.mytoolbar .feed2-select.large{
+.mytoolbar .content-select.large{
 	margin-top: 5px;
 	width: 162px;
 	height: 30px;
 }
-.mytoolbar .feed2-select .feed2-selected-trigger{
+.mytoolbar .content-select .content-selected-trigger{
 	font-size: 14px;
 	line-height: 32px;
 	height: 32px;
