@@ -2,6 +2,28 @@
 	<section>
 		<el-col :span="24" class="toolbar mytoolbar" style="padding-bottom:0px;">
 			<el-form :inline="true" :model="filters">
+				<el-form-item class="filter">
+					<el-date-picker v-model="filters.start_time"
+													format="yyyy-MM-dd"
+													style="width:100%"
+													:pickerOptions="pickerOptions"
+													value-format="yyyy-MM-dd"
+													size="small"
+													clearable
+													placeholder="开始时间">
+					</el-date-picker>
+				</el-form-item>
+				<el-form-item class="filter">
+					<el-date-picker v-model="filters.end_time"
+													format="yyyy-MM-dd"
+													style="width:100%"
+													:pickerOptions="pickerOptions"
+													value-format="yyyy-MM-dd"
+													size="small"
+													clearable
+													placeholder="结束时间">
+					</el-date-picker>
+				</el-form-item>
 				<el-form-item v-if="role_id=='4'||role_id=='6'">
 					<el-select size="small" v-model="filters.user_name" clearable filterable placeholder="销售经理">
 						<el-option v-for="item in salesList" :label="item.user_name" :value="item.user_name" :key="item.id"></el-option>
@@ -146,7 +168,7 @@
 							<el-option label="400电话" value="6"></el-option>
 							<el-option label="注册" value="7"></el-option>
 							<el-option label="公司资源" value="8"></el-option>
-							<el-option label="自拓" value="9"></el-option>>
+							<el-option label="自拓" value="9"></el-option>
 						</el-select>
 					</el-form-item>
 					<el-form-item label="销售经理" prop="user_name">
@@ -174,9 +196,16 @@
 	export default {
 		data() {
 			return {
+				pickerOptions: {
+          disabledDate(time) {
+            return time.getTime() > Date.now();
+          }
+        },
 				filters: {
 					user_name: '',
 					state: '',
+					start_time:'',
+					end_time:'',
 				},
 				role_id:'',
 				list: [],
@@ -208,8 +237,19 @@
 			},
 			//获取table列表
 			getTableList() {
+				if(this.filters.start_time && this.filters.end_time){
+					if(new Date(this.filters.end_time)<new Date(this.filters.start_time)){
+						this.$message({
+						message: '开始时间应大于结束时间',
+						type: 'warning'
+					});
+					return;
+					}
+				}
 				const data = {
 					role_id:this.role_id,
+					start_time:this.filters.start_time,
+					end_time:this.filters.end_time,
 					user_name:this.filters.user_name,
 					state:this.filters.state,
 					page: this.page,

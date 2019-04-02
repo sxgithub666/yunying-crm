@@ -26,14 +26,25 @@
 		<el-col :span="24" class="toolbar mytoolbar" style="padding-bottom:0px;margin-top:0;">
 			<el-form :inline="true" :model="filters">
 				<el-form-item class="filter">
-					<el-date-picker v-model="filters.create_time"
+					<el-date-picker v-model="filters.start_time"
 													format="yyyy-MM-dd"
 													style="width:100%"
 													:pickerOptions="pickerOptions"
 													value-format="yyyy-MM-dd"
 													size="small"
 													clearable
-													placeholder="创建日期">
+													placeholder="开始时间">
+					</el-date-picker>
+				</el-form-item>
+				<el-form-item class="filter">
+					<el-date-picker v-model="filters.end_time"
+													format="yyyy-MM-dd"
+													style="width:100%"
+													:pickerOptions="pickerOptions"
+													value-format="yyyy-MM-dd"
+													size="small"
+													clearable
+													placeholder="结束时间">
 					</el-date-picker>
 				</el-form-item>
 				<el-form-item v-if="role_id==='6'||role_id=='4'" class="filter">
@@ -53,9 +64,9 @@
 				<el-form-item v-if="role_id=='6'||role_id=='4'">
 					<el-button type="primary" size="small" @click="handleAdd">新增</el-button>
 				</el-form-item>
-				<el-form-item>
+				<!-- <el-form-item> -->
 					<div class="totalNum">总条数：{{this.total}}</div>
-				</el-form-item>
+				<!-- </el-form-item> -->
 			</el-form>
 		</el-col>
 
@@ -316,7 +327,8 @@
 					contract: '',
 					content_key: '',
 					user_name:'',
-					create_time:''
+					start_time:'',
+					end_time:'',
 				},
 				role_id:'',
 				list: [],
@@ -385,13 +397,23 @@
 			},
 			//获取table列表
 			getTableList() {
+				if(this.filters.start_time && this.filters.end_time){
+					if(new Date(this.filters.end_time)<new Date(this.filters.start_time)){
+						this.$message({
+						message: '开始时间应大于结束时间',
+						type: 'warning'
+					});
+					return;
+					}
+				}
 				const data = {
 					role_id:this.role_id,
 					page: this.page,
 					rows:10,
 					contract: this.filters.contract,
 					content_key: this.filters.content_key,
-					create_time: this.filters.create_time,
+					start_time: this.filters.start_time,
+					end_time: this.filters.end_time,
 					user_name: this.filters.user_name,
 				};
 				this.listLoading = true;
@@ -595,7 +617,8 @@
 				const data={
 					contract: this.filters.contract,
 					content_key: this.filters.content_key,
-					create_time: this.filters.create_time,
+					start_time: this.filters.start_time,
+					end_time: this.filters.end_time,
 					user_name: this.filters.user_name,
 					role_id: this.role_id,
 				};
@@ -667,6 +690,7 @@
 }
 .totalNum{
 	color: #909399;
+	padding-bottom: 5px;
 }
 .filter{
 	width: 16%;
